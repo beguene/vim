@@ -129,18 +129,6 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Set font according to system
-if MySys() == "mac"
-    set shell=/bin/bash
-    "Backup and Dir
-    set dir=~/tmp
-    set backupdir=~/tmp
-elseif MySys() == "windows"
-    set dir=C:\Windows\Temp
-    set backupdir=C:\Windows\Temp
-elseif MySys() == "linux"
-    set shell=/bin/bash
-endif
 
 " Sets how many lines of history VIM has to remember
 set history=700
@@ -200,7 +188,7 @@ if version >= 703
         if MySys() == "windows"
             set undodir=C:\Windows\Temp
         else
-            set undodir=~/.vim/undodir
+            set undodir=~/tmp/undodir
         endif
         set undofile
     catch
