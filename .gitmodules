@@ -4,3 +4,33 @@
 [submodule "bundle-archive/mru"]
 	path = bundle-archive/mru
 	url = https://github.com/vim-scripts/mru.vim.git
+[submodule "bundle-archive/snipmate"]
+	path = bundle-archive/snipmate
+	url = https://github.com/msanders/snipmate.vim
+[submodule "bundle-archive/ack"]
+	path = bundle-archive/ack
+	url = https://github.com/mileszs/ack.vim.git
+[submodule "bundle-archive/bufexplorer"]
+	path = bundle-archive/bufexplorer
+	url = https://github.com/corntrace/bufexplorer.git
+[submodule "bundle-archive/command-t"]
+	path = bundle-archive/command-t
+	url = https://github.com/wincent/Command-T.git
+[submodule "bundle-archive/fugitive"]
+	path = bundle-archive/fugitive
+	url = https://github.com/tpope/vim-fugitive.git
+[submodule "bundle-archive/delimitMate"]
+	path = bundle-archive/delimitMate
+	url = https://github.com/Raimondi/delimitMate.git
+[submodule "bundle-archive/nerdcommenter"]
+	path = bundle-archive/nerdcommenter
+	url = https://github.com/scrooloose/nerdcommenter.git
+[submodule "bundle-archive/gundo"]
+	path = bundle-archive/gundo
+	url = https://github.com/sjl/gundo.vim.git
+[submodule "bundle-archive/matchit"]
+	path = bundle-archive/matchit
+	url = https://github.com/tsaleh/vim-matchit.git
+[submodule "bundle-archive/doctorjs"]
+	path = bundle-archive/doctorjs
+	url = https://github.com/mozilla/doctorjs.git
