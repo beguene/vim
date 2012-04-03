@@ -460,3 +460,19 @@ let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript
 "endfunction
 "map <Leader>w :call HandleURI()<CR>
 inoremap <C-L> <C-V>u2022<Space>
+" gj/gk treat wrapped lines as separate
+" " (i.e. you can move up/down in one wrapped line)
+
+nn j gj
+nn k gk
+nn gj j
+nn gk k
+" Switch to current dir
+nn ,cd :lcd %:p:h<cr>
+" Make c-g show full path/buffer number too
+nn <c-g> 2<c-g>
+" Pressing v again brings you out of visual mode
+xno v <esc>
+" Easier navigation in insert mode
+ino <silent> <c-a> <c-o>b
+ino <silent> <c-e> <esc>ea

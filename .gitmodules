@@ -34,3 +34,18 @@
 [submodule "bundle-archive/doctorjs"]
 	path = bundle-archive/doctorjs
 	url = https://github.com/mozilla/doctorjs.git
+[submodule "bundle-archive/syntastic"]
+	path = bundle-archive/syntastic
+	url = https://github.com/scrooloose/syntastic.git
+[submodule "bundle-archive/supertab"]
+	path = bundle-archive/supertab
+	url = https://github.com/ervandew/supertab.git
+[submodule "bundle-archive/tagbar"]
+	path = bundle-archive/tagbar
+	url = https://github.com/majutsushi/tagbar.git
+[submodule "bundle-archive/taglist-plus"]
+	path = bundle-archive/taglist-plus
+	url = https://github.com/int3/vim-taglist-plus.git
+[submodule "bundle-archive/yankRing"]
+	path = bundle-archive/yankRing
+	url = https://github.com/vim-scripts/YankRing.vim.git
