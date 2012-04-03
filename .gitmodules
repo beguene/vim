@@ -1,0 +1,6 @@
+[submodule "bundle-archive/nerdtree"]
+	path = bundle-archive/nerdtree
+	url = https://github.com/scrooloose/nerdtree.git
+[submodule "bundle-archive/mru"]
+	path = bundle-archive/mru
+	url = https://github.com/vim-scripts/mru.vim.git

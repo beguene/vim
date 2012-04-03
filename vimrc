@@ -7,6 +7,10 @@ fun! MySys()
     return "mac"
 endfun
 "set runtimepath=~/.vim,$VIMRUNTIME
+" list only the plugin groups you will use
+if !exists('g:active_bundle_groups')
+    let g:active_bundle_groups=['general', 'programming', 'php', 'javascript', 'html', 'misc']
+endif
 " To disable a plugin, add it's bundle name to the following list
 let g:pathogen_disabled = []
 if !g:me_experimental
@@ -28,10 +32,9 @@ if v:version < '703' || !has('python')
 endif
 
 if v:version < '702'
-    call add(g:pathogen_disabled, 'fuzzyfinder')
     call add(g:pathogen_disabled, 'l9')
 endif
-    call add(g:pathogen_disabled, 'csscolor')
+call add(g:pathogen_disabled, 'csscolor')
 if MySys() == "mac"
     set shell=/bin/bash
     "Backup and Dir
@@ -45,7 +48,7 @@ elseif MySys() == "windows"
 elseif MySys() == "linux"
     set shell=/bin/bash
 endif
-"call pathogen#runtime_append_all_bundles()
+call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 call pathogen#infect()
 
@@ -202,8 +205,11 @@ if version >= 703
         set undofile
     catch
     endtry
-    set undolevels=1000 "maximum number of changes that can be undone
-    set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+    if has('persistent_undo')
+        set undofile                "so is persistent undo ...
+        set undolevels=1000         "maximum number of changes that can be undone
+        set undoreload=10000        "maximum number lines to save for undo on a buffer reload
+    endif
 endif
 nnoremap <leader>u :GundoToggle<CR>
 
