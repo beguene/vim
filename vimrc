@@ -537,3 +537,25 @@ inoremap <A-l> <Right>
 
 " :map + v%zf # hit "+" to fold a function/loop anything within a paranthesis
 "
+function! ListLeaders()
+     silent! redir @a
+     silent! nmap <LEADER>
+     silent! redir END
+     silent! new
+     silent! put! a
+     silent! g/^s*$/d
+     silent! %s/^.*,//
+     silent! normal ggVg
+     silent! sort
+     silent! let lines = getline(1,"$")
+endfunction
+
+command! ListLeaders :call ListLeaders()<CR>
+" Help File speedups, <enter> to follow tag, delete for back
+au filetype help nnoremap <buffer><cr> <c-]>
+au filetype help nnoremap <buffer><bs> <c-T>
+au filetype help nnoremap q :q!<CR>
+au filetype help set nonumber
+au FileType help wincmd _ 
+set splitbelow
+
