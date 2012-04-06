@@ -114,8 +114,6 @@ if has("autocmd")
                     \ endif
 
     augroup END
-    au InsertEnter * set nocursorline
-    au InsertLeave * set cursorline
     "autocmd BufEnter * silent! lcd %:p:h
 endif " has("autocmd")
 
@@ -150,23 +148,61 @@ map <leader>e :e! ~/.vimrc<cr>
 map <leader>f <C-]><cr>
 nmap <leader>r :reg<cr>
 nmap <leader>c :changes<cr>
-"
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set selectmode=mouse
+" ******* Theme and Layout *******
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+hi clear SpellBad
+hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
+hi clear StatusLine
+hi clear StatusLineNC
+hi StatusLine guifg=darkgreen guibg=black ctermbg=darkgreen ctermfg=black
+hi StatusLineNC guifg=white guibg=black ctermbg=white ctermfg=black
+if has("gui_running")
+    set guioptions=abirLb
+    set guifont=Menlo:h12
+    set background=dark
+    "colorscheme mustang
+    "colors peaksea
+    "colorscheme clouds_midnight
+    "colo vividchalk
+    colo wombat
+    "colorscheme lucius
+else
+    set background=dark
+    "colorscheme mustang
+    colorscheme wombat256mod
+endif
 set encoding=utf-8
-set guifont=Lucida_Console:h8
+set guifont=Lucida_Console:h14
 set guioptions-=T
 set ic
 set fileformats=unix,mac,dos
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ******* Status Line *******
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Format the statusline
+
+set laststatus=2
+set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
+"set statusline+=%{fugitive#statusline()}
+set statusline+=%= "align the rest to right
+set statusline+=[%l,%v][%p%%]
+set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set selectmode=mouse
 set mousef
 " Tabs / Indent
 set shiftwidth=4
 set tabstop=4
 set softtabstop=4
 set expandtab
-
 set nowrapscan
 set wrap
+
 "SEARCH OPTIONS
 set ignorecase
 set smartcase
@@ -202,13 +238,12 @@ endif
 nnoremap <leader>u :GundoToggle<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set cursorline
 set showmatch "Show matching bracket
 set autoindent
 set wrap
 set smartindent
 set smarttab
-set scrolloff=4 " keep at least 3 lines above/below
+set scrolloff=4 " keep at least 4 lines above/below
 set complete=.,w,b,u,U,t,i,d
 set ttyfast
 set nu
@@ -247,6 +282,11 @@ nnoremap <C-H> gT
 nnoremap <C-L> gt
 nnoremap <C-K> :bp<CR>
 nnoremap <C-J> :bn<CR>
+" Easier navigation in insert mode
+ino <silent> <c-a> <c-o>b
+ino <silent> <c-e> <esc>ea
+" Kill the current buffer without changing the windows split
+nmap <leader>bd :b#<bar>bd#<CR>
 
 "Other
 inoremap jj <Esc>
@@ -268,13 +308,14 @@ if has("autocmd")
     " run file with PHP CLI (CTRL-M)
     autocmd FileType php map <F5> :w!<CR>:!php %<CR>
     " PHP parser check (CTRL-L)
-    "autocmd FileType php noremap <C-L> w!<CR>:!php -l %<CR>
+    autocmd FileType php noremap <C-L> w!<CR>:!php -l %<CR>
     " ###### JAVASCRIPT
     " Javascript parser check (CTRL-L)
     autocmd FileType javascript map <F5> :w!<CR>:!node %<CR>
     autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
     au FileType javascript setl fen
     au FileType javascript setl nocindent
+    let javascript_enable_domhtmlcss=1
 
     " ###### TWIG
     au BufRead,BufNewFile *.html.twig set ft=html.twig syntax=htmltwig
@@ -296,11 +337,10 @@ if has("autocmd")
         au FileType sh set nosmartindent autoindent
     augroup END
     "INDENT FORMAT
-    " HTML (tab width 2 chr, no wrapping)
-    autocmd FileType html setlocal sw=2
-    autocmd FileType html setlocal ts=2
-    autocmd FileType html setlocal sts=2
+    " HTML,xhtml,xml (tab width 2 chr, no wrapping)
     autocmd FileType html setlocal textwidth=0
+    autocmd FileType html,xhtml,xml setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
+
     " Python (tab width 4 chr, wrap at 79th char)
     autocmd FileType python setlocal sw=4
     autocmd FileType python setlocal ts=4
@@ -316,6 +356,8 @@ if has("autocmd")
     autocmd FileType javascript setlocal ts=4
     autocmd FileType javascript setlocal sts=4
     autocmd FileType javascript setlocal textwidth=79
+    "SQL"
+    au FileType sql setlocal completefunc=sqlcomplete#Complete"
     " TXT
     au BufRead,BufNewFile *.txt set ft=txt syntax=txt
     autocmd FileType txt setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
@@ -336,45 +378,6 @@ nmap <leader>S /{/+1<CR>vi{:sort<CR>
 
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* Status Line *******
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Format the statusline
-
-set laststatus=2
-set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-set statusline+=%{fugitive#statusline()}
-set statusline+=%= "align the rest to right
-set statusline+=[%l,%v][%p%%]
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* Theme and Layout *******
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-hi clear SpellBad
-hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
-hi clear StatusLine
-hi clear StatusLineNC
-hi StatusLine guifg=darkgreen guibg=black ctermbg=darkgreen ctermfg=black
-hi StatusLineNC guifg=white guibg=black ctermbg=white ctermfg=black
-if has("gui_running")
-    set guioptions=abirLb
-    set guifont=Menlo:h12
-    "colorscheme mustang
-    "set background=dark
-    "colors peaksea
-    "colorscheme clouds_midnight
-    "colo xoria256
-    "colo vividchalk
-    colo wombat
-    "colorscheme lucius
-    set background=dark
-else
-    "colorscheme mustang
-    colo xoria256
-    set background=dark
-endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "******* SPECIAL *********
@@ -384,12 +387,14 @@ command! ConvertToUnix :1,$s/^M/\r/g
 " Remove the Windows ^M - when the encodings gets messed up
 command! RemoveControlM mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
-"make <c-l> clear the highlight as well as redraw
-nnoremap <C-L> :nohls<CR><C-L>
 " Highlight redundant whitespaces and tabs.
 "highlight RedundantSpaces ctermbg=gray guibg=gray
 "match RedundantSpaces /\s\+$\| \+\ze\t\|\t/
 "
+" makes Esc turn off search highlight in normal mode.
+nnoremap <esc> :noh<CR><esc>
+"make <c-l> clear the highlight as well as redraw
+nnoremap <C-L> :nohls<CR><C-L>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "******* COMMAND MODE RELATED *********
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -456,11 +461,53 @@ nn k gk
 nn gj j
 nn gk k
 " Switch to current dir
-nn ,cd :lcd %:p:h<cr>
+nn <leader>cd :lcd %:p:h<cr>
 " Make c-g show full path/buffer number too
 nn <c-g> 2<c-g>
 " Pressing v again brings you out of visual mode
 xno v <esc>
-" Easier navigation in insert mode
-ino <silent> <c-a> <c-o>b
-ino <silent> <c-e> <esc>ea
+"OPTION TO TEST
+"" This is for working across multiple xterms and/or gvims
+" Transfer/read and write one block of text between vim sessions (capture
+" whole line):
+" " Write
+" nmap ;w :. w! ~/.vimxfer<CR>
+" " Read
+" nmap ;r :r ~/.vimxfer<CR>
+" " Append 
+" nmap ;a :. w! >>~/.vimxfer<CR>)
+" Similar set of maps for quick browsing of errors (see quickfix) and grep
+" results:
+"
+" map <C-n> :cn<CR>
+" map <C-m> :cp<CR>)
+" Use the first available 'tags' file in the directory tree:
+"
+" :set tags=tags;/
+" " Nerd tree stuff
+" let NERDTreeIgnore = ['\.pyc$', '\.pyo$']'
+" " Save and quit quickly.
+ nnoremap <leader>s :w<CR>
+" nnoremap <leader>q :q<CR>
+" nnoremap <leader>Q :q!<CR>
+" " The way it should have been.
+" noremap Y y$
+"
+"
+"" Moving around in insert mode.
+inoremap <D-j> <C-O>gj
+inoremap <A-k> <C-O>gk
+inoremap <A-h> <Left>
+inoremap <A-l> <Right>
+"" ===SuperTab
+" Map SuperTab to space key.
+" let g:SuperTabMappingForward = '<c-space>'
+" let g:SuperTabMappingBackward = '<s-c-space>'
+" let g:SuperTabDefaultCompletionType = 'context''
+" Disable syntax highlighting when editing huge (>4MB) files:
+"
+" au BufReadPost *        if getfsize(bufname("%")) > 4*1024*1024 |
+" \                               set syntax= |
+" \                       endif)
+
+" :map + v%zf # hit "+" to fold a function/loop anything within a paranthesis
