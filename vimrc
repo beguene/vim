@@ -254,7 +254,7 @@ set noerrorbells
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 noremap <leader>k :BufExplorer<CR>
 let g:bufExplorerSplitBelow=1        " Split new window below current.
-noremap <leader>m :NERDTreeClose<CR>:MRU<CR>
+noremap <leader>m :MRU<CR>
 let MRU_Add_Menu = 0 
 let MRU_Window_Height = 20
 noremap <leader>n :NERDTreeToggle %:p:h<CR>
@@ -272,6 +272,31 @@ let Tlist_Use_Right_Window   = 1
 let Tlist_Show_One_File = 1
 " Command-T <leader>t
 let g:CommandTMatchWindowReverse = 1
+function! Git_Repo_Cdup() " Get the relative path to repo root
+    "Ask git for the root of the git repo (as a relative '../../' path)
+    let git_top = system('git rev-parse --show-cdup')
+    let git_fail = 'fatal: Not a git repository'
+    if strpart(git_top, 0, strlen(git_fail)) == git_fail
+        " Above line says we are not in git repo. Ugly. Better version?
+        return ''
+    else
+        " Return the cdup path to the root. If already in root,
+        " path will be empty, so add './'
+        return './' . git_top
+    endif
+endfunction
+
+function! CD_Git_Root()
+    execute 'cd '.Git_Repo_Cdup()
+    let curdir = getcwd()
+    echo 'CWD now set to: '.curdir
+endfunction
+nnoremap <LEADER>gr :call CD_Git_Root()<cr>
+nnoremap <silent> <leader>t :call CD_Git_Root()<CR>:CommandT<CR>
+nnoremap <silent> <leader>b :CommandTBuffer<CR>
+nnoremap <silent> <leader>j :CommandTJump<CR>
+" YankRing
+noremap <leader>y :YRShow<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* Navigation *******
@@ -411,7 +436,7 @@ set gdefault
 " Fold tag
 nnoremap <leader>ft Vatzf
 nnoremap <leader>w <C-w>v<C-w>l
-set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*
+set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
 set formatoptions-=o "dont continue comments when pushing o/O
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
@@ -511,3 +536,4 @@ inoremap <A-l> <Right>
 " \                       endif)
 
 " :map + v%zf # hit "+" to fold a function/loop anything within a paranthesis
+"
