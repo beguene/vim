@@ -49,3 +49,6 @@
 [submodule "bundle-archive/yankRing"]
 	path = bundle-archive/yankRing
 	url = https://github.com/vim-scripts/YankRing.vim.git
+[submodule "bundle-archive/vim-symfony"]
+	path = bundle-archive/vim-symfony
+	url = https://github.com/docteurklein/vim-symfony.git
