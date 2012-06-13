@@ -49,3 +49,15 @@
 [submodule "bundle-archive/yankRing"]
 	path = bundle-archive/yankRing
 	url = https://github.com/vim-scripts/YankRing.vim.git
+[submodule "bundle-archive/snipmate-snippets"]
+	path = bundle-archive/snipmate-snippets
+	url = https://github.com/honza/snipmate-snippets.git
+[submodule "bundle-archive/vim-addon-mw-utils"]
+	path = bundle-archive/vim-addon-mw-utils
+	url = https://github.com/MarcWeber/vim-addon-mw-utils.git
+[submodule "bundle-archive/tlib_vim"]
+	path = bundle-archive/tlib_vim
+	url = https://github.com/tomtom/tlib_vim.git
+[submodule "bundle-archive/vim-snipmate"]
+	path = bundle-archive/vim-snipmate
+	url = git://github.com/garbas/vim-snipmate.git
