@@ -1,21 +1,21 @@
 " ase Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
-let g:me_experimental = 1
 
 fun! MySys()
     return "mac"
 endfun
 "set runtimepath=~/.vim,$VIMRUNTIME
+let g:snips_author="Beguene Permale"
 " list only the plugin groups you will use
 if !exists('g:active_bundle_groups')
     let g:active_bundle_groups=['general', 'programming', 'php', 'javascript', 'html', 'misc']
 endif
 " To disable a plugin, add it's bundle name to the following list
 let g:pathogen_disabled = []
-if !g:me_experimental
-    call add(g:pathogen_disabled, 'ctrlp')
-endif
+"if !g:me_experimental
+    "call add(g:pathogen_disabled, 'ctrlp')
+"endif
 " for some reason the csscolor plugin is very slow when run on the terminal
 " but not in GVim, so disable it if no GUI is running
 if !has('gui_running')
@@ -44,7 +44,7 @@ elseif MySys() == "windows"
     set dir=C:\Windows\Temp
     set backupdir=C:\Windows\Temp
     call add(g:pathogen_disabled, 'doctorjs')
-    call add(g:pathogen_disabled, 'command-t')
+    call add(g:pathogen_disabled, 'ccHommand-t')
 elseif MySys() == "linux"
     set shell=/bin/bash
 endif
@@ -131,9 +131,14 @@ endif
 " Sets how many lines of history VIM has to remember
 set history=700
 
-
 " Set to auto read when a file is changed from the outside
 set autoread
+" wrap lines rather than make use of the horizontal scrolling
+set wrap
+" " try not to wrap in the middle of a word
+set linebreak
+" " use an 80-character line limit
+set textwidth=80
 
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
@@ -148,6 +153,12 @@ map <leader>e :e! ~/.vimrc<cr>
 map <leader>f <C-]><cr>
 nmap <leader>r :reg<cr>
 nmap <leader>c :changes<cr>
+" Tags keys : jump to definition
+nnoremap <C-f> <C-]>
+noremap <Leader>d :set list!<CR>
+map <F2> :mksession! ~/tmp/vimtoday.ses
+set pastetoggle=<F3>
+nmap <F4> :w<CR>:make<CR>:copen<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* Theme and Layout *******
@@ -185,11 +196,11 @@ set fileformats=unix,mac,dos
 
 set laststatus=2
 set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-"set statusline+=%{fugitive#statusline()}
+set statusline+=%{fugitive#statusline()}
 set statusline+=%= "align the rest to right
 set statusline+=[%l,%v][%p%%]
 set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -209,6 +220,7 @@ set smartcase
 set incsearch " do incremental searching
 set showtabline=2
 set foldmethod=marker
+" Completion
 set wildmenu
 set wildmode=longest,full
 set hidden
@@ -249,20 +261,25 @@ set ttyfast
 set nu
 set noerrorbells
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* File management *******
+" ******* Files / Dir  management *******
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 noremap <leader>k :BufExplorer<CR>
 let g:bufExplorerSplitBelow=1        " Split new window below current.
+" *** MRU ***
 noremap <leader>m :MRU<CR>
-let MRU_Add_Menu = 0 
+let MRU_Add_Menu = 0
 let MRU_Window_Height = 20
-noremap <leader>n :NERDTreeToggle %:p:h<CR>
+" *** NERDTree ***
+"noremap <leader>n :NERDTreeToggle %:p:h<CR>
+noremap <leader>n :NERDTree %<CR>
 let NERDTreeQuitOnOpen = 1
 let NERDTreeChDirMode=2
+" let NERDTreeIgnore = ['\.pyc$', '\.pyo$']'
 "nnoremap <silent> <S-t> :tabnew<CR>:NERDTree<CR>
-"TagList
+" *** TAGLIST/TAGBAR ***
 "set tags=$HOME/jdk_tags
+set tags=tags;
 nmap <leader>b :TagbarToggle<CR>
 set cpt=k,.,w,b,u,t,i
 noremap <leader>l :TlistToggle<CR>
@@ -270,8 +287,15 @@ let Tlist_Exit_OnlyWindow = 1
 let Tlist_GainFocus_On_ToggleOpen = 1
 let Tlist_Use_Right_Window   = 1
 let Tlist_Show_One_File = 1
-" Command-T <leader>t
+" *** COMMAND_T ***
 let g:CommandTMatchWindowReverse = 1
+nnoremap <silent> <leader>t :call CD_Git_Root()<CR>:CommandT<CR>
+nnoremap <silent> <leader>b :CommandTBuffer<CR>
+nnoremap <silent> <leader>j :CommandTJump<CR>
+" *** CTRL P ***
+let g:ctrlp_map = '<leader>p'
+let g:ctrlp_working_path_mode = 2
+" *** GIT / FUGITIVE ***
 function! Git_Repo_Cdup() " Get the relative path to repo root
     "Ask git for the root of the git repo (as a relative '../../' path)
     let git_top = system('git rev-parse --show-cdup')
@@ -291,31 +315,48 @@ function! CD_Git_Root()
     let curdir = getcwd()
     echo 'CWD now set to: '.curdir
 endfunction
-nnoremap <LEADER>gr :call CD_Git_Root()<cr>
-nnoremap <silent> <leader>t :call CD_Git_Root()<CR>:CommandT<CR>
-nnoremap <silent> <leader>b :CommandTBuffer<CR>
-nnoremap <silent> <leader>j :CommandTJump<CR>
-" YankRing
-noremap <leader>y :YRShow<CR>
+nnoremap <LEADER>gr :call CD_Git_Root()<cr> " change to the git project dir
+" *** YANKRING ***
+nnoremap <silent> <leader>y :YRShow<cr>
+inoremap <silent> <leader>y <ESC>:YRShow<cr>
+" *** ACK ***
+ nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
+" " Use <Leader>A to ack for the word under the cursor
+ nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* Navigation *******
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" When pressing <leader>cd switch to the directory of the open buffer
-map <leader>cd :cd %:p:h<cr>
+" Make H/J/K/L work like super versions of h/j/k/l - J/K go to start/end of
+" buffer, and H/L go to start/end of line.
+noremap H ^
+noremap L $
+" gj/gk treat wrapped lines as separate
+" " (i.e. you can move up/down in one wrapped line)
+nn j gj
+nn k gk
+nn gj j
+nn gk k
 nnoremap <C-H> gT
 nnoremap <C-L> gt
 nnoremap <C-K> :bp<CR>
 nnoremap <C-J> :bn<CR>
-" Easier navigation in insert mode
+" When pressing <leader>cd switch to the directory of the open buffer
+map <leader>cd :cd %:p:h<cr>
+" Bash-like command for navigation in Insert Mode
 ino <silent> <c-a> <c-o>b
 ino <silent> <c-e> <esc>ea
 " Kill the current buffer without changing the windows split
 nmap <leader>bd :b#<bar>bd#<CR>
+"Jump between windows
+nnoremap <Space><Space> <c-w>w
+" Quickfix / Location List
+nnoremap <leader>qn :cnext<CR>
+nnoremap <leader>qp :cprev<CR>
+nnoremap <leader>qq :cclose<CR>
 
 "Other
 inoremap jj <Esc>
-map <F2> :mksession! ~/.vim/vimtoday.ses
 " Quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
@@ -323,7 +364,7 @@ nmap <silent> <leader>sv :so $MYVIMRC<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* File Type *******
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:syntastic_auto_loc_list=0
+"let g:syntastic_auto_loc_list=0
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
     " ###### PHP
@@ -331,15 +372,14 @@ if has("autocmd")
     "au BufNewFile *.php set ft=php.html
     au FileType php set omnifunc=phpcomplete#CompletePHP
     " run file with PHP CLI (CTRL-M)
-    autocmd FileType php map <F5> :w!<CR>:!php %<CR>
+    "autocmd FileType php noremap <F5> <esc>:w!<CR>:!php %<CR>
     " PHP parser check (CTRL-L)
-    autocmd FileType php noremap <C-L> w!<CR>:!php -l %<CR>
+    "autocmd FileType php noremap <F4> <esc>:w!<CR>:!php -l %<CR>
     " ###### JAVASCRIPT
     " Javascript parser check (CTRL-L)
     autocmd FileType javascript map <F5> :w!<CR>:!node %<CR>
     autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
-    au FileType javascript setl fen
-    au FileType javascript setl nocindent
+    au FileType javascript setl fen  nocindent
     let javascript_enable_domhtmlcss=1
 
     " ###### TWIG
@@ -354,6 +394,12 @@ if has("autocmd")
     autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
     autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
     autocmd FileType python set omnifunc=pythoncomplete#Complete
+    " Display tabs at the beginning of a line in Python mode as bad.
+     au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
+    " " Make trailing whitespace be flagged as bad.
+     au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
+     let python_highlight_all=1
+    autocmd FileType python map <F5> :w!<CR>:!python %<CR>
     "" Java"
     autocmd FileType java map <F5> :w!<CR>:!javac %<CR>
     augroup sh
@@ -366,60 +412,50 @@ if has("autocmd")
     autocmd FileType html setlocal textwidth=0
     autocmd FileType html,xhtml,xml setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
 
+    " PHP (tab width 4 chr, wrap at 79th char)
+    autocmd FileType php setlocal sw=4 ts=4 sts=4 textwidth=79
     " Python (tab width 4 chr, wrap at 79th char)
-    autocmd FileType python setlocal sw=4
-    autocmd FileType python setlocal ts=4
-    autocmd FileType python setlocal sts=4
-    autocmd FileType python setlocal textwidth=79
+    autocmd FileType python setlocal sw=4 ts=4 sts=4 textwidth=79 expandtab
     " CSS (tab width 2 chr, wrap at 79th char)
-    autocmd FileType css setlocal sw=2
-    autocmd FileType css setlocal ts=2
-    autocmd FileType css setlocal sts=2
-    autocmd FileType css setlocal textwidth=79
+    autocmd FileType css setlocal sw=2 ts=2 sts=2 textwidth=79
     " JavaScript (tab width 4 chr, wrap at 79th)
-    autocmd FileType javascript setlocal sw=4
-    autocmd FileType javascript setlocal ts=4
-    autocmd FileType javascript setlocal sts=4
-    autocmd FileType javascript setlocal textwidth=79
+    autocmd FileType javascript setlocal sw=4 ts=4 sts=4 textwidth=79
     "SQL"
     au FileType sql setlocal completefunc=sqlcomplete#Complete"
     " TXT
     au BufRead,BufNewFile *.txt set ft=txt syntax=txt
     autocmd FileType txt setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
-
+    " Set Cursor line on MRU window"
+    autocmd BufEnter,BufRead __MRU_Files__ set cursorline
+    " Help File speedups, <enter> to follow tag, delete for back
+    au filetype help nnoremap <buffer><cr> <c-]>
+    au filetype help nnoremap <buffer><bs> <c-T>
+    au filetype help nnoremap q :q!<CR>
+    au filetype help set nonumber
+    au FileType help wincmd _
+    set splitbelow
 endif
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"*******Language Specific *********
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PHP Generated Code Highlights (HTML & SQL)
 let php_sql_query=1
 let php_htmlInStrings=1
 "For highlighting parent error ] or ): >
 let php_parent_error_close = 1
 "For skipping an php end tag, if there exists an open ( or [ without a closing
-"one: >
+""one: >
 let php_parent_error_open = 1
-"Enable folding for classes and functions: >
 "  CSS properties sort
 nmap <leader>S /{/+1<CR>vi{:sort<CR>
-
-
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"******* SPECIAL *********
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-command! CleanHTML :%s#<[^>]\+>##g
-command! ConvertToUnix :1,$s/^M/\r/g
-" Remove the Windows ^M - when the encodings gets messed up
-command! RemoveControlM mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
-
-" Highlight redundant whitespaces and tabs.
-"highlight RedundantSpaces ctermbg=gray guibg=gray
-"match RedundantSpaces /\s\+$\| \+\ze\t\|\t/
 "
-" makes Esc turn off search highlight in normal mode.
-nnoremap <esc> :noh<CR><esc>
-"make <c-l> clear the highlight as well as redraw
-nnoremap <C-L> :nohls<CR><C-L>
+"JAVA
+" Highlight functions using Java style
+let java_highlight_functions="style"
+" Don't flag C++ keywords as errors
+let java_allow_cpp_keywords=1
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "******* COMMAND MODE RELATED *********
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -427,116 +463,22 @@ nnoremap <C-L> :nohls<CR><C-L>
 cnoremap <C-A>      <Home>
 cnoremap <C-E>      <End>
 cnoremap <C-K>      <C-U>
-
 cnoremap <C-P> <Up>
 cnoremap <C-N> <Down>
+
 "gdefault applies substitutions globally on lines. For example, instead of
 ":%s/foo/bar/g you just type :%s/foo/bar/.
 set gdefault
-" Fold tag
-nnoremap <leader>ft Vatzf
-nnoremap <leader>w <C-w>v<C-w>l
-set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
-set formatoptions-=o "dont continue comments when pushing o/O
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
-set showcmd
-map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
-map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
-"This is necessary to allow pasting from outside vim. It turns off auto stuff.
-"You can tell you are in paste mode when the ruler is not visible
-set pastetoggle=<F3>
-if &diff
-    syntax off
-endif
-"use :set list! to toggle visible whitespace on/off
-set listchars=tab:>-,trail:.,extends:>
-"don't move the cursor after pasting
-"(by jumping to back start of previously changed text)
-noremap p p`[
-noremap P P`[
-inoremap <C-x><C-o> <C-x><C-o>
-"JAVA
-" Highlight functions using Java style
-let java_highlight_functions="style"
-" Don't flag C++ keywords as errors
-let java_allow_cpp_keywords=1
-let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
-let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
-"let g:EclimXmlValidate = 0
-"let g:ctrlp_map = '<c-p>'
-"function! HandleURI()
-  "let s:uri = matchstr(getline("."), '[a-z]*:\/\/[^ >,;:]*')
-  "echo s:uri
-  "if s:uri != ""
-      "exec "!open -a Firefox \"" . s:uri . "\""
-  "else
-      "echo "No URI found in line."
-  "endif
-"endfunction
-"map <Leader>w :call HandleURI()<CR>
-inoremap <C-L> <C-V>u2022<Space>
-" gj/gk treat wrapped lines as separate
-" " (i.e. you can move up/down in one wrapped line)
 
-nn j gj
-nn k gk
-nn gj j
-nn gk k
-" Switch to current dir
-nn <leader>cd :lcd %:p:h<cr>
-" Make c-g show full path/buffer number too
-nn <c-g> 2<c-g>
-" Pressing v again brings you out of visual mode
-xno v <esc>
-"OPTION TO TEST
-"" This is for working across multiple xterms and/or gvims
-" Transfer/read and write one block of text between vim sessions (capture
-" whole line):
-" " Write
-" nmap ;w :. w! ~/.vimxfer<CR>
-" " Read
-" nmap ;r :r ~/.vimxfer<CR>
-" " Append 
-" nmap ;a :. w! >>~/.vimxfer<CR>)
-" Similar set of maps for quick browsing of errors (see quickfix) and grep
-" results:
-"
-" map <C-n> :cn<CR>
-" map <C-m> :cp<CR>)
-" Use the first available 'tags' file in the directory tree:
-"
-" :set tags=tags;/
-" " Nerd tree stuff
-" let NERDTreeIgnore = ['\.pyc$', '\.pyo$']'
-" " Save and quit quickly.
- nnoremap <leader>s :w<CR>
-" nnoremap <leader>q :q<CR>
-" nnoremap <leader>Q :q!<CR>
-" " The way it should have been.
-" noremap Y y$
-"
-"
-"" Moving around in insert mode.
-inoremap <D-j> <C-O>gj
-inoremap <A-k> <C-O>gk
-inoremap <A-h> <Left>
-inoremap <A-l> <Right>
-"" ===SuperTab
-" Map SuperTab to space key.
-" let g:SuperTabMappingForward = '<c-space>'
-" let g:SuperTabMappingBackward = '<s-c-space>'
-" let g:SuperTabDefaultCompletionType = 'context''
-" Disable syntax highlighting when editing huge (>4MB) files:
-"
-" au BufReadPost *        if getfsize(bufname("%")) > 4*1024*1024 |
-" \                               set syntax= |
-" \                       endif)
-
-" :map + v%zf # hit "+" to fold a function/loop anything within a paranthesis
-"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"******* SPECIAL *********
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+command! XCleanHTML :%s#<[^>]\+>##g
+" Remove the Windows ^M - when the encodings gets messed up
+command! XRemoveControlM :%s/\+$//
+set listchars=tab:>-,trail:·,eol:$
+command! XShowTrailingWhitespace set nolist!
+command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
 function! ListLeaders()
      silent! redir @a
      silent! nmap <LEADER>
@@ -549,13 +491,68 @@ function! ListLeaders()
      silent! sort
      silent! let lines = getline(1,"$")
 endfunction
+command! XListLeaders :call ListLeaders()
+function! FindTODOFIXME(args)
+    let l:grepargs = a:args
+    noautocmd vimgrep /TODO/ "".a:args
+    "silent! copen
+    echo a:args
+endfunction
+command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
 
-command! ListLeaders :call ListLeaders()<CR>
-" Help File speedups, <enter> to follow tag, delete for back
-au filetype help nnoremap <buffer><cr> <c-]>
-au filetype help nnoremap <buffer><bs> <c-T>
-au filetype help nnoremap q :q!<CR>
-au filetype help set nonumber
-au FileType help wincmd _ 
-set splitbelow
+" Fold tag
+nnoremap <leader>ft Vatzf
+nnoremap <leader>w <C-w>v<C-w>l
+set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
+set formatoptions=tcrqn21
+set formatoptions-=o "dont continue comments when pushing o/O
+set showcmd
+"This is necessary to allow pasting from outside vim. It turns off auto stuff.
+"You can tell you are in paste mode when the ruler is not visible
+set pastetoggle=<F3>
+map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
+map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
+" " Save quickly.
+noremap <leader>s :w<CR>
+if &diff
+    syntax off
+endif
+"don't move the cursor after pasting
+"(by jumping to back start of previously changed text)
+noremap p p`[
+noremap P P`[
+" Pressing v again brings you out of visual mode
+xno v <esc>
 
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
+"let g:ctrlp_map = '<c-p>'
+inoremap <C-L> <C-V>u2022<Space>
+
+"OPTION TO TEST
+"
+set tags=tags;/
+
+"" F5 to compile
+"map <F5> :w<CR>:make<CR>
+"imap <F5> <Esc>:w<CR>:make<CR><Insert>
+" Remove trailing whitespaces and ^M chars
+"autocmd FileType c,cpp,java,php,js,python,twig,xml,yml autocmd BufWritePre <buffer>
+"
+"
+
+" Disable syntax highlighting when editing huge (>4MB) files:
+"
+" au BufReadPost *        if getfsize(bufname("%")) > 4*1024*1024 |
+" \                               set syntax= |
+" \                       endif)
+
+" :map + v%zf # hit "+" to fold a function/loop anything within a paranthesis
+"
+"" ===SuperTab
+" Map SuperTab to space key.
+" let g:SuperTabMappingForward = '<c-space>'
+" let g:SuperTabMappingBackward = '<s-c-space>'
+let g:SuperTabDefaultCompletionType = "<c-x><c-n>"
+" let g:SuperTabDefaultCompletionType = 'context''
