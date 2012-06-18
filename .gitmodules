@@ -58,3 +58,9 @@
 [submodule "bundle-archive/ctrlp"]
 	path = bundle-archive/ctrlp
 	url = https://github.com/kien/ctrlp.vim.git
+[submodule "bundle-archive/zen-coding"]
+	path = bundle-archive/zen-coding
+	url = http://github.com/mattn/zencoding-vim.git
+[submodule "bundle-archive/vim-colors-solarized"]
+	path = bundle-archive/vim-colors-solarized
+	url = git://github.com/altercation/vim-colors-solarized.git

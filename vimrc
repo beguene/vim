@@ -1,6 +1,9 @@
-" ase Vim settings, rather then Vi settings (much better!).
+" Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
+" With a map leader it's possible to do extra key combinations
+let mapleader = ","
+let g:mapleader = ","
 
 fun! MySys()
     return "mac"
@@ -29,6 +32,8 @@ endif
 " Gundo requires at least vim 7.3
 if v:version < '703' || !has('python')
     call add(g:pathogen_disabled, 'gundo')
+else
+    nnoremap <leader>u :GundoToggle<CR>
 endif
 
 if v:version < '702'
@@ -44,7 +49,7 @@ elseif MySys() == "windows"
     set dir=C:\Windows\Temp
     set backupdir=C:\Windows\Temp
     call add(g:pathogen_disabled, 'doctorjs')
-    call add(g:pathogen_disabled, 'ccHommand-t')
+    call add(g:pathogen_disabled, 'command-t')
 elseif MySys() == "linux"
     set shell=/bin/bash
 endif
@@ -71,18 +76,16 @@ set showcmd		" display incomplete commands
 " Don't use Ex mode, use Q for formatting
 map Q gq
 
-
-" In many terminal emulators the mouse works just fine, thus enable it.
-if has('mouse')
-    set mouse=a
-endif
+" Disable annoying mouse
+set mouse=""
+set nomousef
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
     syntax on
     set hlsearch
-     au GUIEnter * set fullscreen
+    au GUIEnter * set fullscreen
 endif
 
 
@@ -100,8 +103,8 @@ if has("autocmd")
     augroup vimrcEx
         au!
 
-        " For all text files set 'textwidth' to 78 characters.
-        autocmd FileType text setlocal textwidth=78
+        " For all text files set 'textwidth' to 79 characters.
+        autocmd FileType text setlocal textwidth=79
 
         " When editing a file, always jump to the last known cursor position.
         " Don't do it when the position is invalid or when inside an event handler
@@ -114,7 +117,6 @@ if has("autocmd")
                     \ endif
 
     augroup END
-    "autocmd BufEnter * silent! lcd %:p:h
 endif " has("autocmd")
 
 " Convenient command to see the difference between the current buffer and the
@@ -130,35 +132,30 @@ endif
 
 " Sets how many lines of history VIM has to remember
 set history=700
-
 " Set to auto read when a file is changed from the outside
 set autoread
 " wrap lines rather than make use of the horizontal scrolling
 set wrap
 " " try not to wrap in the middle of a word
 set linebreak
-" " use an 80-character line limit
-set textwidth=80
+" " use an 79-character line limit
+set textwidth=79
 
-" With a map leader it's possible to do extra key combinations
-" like <leader>w saves the current file
-let mapleader = ","
-let g:mapleader = ","
 
-" Fast saving
-nmap <leader>w :w!<cr>
 " Fast editing of the .vimrc
 map <leader>e :e! ~/.vimrc<cr>
-
-map <leader>f <C-]><cr>
 nmap <leader>r :reg<cr>
 nmap <leader>c :changes<cr>
 " Tags keys : jump to definition
 nnoremap <C-f> <C-]>
-noremap <Leader>d :set list!<CR>
 map <F2> :mksession! ~/tmp/vimtoday.ses
 set pastetoggle=<F3>
 nmap <F4> :w<CR>:make<CR>:copen<CR>
+map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
+map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
+set splitright
+" Add the unnamed register to the clipboard
+"set clipboard=unnamed
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* Theme and Layout *******
@@ -171,7 +168,9 @@ hi StatusLine guifg=darkgreen guibg=black ctermbg=darkgreen ctermfg=black
 hi StatusLineNC guifg=white guibg=black ctermbg=white ctermfg=black
 if has("gui_running")
     set guioptions=abirLb
+    set guioptions-=T
     set guifont=Menlo:h12
+    set guifont=Lucida_Console:h14
     set background=dark
     "colorscheme mustang
     "colors peaksea
@@ -185,15 +184,11 @@ else
     colorscheme wombat256mod
 endif
 set encoding=utf-8
-set guifont=Lucida_Console:h14
-set guioptions-=T
 set ic
 set fileformats=unix,mac,dos
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* Status Line *******
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Format the statusline
-
 set laststatus=2
 set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
 set statusline+=%{fugitive#statusline()}
@@ -202,10 +197,7 @@ set statusline+=[%l,%v][%p%%]
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
-"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set selectmode=mouse
-set mousef
 " Tabs / Indent
 set shiftwidth=4
 set tabstop=4
@@ -231,23 +223,19 @@ map n nzz
 " => Backups and undo
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "persistent undo
-if version >= 703
+if version >= 703 && has('persistent_undo')
     try
         if MySys() == "windows"
             set undodir=C:\Windows\Temp
         else
             set undodir=~/tmp/undodir
         endif
-        set undofile
     catch
     endtry
-    if has('persistent_undo')
-        set undofile                "so is persistent undo ...
-        set undolevels=1000         "maximum number of changes that can be undone
-        set undoreload=10000        "maximum number lines to save for undo on a buffer reload
-    endif
+    set undofile                "so is persistent undo ...
+    set undolevels=1000         "maximum number of changes that can be undone
+    set undoreload=10000        "maximum number lines to save for undo on a buffer reload
 endif
-nnoremap <leader>u :GundoToggle<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set showmatch "Show matching bracket
@@ -264,6 +252,8 @@ set noerrorbells
 " ******* Files / Dir  management *******
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
+" :cd. change working directory to that of the current file
+cmap cd. lcd %:p:h
 noremap <leader>k :BufExplorer<CR>
 let g:bufExplorerSplitBelow=1        " Split new window below current.
 " *** MRU ***
@@ -271,12 +261,10 @@ noremap <leader>m :MRU<CR>
 let MRU_Add_Menu = 0
 let MRU_Window_Height = 20
 " *** NERDTree ***
-"noremap <leader>n :NERDTreeToggle %:p:h<CR>
-noremap <leader>n :NERDTree %<CR>
+nnoremap <leader>n :NERDTree %<CR>
 let NERDTreeQuitOnOpen = 1
 let NERDTreeChDirMode=2
 " let NERDTreeIgnore = ['\.pyc$', '\.pyo$']'
-"nnoremap <silent> <S-t> :tabnew<CR>:NERDTree<CR>
 " *** TAGLIST/TAGBAR ***
 "set tags=$HOME/jdk_tags
 set tags=tags;
@@ -296,7 +284,7 @@ nnoremap <silent> <leader>j :CommandTJump<CR>
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_working_path_mode = 2
 " *** GIT / FUGITIVE ***
-function! Git_Repo_Cdup() " Get the relative path to repo root
+function! Git_Repo_Cdup() " Get the relative path to repo root {{{1
     "Ask git for the root of the git repo (as a relative '../../' path)
     let git_top = system('git rev-parse --show-cdup')
     let git_fail = 'fatal: Not a git repository'
@@ -308,13 +296,13 @@ function! Git_Repo_Cdup() " Get the relative path to repo root
         " path will be empty, so add './'
         return './' . git_top
     endif
-endfunction
+endfunction "}}}
 
-function! CD_Git_Root()
+function! CD_Git_Root() "{{{1 
     execute 'cd '.Git_Repo_Cdup()
     let curdir = getcwd()
     echo 'CWD now set to: '.curdir
-endfunction
+endfunction "}}}
 nnoremap <LEADER>gr :call CD_Git_Root()<cr> " change to the git project dir
 " *** YANKRING ***
 nnoremap <silent> <leader>y :YRShow<cr>
@@ -360,6 +348,12 @@ inoremap jj <Esc>
 " Quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
+"don't move the cursor after pasting
+"(by jumping to back start of previously changed text)
+noremap p p`[
+noremap P P`[
+" Pressing v again brings you out of visual mode
+xno v <esc>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* File Type *******
@@ -389,8 +383,10 @@ if has("autocmd")
     autocmd BufRead,BufNewFile *.less set omnifunc=csscomplete#CompleteCSS
     ""css files
     autocmd BufRead,BufNewFile *.css set omnifunc=csscomplete#CompleteCSS
-    ""scss files
-    "autocmd BufNewFile,BufRead *.scss set ft=scss.css
+    " make CSS omnicompletion work for SASS and SCSS
+    autocmd BufNewFile,BufRead *.scss             set ft=scss.css
+    autocmd BufNewFile,BufRead *.sass             set ft=sass.css
+    autocmd BufNewFile,BufRead *.less             set ft=less.css
     autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
     autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
     autocmd FileType python set omnifunc=pythoncomplete#Complete
@@ -479,7 +475,7 @@ command! XRemoveControlM :%s/\+$//
 set listchars=tab:>-,trail:·,eol:$
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
-function! ListLeaders()
+function! ListLeaders() " {{{1
      silent! redir @a
      silent! nmap <LEADER>
      silent! redir END
@@ -490,14 +486,14 @@ function! ListLeaders()
      silent! normal ggVg
      silent! sort
      silent! let lines = getline(1,"$")
-endfunction
+endfunction "}}}
 command! XListLeaders :call ListLeaders()
-function! FindTODOFIXME(args)
+function! FindTODOFIXME(args) "{{{1 
     let l:grepargs = a:args
     noautocmd vimgrep /TODO/ "".a:args
     "silent! copen
     echo a:args
-endfunction
+endfunction "}}}
 command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
 
 " Fold tag
@@ -507,22 +503,11 @@ set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.
 set formatoptions=tcrqn21
 set formatoptions-=o "dont continue comments when pushing o/O
 set showcmd
-"This is necessary to allow pasting from outside vim. It turns off auto stuff.
-"You can tell you are in paste mode when the ruler is not visible
-set pastetoggle=<F3>
-map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
-map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
 " " Save quickly.
 noremap <leader>s :w<CR>
 if &diff
     syntax off
 endif
-"don't move the cursor after pasting
-"(by jumping to back start of previously changed text)
-noremap p p`[
-noremap P P`[
-" Pressing v again brings you out of visual mode
-xno v <esc>
 
 let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
@@ -531,14 +516,7 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 inoremap <C-L> <C-V>u2022<Space>
 
 "OPTION TO TEST
-"
 set tags=tags;/
-
-"" F5 to compile
-"map <F5> :w<CR>:make<CR>
-"imap <F5> <Esc>:w<CR>:make<CR><Insert>
-" Remove trailing whitespaces and ^M chars
-"autocmd FileType c,cpp,java,php,js,python,twig,xml,yml autocmd BufWritePre <buffer>
 "
 "
 
@@ -550,9 +528,21 @@ set tags=tags;/
 
 " :map + v%zf # hit "+" to fold a function/loop anything within a paranthesis
 "
-"" ===SuperTab
-" Map SuperTab to space key.
-" let g:SuperTabMappingForward = '<c-space>'
-" let g:SuperTabMappingBackward = '<s-c-space>'
-let g:SuperTabDefaultCompletionType = "<c-x><c-n>"
-" let g:SuperTabDefaultCompletionType = 'context''
+
+let g:user_zen_leader_key = '<c-e>'
+let g:user_zen_expandabbr_key = '<c-e>'
+let g:use_zen_complete_tag = 1
+" --- SnipMate
+let g:snipMateAllowMatchingDot = 0
+" set the forward slash to be the slash of note.  Backslashes suck
+set shellslash
+" Search the current file for the word under the cursor and display matches
+nmap <silent> ,gw :Ack /<C-r><C-w>/ %<CR>
+
+" ================ Turn Off Swap Files ==============
+set noswapfile
+set nobackup
+set nowb
+syntax enable
+set background=dark
+colorscheme solarized
