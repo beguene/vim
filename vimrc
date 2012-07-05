@@ -248,6 +248,7 @@ set complete=.,w,b,u,U,t,i,d
 set ttyfast
 set nu
 set noerrorbells
+set vb t_vb=
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ******* Files / Dir  management *******
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
