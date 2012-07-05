@@ -1,6 +1,8 @@
 " Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
+"
+" ******* Init & Constants ******* {{{
 " With a map leader it's possible to do extra key combinations
 let mapleader = ","
 let g:mapleader = ","
@@ -8,8 +10,8 @@ let g:mapleader = ","
 fun! MySys()
     return "mac"
 endfun
-"set runtimepath=~/.vim,$VIMRUNTIME
-let g:snips_author="Beguene Permale"
+let g:snips_author="Beguene Permale" "}}}"
+" ******* Plugins ******* {{{
 " list only the plugin groups you will use
 if !exists('g:active_bundle_groups')
     let g:active_bundle_groups=['general', 'programming', 'php', 'javascript', 'html', 'misc']
@@ -40,6 +42,12 @@ if v:version < '702'
     call add(g:pathogen_disabled, 'l9')
 endif
 call add(g:pathogen_disabled, 'csscolor')
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
+call pathogen#infect() " }}}"
+
+
+" ******* System & OS ******* {{{
 if MySys() == "mac"
     set shell=/bin/bash
     "Backup and Dir
@@ -52,10 +60,7 @@ elseif MySys() == "windows"
     call add(g:pathogen_disabled, 'command-t')
 elseif MySys() == "linux"
     set shell=/bin/bash
-endif
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
-call pathogen#infect()
+endif "}}}"
 
 "The modelines bit prevents some security exploits having to do with modelines in files. I never use modelines so I don’t miss any functionality here.
 set modelines=0
@@ -86,6 +91,9 @@ if &t_Co > 2 || has("gui_running")
     syntax on
     set hlsearch
     au GUIEnter * set fullscreen
+endif
+if &diff
+    syntax off
 endif
 
 
@@ -126,28 +134,30 @@ if !exists(":DiffOrig")
     command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
                 \ | wincmd p | diffthis
 endif
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => General
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 " Sets how many lines of history VIM has to remember
 set history=700
+set hidden
+set confirm
+
+" ******* Format ******* {{{
 " Set to auto read when a file is changed from the outside
 set autoread
 " wrap lines rather than make use of the horizontal scrolling
 set wrap
 " " try not to wrap in the middle of a word
 set linebreak
+set formatoptions=tcrqn21
+set formatoptions-=o "dont continue comments when pushing o/O
+set showcmd
 " " use an 79-character line limit
-set textwidth=79
+set textwidth=79 " }}}"
 
 
 " Fast editing of the .vimrc
 map <leader>e :e! ~/.vimrc<cr>
 nmap <leader>r :reg<cr>
 nmap <leader>c :changes<cr>
-" Tags keys : jump to definition
-nnoremap <C-f> <C-]>
+
 map <F2> :mksession! ~/tmp/vimtoday.ses
 set pastetoggle=<F3>
 nmap <F4> :w<CR>:make<CR>:copen<CR>
@@ -157,15 +167,13 @@ set splitright
 " Add the unnamed register to the clipboard
 "set clipboard=unnamed
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* Theme and Layout *******
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ******* Theme and Layout ******* {{{
 hi clear SpellBad
-hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
+"hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
 hi clear StatusLine
 hi clear StatusLineNC
-hi StatusLine guifg=darkgreen guibg=black ctermbg=darkgreen ctermfg=black
-hi StatusLineNC guifg=white guibg=black ctermbg=white ctermfg=black
+"hi StatusLine guifg=darkgreen guibg=black ctermbg=darkgreen ctermfg=black
+"hi StatusLineNC guifg=white guibg=black ctermbg=white ctermfg=black
 if has("gui_running")
     set guioptions=abirLb
     set guioptions-=T
@@ -181,14 +189,16 @@ if has("gui_running")
 else
     set background=dark
     "colorscheme mustang
-    colorscheme wombat256mod
+    "colorscheme wombat256mod
+    colorscheme solarized
 endif
 set encoding=utf-8
 set ic
-set fileformats=unix,mac,dos
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* Status Line *******
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set nu
+set noerrorbells
+set vb t_vb=
+set fileformats=unix,mac,dos "}}}"
+" ******* Status Line ******* "{{{
 set laststatus=2
 set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
 set statusline+=%{fugitive#statusline()}
@@ -196,32 +206,43 @@ set statusline+=%= "align the rest to right
 set statusline+=[%l,%v][%p%%]
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tabs / Indent
+set statusline+=%* "}}}"
+
+" ******* Tab & Indent ******* "{{{
 set shiftwidth=4
 set tabstop=4
 set softtabstop=4
-set expandtab
-set nowrapscan
-set wrap
+set smarttab
+set smartindent
+set autoindent
+set expandtab "}}}"
 
-"SEARCH OPTIONS
-set ignorecase
-set smartcase
-set incsearch " do incremental searching
-set showtabline=2
+set nowrapscan
 set foldmethod=marker
-" Completion
-set wildmenu
-set wildmode=longest,full
-set hidden
-set confirm
+
+" ******* Search ******* "{{{
+"gdefault applies substitutions globally on lines. For example, instead of
+":%s/foo/bar/g you just type :%s/foo/bar/.
+set gdefault
 map N Nzz
 map n nzz
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Backups and undo
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Search the current file for the word under the cursor and display matches
+nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
+" *** ACK ***
+ nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
+" " Use <Leader>A to ack for the word under the cursor
+ nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
+set ignorecase
+set smartcase
+set incsearch " do incremental searching }}}
+" ******* Completion ******* "{{{
+set complete=.,w,b,u,U,t,i,d
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+set wildmenu
+set wildmode=longest,full "}}}"
+
+" ******* Backup & Undo ******* "{{{
 "persistent undo
 if version >= 703 && has('persistent_undo')
     try
@@ -235,23 +256,12 @@ if version >= 703 && has('persistent_undo')
     set undofile                "so is persistent undo ...
     set undolevels=1000         "maximum number of changes that can be undone
     set undoreload=10000        "maximum number lines to save for undo on a buffer reload
-endif
+endif "}}}"
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set showmatch "Show matching bracket
-set autoindent
-set wrap
-set smartindent
-set smarttab
 set scrolloff=4 " keep at least 4 lines above/below
-set complete=.,w,b,u,U,t,i,d
 set ttyfast
-set nu
-set noerrorbells
-set vb t_vb=
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* Files / Dir  management *******
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ******* Files / Dir  management ******* {{{
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
@@ -283,7 +293,7 @@ nnoremap <silent> <leader>b :CommandTBuffer<CR>
 nnoremap <silent> <leader>j :CommandTJump<CR>
 " *** CTRL P ***
 let g:ctrlp_map = '<leader>p'
-let g:ctrlp_working_path_mode = 2
+let g:ctrlp_working_path_mode = 2 " }}}"
 " *** GIT / FUGITIVE ***
 function! Git_Repo_Cdup() " Get the relative path to repo root {{{1
     "Ask git for the root of the git repo (as a relative '../../' path)
@@ -308,16 +318,9 @@ nnoremap <LEADER>gr :call CD_Git_Root()<cr> " change to the git project dir
 " *** YANKRING ***
 nnoremap <silent> <leader>y :YRShow<cr>
 inoremap <silent> <leader>y <ESC>:YRShow<cr>
-" *** ACK ***
- nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
-" " Use <Leader>A to ack for the word under the cursor
- nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* Navigation *******
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Make H/J/K/L work like super versions of h/j/k/l - J/K go to start/end of
-" buffer, and H/L go to start/end of line.
+" ******* Navigation ******* {{{
+"  H/L go to start/end of line.
 noremap H ^
 noremap L $
 " gj/gk treat wrapped lines as separate
@@ -326,10 +329,8 @@ nn j gj
 nn k gk
 nn gj j
 nn gk k
-nnoremap <C-H> gT
-nnoremap <C-L> gt
-nnoremap <C-K> :bp<CR>
-nnoremap <C-J> :bn<CR>
+nnoremap <C-K> :bp<CR> " go to previous buffer"
+nnoremap <C-J> :bn<CR> " go to next buffer"
 " When pressing <leader>cd switch to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>
 " Bash-like command for navigation in Insert Mode
@@ -342,7 +343,7 @@ nnoremap <Space><Space> <c-w>w
 " Quickfix / Location List
 nnoremap <leader>qn :cnext<CR>
 nnoremap <leader>qp :cprev<CR>
-nnoremap <leader>qq :cclose<CR>
+nnoremap <leader>qq :cclose<CR> "}}}"
 
 "Other
 inoremap jj <Esc>
@@ -356,9 +357,7 @@ noremap P P`[
 " Pressing v again brings you out of visual mode
 xno v <esc>
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ******* File Type *******
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ******* File Type *******  {{{
 "let g:syntastic_auto_loc_list=0
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -431,11 +430,9 @@ if has("autocmd")
     au filetype help set nonumber
     au FileType help wincmd _
     set splitbelow
-endif
+endif "}}}"
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"*******Language Specific *********
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"*******Language Specific ********* {{{
 " PHP Generated Code Highlights (HTML & SQL)
 let php_sql_query=1
 let php_htmlInStrings=1
@@ -451,32 +448,36 @@ nmap <leader>S /{/+1<CR>vi{:sort<CR>
 " Highlight functions using Java style
 let java_highlight_functions="style"
 " Don't flag C++ keywords as errors
-let java_allow_cpp_keywords=1
+let java_allow_cpp_keywords=1 "}}}"
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"******* COMMAND MODE RELATED *********
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"******* COMMAND MODE RELATED ********* {{{
 " Bash like keys for the command line
 cnoremap <C-A>      <Home>
 cnoremap <C-E>      <End>
 cnoremap <C-K>      <C-U>
 cnoremap <C-P> <Up>
-cnoremap <C-N> <Down>
+cnoremap <C-N> <Down> "}}}"
 
-"gdefault applies substitutions globally on lines. For example, instead of
-":%s/foo/bar/g you just type :%s/foo/bar/.
-set gdefault
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"******* SPECIAL *********
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"******* SPECIAL ********* {{{
 command! XCleanHTML :%s#<[^>]\+>##g
 " Remove the Windows ^M - when the encodings gets messed up
 command! XRemoveControlM :%s/\+$//
 set listchars=tab:>-,trail:·,eol:$
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
-function! ListLeaders() " {{{1
+" " Save quickly.
+noremap <leader>s :w<CR>
+"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
+"let g:ctrlp_map = '<c-p>'
+inoremap <C-L> <C-V>u2022<Space>
+
+let g:user_zen_leader_key = '<c-e>'
+let g:user_zen_expandabbr_key = '<c-e>'
+let g:use_zen_complete_tag = 1
+" --- SnipMate
+let g:snipMateAllowMatchingDot = 0
+
+function! ListLeaders() " {{{
      silent! redir @a
      silent! nmap <LEADER>
      silent! redir END
@@ -496,54 +497,14 @@ function! FindTODOFIXME(args) "{{{1
     echo a:args
 endfunction "}}}
 command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
+"}}}
 
 " Fold tag
-nnoremap <leader>ft Vatzf
 nnoremap <leader>w <C-w>v<C-w>l
 set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
-set formatoptions=tcrqn21
-set formatoptions-=o "dont continue comments when pushing o/O
-set showcmd
-" " Save quickly.
-noremap <leader>s :w<CR>
-if &diff
-    syntax off
-endif
 
-let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
-"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
-"let g:ctrlp_map = '<c-p>'
-inoremap <C-L> <C-V>u2022<Space>
-
-"OPTION TO TEST
-set tags=tags;/
-"
-"
-
-" Disable syntax highlighting when editing huge (>4MB) files:
-"
-" au BufReadPost *        if getfsize(bufname("%")) > 4*1024*1024 |
-" \                               set syntax= |
-" \                       endif)
-
-" :map + v%zf # hit "+" to fold a function/loop anything within a paranthesis
-"
-
-let g:user_zen_leader_key = '<c-e>'
-let g:user_zen_expandabbr_key = '<c-e>'
-let g:use_zen_complete_tag = 1
-" --- SnipMate
-let g:snipMateAllowMatchingDot = 0
-" set the forward slash to be the slash of note.  Backslashes suck
-set shellslash
-" Search the current file for the word under the cursor and display matches
-nmap <silent> ,gw :Ack /<C-r><C-w>/ %<CR>
 
 " ================ Turn Off Swap Files ==============
 set noswapfile
 set nobackup
 set nowb
-syntax enable
-set background=dark
-colorscheme solarized
