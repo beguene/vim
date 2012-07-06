@@ -1,16 +1,44 @@
+" Beguene's settings
+" Author: Beguene Permale
+" Version: 0.1
+
 " Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
-"
+
 " ******* Init & Constants ******* {{{
 " With a map leader it's possible to do extra key combinations
 let mapleader = ","
 let g:mapleader = ","
 
 fun! MySys()
-    return "mac"
+    if has('win32') || has('win64') || has('win32unix')
+        return 'windows'
+    elseif has('mac') || has('macunix')
+        return "mac"
+    else
+        return "unix"
 endfun
+let g:os = MySys()
 let g:snips_author="Beguene Permale" "}}}"
+
+" ******* System & OS ******* {{{
+if os == "mac"
+    set shell=/bin/bash
+    "Backup and Dir
+    set dir=~/tmp/vimbackup
+    set backupdir=~/tmp/vimbackup
+elseif os == "windows"
+    " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+    " let &guioptions = substitute(&guioptions, "t", "", "g")
+    set dir=C:\Windows\Temp
+    set backupdir=C:\Windows\Temp
+    call add(g:pathogen_disabled, 'doctorjs')
+    call add(g:pathogen_disabled, 'command-t')
+else 
+    set shell=/bin/bash
+endif "}}}"
+
 " ******* Plugins ******* {{{
 " list only the plugin groups you will use
 if !exists('g:active_bundle_groups')
@@ -47,36 +75,12 @@ call pathogen#helptags()
 call pathogen#infect() " }}}"
 
 
-" ******* System & OS ******* {{{
-if MySys() == "mac"
-    set shell=/bin/bash
-    "Backup and Dir
-    set dir=~/tmp/vimbackup
-    set backupdir=~/tmp/vimbackup
-elseif MySys() == "windows"
-    set dir=C:\Windows\Temp
-    set backupdir=C:\Windows\Temp
-    call add(g:pathogen_disabled, 'doctorjs')
-    call add(g:pathogen_disabled, 'command-t')
-elseif MySys() == "linux"
-    set shell=/bin/bash
-endif "}}}"
-
 "The modelines bit prevents some security exploits having to do with modelines in files. I never use modelines so I don’t miss any functionality here.
 set modelines=0
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
-if has("vms")
-    set nobackup		" do not keep a backup file, use versions instead
-else
-    set backup		" keep a backup file
-endif
 set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-" let &guioptions = substitute(&guioptions, "t", "", "g")
 
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -85,59 +89,25 @@ map Q gq
 set mouse=""
 set nomousef
 
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-    syntax on
-    set hlsearch
-    au GUIEnter * set fullscreen
-endif
-if &diff
-    syntax off
-endif
 
-
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
-
-    " Enable file type detection.
-    " Use the default filetype settings, so that mail gets 'tw' set to 72,
-    " 'cindent' is on in C files, etc.
-    " Also load indent files, to automatically do language-dependent indenting.
-    filetype plugin indent on
-    filetype on
-
-    " Put these in an autocmd group, so that we can delete them easily.
-    augroup vimrcEx
-        au!
-
-        " For all text files set 'textwidth' to 79 characters.
-        autocmd FileType text setlocal textwidth=79
-
-        " When editing a file, always jump to the last known cursor position.
-        " Don't do it when the position is invalid or when inside an event handler
-        " (happens when dropping a file on gvim).
-        " Also don't do it when the mark is in the first line, that is the default
-        " position when opening a file.
-        autocmd BufReadPost *
-                    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-                    \   exe "normal! g`\"" |
-                    \ endif
-
-    augroup END
-endif " has("autocmd")
-
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-    command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-                \ | wincmd p | diffthis
-endif
 " Sets how many lines of history VIM has to remember
 set history=700
 set hidden
 set confirm
+nmap <leader>r :reg<cr>
+nmap <leader>c :changes<cr>
+
+map <F2> :mksession! ~/tmp/vimtoday.ses
+set pastetoggle=<F3>
+nmap <F4> :w<CR>:make<CR>:copen<CR>
+map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
+map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
+set splitright
+set nowrapscan
+set foldmethod=marker
+set showmatch "Show matching bracket
+set scrolloff=6 " keep at least 6 lines above/below
+set ttyfast
 
 " ******* Format ******* {{{
 " Set to auto read when a file is changed from the outside
@@ -152,22 +122,17 @@ set showcmd
 " " use an 79-character line limit
 set textwidth=79 " }}}"
 
-
-" Fast editing of the .vimrc
-map <leader>e :e! ~/.vimrc<cr>
-nmap <leader>r :reg<cr>
-nmap <leader>c :changes<cr>
-
-map <F2> :mksession! ~/tmp/vimtoday.ses
-set pastetoggle=<F3>
-nmap <F4> :w<CR>:make<CR>:copen<CR>
-map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
-map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
-set splitright
-" Add the unnamed register to the clipboard
-"set clipboard=unnamed
-
 " ******* Theme and Layout ******* {{{
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+    syntax on
+    set hlsearch
+    au GUIEnter * set fullscreen
+endif
+if &diff
+    syntax off
+endif
 hi clear SpellBad
 "hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
 hi clear StatusLine
@@ -198,6 +163,7 @@ set nu
 set noerrorbells
 set vb t_vb=
 set fileformats=unix,mac,dos "}}}"
+
 " ******* Status Line ******* "{{{
 set laststatus=2
 set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
@@ -217,9 +183,6 @@ set smartindent
 set autoindent
 set expandtab "}}}"
 
-set nowrapscan
-set foldmethod=marker
-
 " ******* Search ******* "{{{
 "gdefault applies substitutions globally on lines. For example, instead of
 ":%s/foo/bar/g you just type :%s/foo/bar/.
@@ -235,6 +198,7 @@ nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
 set ignorecase
 set smartcase
 set incsearch " do incremental searching }}}
+
 " ******* Completion ******* "{{{
 set complete=.,w,b,u,U,t,i,d
 let g:SuperTabDefaultCompletionType = "context"
@@ -243,6 +207,11 @@ set wildmenu
 set wildmode=longest,full "}}}"
 
 " ******* Backup & Undo ******* "{{{
+if has("vms")
+    set nobackup		" do not keep a backup file, use versions instead
+else
+    set backup		" keep a backup file
+endif
 "persistent undo
 if version >= 703 && has('persistent_undo')
     try
@@ -258,9 +227,6 @@ if version >= 703 && has('persistent_undo')
     set undoreload=10000        "maximum number lines to save for undo on a buffer reload
 endif "}}}"
 
-set showmatch "Show matching bracket
-set scrolloff=4 " keep at least 4 lines above/below
-set ttyfast
 " ******* Files / Dir  management ******* {{{
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 " :cd. change working directory to that of the current file
@@ -293,9 +259,11 @@ nnoremap <silent> <leader>b :CommandTBuffer<CR>
 nnoremap <silent> <leader>j :CommandTJump<CR>
 " *** CTRL P ***
 let g:ctrlp_map = '<leader>p'
-let g:ctrlp_working_path_mode = 2 " }}}"
-" *** GIT / FUGITIVE ***
-function! Git_Repo_Cdup() " Get the relative path to repo root {{{1
+let g:ctrlp_working_path_mode = 2 
+"}}}"
+
+" ******* Git / Fugitive ******* {{{
+function! Git_Repo_Cdup() " Get the relative path to repo root
     "Ask git for the root of the git repo (as a relative '../../' path)
     let git_top = system('git rev-parse --show-cdup')
     let git_fail = 'fatal: Not a git repository'
@@ -307,17 +275,15 @@ function! Git_Repo_Cdup() " Get the relative path to repo root {{{1
         " path will be empty, so add './'
         return './' . git_top
     endif
-endfunction "}}}
+endfunction 
 
-function! CD_Git_Root() "{{{1 
+function! CD_Git_Root() 
     execute 'cd '.Git_Repo_Cdup()
     let curdir = getcwd()
     echo 'CWD now set to: '.curdir
-endfunction "}}}
+endfunction 
 nnoremap <LEADER>gr :call CD_Git_Root()<cr> " change to the git project dir
-" *** YANKRING ***
-nnoremap <silent> <leader>y :YRShow<cr>
-inoremap <silent> <leader>y <ESC>:YRShow<cr>
+" }}}
 
 " ******* Navigation ******* {{{
 "  H/L go to start/end of line.
@@ -338,29 +304,35 @@ ino <silent> <c-a> <c-o>b
 ino <silent> <c-e> <esc>ea
 " Kill the current buffer without changing the windows split
 nmap <leader>bd :b#<bar>bd#<CR>
-"Jump between windows
-nnoremap <Space><Space> <c-w>w
+inoremap jj <Esc>
 " Quickfix / Location List
 nnoremap <leader>qn :cnext<CR>
 nnoremap <leader>qp :cprev<CR>
 nnoremap <leader>qq :cclose<CR> "}}}"
 
-"Other
-inoremap jj <Esc>
-" Quickly edit/reload the vimrc file
-nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
+" ******* Yank & Paste ******* {{{
+" *** YANKRING ***
+nnoremap <silent> <leader>y :YRShow<cr>
+inoremap <silent> <leader>y <ESC>:YRShow<cr>
 "don't move the cursor after pasting
 "(by jumping to back start of previously changed text)
 noremap p p`[
 noremap P P`[
+" Yank text to the OS X clipboard
+noremap <leader>y "*y
 " Pressing v again brings you out of visual mode
-xno v <esc>
+xno v <esc> " }}}
 
 " ******* File Type *******  {{{
 "let g:syntastic_auto_loc_list=0
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
+    " Enable file type detection.
+    " Use the default filetype settings, so that mail gets 'tw' set to 72,
+    " 'cindent' is on in C files, etc.
+    " Also load indent files, to automatically do language-dependent indenting.
+    filetype plugin indent on
+    filetype on
     " ###### PHP
     "au BufRead *.php set ft=php.html
     "au BufNewFile *.php set ft=php.html
@@ -391,10 +363,10 @@ if has("autocmd")
     autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
     autocmd FileType python set omnifunc=pythoncomplete#Complete
     " Display tabs at the beginning of a line in Python mode as bad.
-     au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
+    au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
     " " Make trailing whitespace be flagged as bad.
-     au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
-     let python_highlight_all=1
+    au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
+    let python_highlight_all=1
     autocmd FileType python map <F5> :w!<CR>:!python %<CR>
     "" Java"
     autocmd FileType java map <F5> :w!<CR>:!javac %<CR>
@@ -421,6 +393,7 @@ if has("autocmd")
     " TXT
     au BufRead,BufNewFile *.txt set ft=txt syntax=txt
     autocmd FileType txt setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
+    autocmd FileType txt setlocal textwidth=79
     " Set Cursor line on MRU window"
     autocmd BufEnter,BufRead __MRU_Files__ set cursorline
     " Help File speedups, <enter> to follow tag, delete for back
@@ -432,7 +405,7 @@ if has("autocmd")
     set splitbelow
 endif "}}}"
 
-"*******Language Specific ********* {{{
+"******* Language Specific ********* {{{
 " PHP Generated Code Highlights (HTML & SQL)
 let php_sql_query=1
 let php_htmlInStrings=1
@@ -450,7 +423,8 @@ let java_highlight_functions="style"
 " Don't flag C++ keywords as errors
 let java_allow_cpp_keywords=1 "}}}"
 
-"******* COMMAND MODE RELATED ********* {{{
+"******* Command Mode Related ********* {{{
+set showcmd		" display incomplete commands
 " Bash like keys for the command line
 cnoremap <C-A>      <Home>
 cnoremap <C-E>      <End>
@@ -458,11 +432,34 @@ cnoremap <C-K>      <C-U>
 cnoremap <C-P> <Up>
 cnoremap <C-N> <Down> "}}}"
 
-"******* SPECIAL ********* {{{
+"******* Special ********* {{{
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+    " Put these in an autocmd group, so that we can delete them easily.
+    augroup vimrcEx
+        au!
+        " When editing a file, always jump to the last known cursor position.
+        " Don't do it when the position is invalid or when inside an event handler
+        " (happens when dropping a file on gvim).
+        " Also don't do it when the mark is in the first line, that is the default
+        " position when opening a file.
+        autocmd BufReadPost *
+                    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+                    \   exe "normal! g`\"" |
+                    \ endif
+    augroup END
+endif " has("autocmd")
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+    command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+                \ | wincmd p | diffthis
+endif
+set listchars=tab:>-,trail:·,eol:$
 command! XCleanHTML :%s#<[^>]\+>##g
 " Remove the Windows ^M - when the encodings gets messed up
 command! XRemoveControlM :%s/\+$//
-set listchars=tab:>-,trail:·,eol:$
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
 " " Save quickly.
@@ -490,21 +487,28 @@ function! ListLeaders() " {{{
      silent! let lines = getline(1,"$")
 endfunction "}}}
 command! XListLeaders :call ListLeaders()
-function! FindTODOFIXME(args) "{{{1 
+function! FindTODOFIXME(args) "{{{
     let l:grepargs = a:args
     noautocmd vimgrep /TODO/ "".a:args
     "silent! copen
     echo a:args
 endfunction "}}}
 command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
+
+" Quickly edit/reload the vimrc file
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+nmap <silent> <leader>sv :so $MYVIMRC<CR>
 "}}}
 
-" Fold tag
-nnoremap <leader>w <C-w>v<C-w>l
 set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
-
 
 " ================ Turn Off Swap Files ==============
 set noswapfile
 set nobackup
 set nowb
+"
+" ******* Experimental *******  {{{
+" Preserve indentation while pasting text from the OS X clipboard
+" noremap <leader>p :set paste<CR>:put  *<CR>:set nopaste<CR>
+" Add the unnamed register to the clipboard
+"set clipboard=unnamed
