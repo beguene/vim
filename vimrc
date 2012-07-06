@@ -74,7 +74,6 @@ call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 call pathogen#infect() " }}}"
 
-
 "The modelines bit prevents some security exploits having to do with modelines in files. I never use modelines so I don’t miss any functionality here.
 set modelines=0
 " allow backspacing over everything in insert mode
@@ -89,7 +88,6 @@ map Q gq
 set mouse=""
 set nomousef
 
-
 " Sets how many lines of history VIM has to remember
 set history=700
 set hidden
@@ -103,7 +101,6 @@ nmap <F4> :w<CR>:make<CR>:copen<CR>
 map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
 map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
 set splitright
-set nowrapscan
 set foldmethod=marker
 set showmatch "Show matching bracket
 set scrolloff=6 " keep at least 6 lines above/below
