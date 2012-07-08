@@ -6,6 +6,23 @@
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
+"The modelines bit prevents some security exploits having to do with modelines in files. I never use modelines so I don’t miss any functionality here.
+set modelines=0
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" Disable annoying mouse
+set mouse=
+set nomousef
+
+" Sets how many lines of history VIM has to remember
+set history=700
+set hidden
+set confirm
+set foldmethod=marker
+set showmatch "Show matching bracket
+set ttyfast
+
 " ******* Init & Constants ******* {{{
 " With a map leader it's possible to do extra key combinations
 let mapleader = ","
@@ -24,19 +41,24 @@ let g:snips_author="Beguene Permale" "}}}"
 
 " ******* System & OS ******* {{{
 if os == "mac"
-    set shell=/bin/bash
+    set shell=/bin/zsh
     "Backup and Dir
     set dir=~/tmp/vimbackup
     set backupdir=~/tmp/vimbackup
 elseif os == "windows"
+    if $PATH =~? 'cygwin' && ! exists("g:no_cygwin_shell")
+        set shell=bash
+        set shellpipe=2>&1\|tee
+        set shellslash
+    endif
     " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
     " let &guioptions = substitute(&guioptions, "t", "", "g")
     set dir=C:\Windows\Temp
     set backupdir=C:\Windows\Temp
     call add(g:pathogen_disabled, 'doctorjs')
     call add(g:pathogen_disabled, 'command-t')
-else 
-    set shell=/bin/bash
+else
+    set shell=/bin/zsh
 endif "}}}"
 
 " ******* Plugins ******* {{{
@@ -70,43 +92,16 @@ if v:version < '702'
     call add(g:pathogen_disabled, 'l9')
 endif
 call add(g:pathogen_disabled, 'csscolor')
+if executable('ack')
+    call add(g:pathogen_disabled, 'ack')
+endif
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 call pathogen#infect() " }}}"
 
-"The modelines bit prevents some security exploits having to do with modelines in files. I never use modelines so I don’t miss any functionality here.
-set modelines=0
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
-
-set ruler		" show the cursor position all the time
-
+" ******* Format ******* {{{
 " Don't use Ex mode, use Q for formatting
 map Q gq
-
-" Disable annoying mouse
-set mouse=""
-set nomousef
-
-" Sets how many lines of history VIM has to remember
-set history=700
-set hidden
-set confirm
-nmap <leader>r :reg<cr>
-nmap <leader>c :changes<cr>
-
-map <F2> :mksession! ~/tmp/vimtoday.ses
-set pastetoggle=<F3>
-nmap <F4> :w<CR>:make<CR>:copen<CR>
-map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
-map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
-set splitright
-set foldmethod=marker
-set showmatch "Show matching bracket
-set scrolloff=6 " keep at least 6 lines above/below
-set ttyfast
-
-" ******* Format ******* {{{
 " Set to auto read when a file is changed from the outside
 set autoread
 " wrap lines rather than make use of the horizontal scrolling
@@ -119,7 +114,34 @@ set showcmd
 " " use an 79-character line limit
 set textwidth=79 " }}}"
 
+" ******* Mappings ******* {{{
+nmap <leader>r :reg<cr>
+nmap <leader>c :changes<cr>
+map <F2> :mksession! ~/tmp/vimtoday.ses
+set pastetoggle=<F3>
+nmap <F4> :w<CR>:make<CR>:copen<CR>
+if exists("+spelllang")
+  set spelllang=en_us
+endif
+if has('spell')
+  map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
+  map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
+endif
+inoremap <C-C> <Esc>:nohls<CR>
+nnoremap <space> *
+" Unbind the cursor keys in insert, normal and visual modes.
+for prefix in ['i']
+  for key in ['<Up>', '<Down>', '<Left>', '<Right>']
+    exe prefix . "noremap " . key . " <Nop>"
+  endfor
+endfor "}}}"
+
 " ******* Theme and Layout ******* {{{
+set scrolloff=6 " keep at least 6 lines above/below
+set splitright
+set ruler		" show the cursor position all the time
+" Use the below highlight group when displaying bad whitespace is desired.
+highlight BadWhitespace ctermbg=red guibg=red
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
@@ -132,27 +154,38 @@ if &diff
 endif
 hi clear SpellBad
 "hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
-hi clear StatusLine
-hi clear StatusLineNC
-"hi StatusLine guifg=darkgreen guibg=black ctermbg=darkgreen ctermfg=black
-"hi StatusLineNC guifg=white guibg=black ctermbg=white ctermfg=black
 if has("gui_running")
-    set guioptions=abirLb
-    set guioptions-=T
-    set guifont=Menlo:h12
-    set guifont=Lucida_Console:h14
-    set background=dark
-    "colorscheme mustang
-    "colors peaksea
-    "colorscheme clouds_midnight
-    "colo vividchalk
-    colo wombat
-    "colorscheme lucius
+  set background=dark
+  if exists("&guifont")
+    if has("mac")
+      "set guifont=Monaco:h12
+      set guifont=Lucida_Console:h14
+    elseif has("unix")
+      if &guifont == ""
+        set guifont=bitstream\ vera\ sans\ mono\ 11
+      endif
+    elseif has("win32")
+      set guifont=Consolas:h11,Courier\ New:h10
+    endif
+  endif
+  set guioptions=abirLb
+  set guioptions-=T
+  set guifont=Menlo:h12
+  "colorscheme mustang
+  "colors peaksea
+  "colorscheme clouds_midnight
+  "colo vividchalk
+  colo wombat
+  "colorscheme lucius
 else
     set background=dark
     "colorscheme mustang
     "colorscheme wombat256mod
-    colorscheme solarized
+    silent! colorscheme solarized
+    let g:solarized_termtrans=1
+    let g:solarized_termcolors=256
+    let g:solarized_contrast="high"
+    let g:solarized_visibility="high"
 endif
 set encoding=utf-8
 set ic
@@ -162,9 +195,21 @@ set vb t_vb=
 set fileformats=unix,mac,dos "}}}"
 
 " ******* Status Line ******* "{{{
+" Returns true if paste mode is enabled
+function! HasPaste() "{{{2
+    if &paste
+        return 'PASTE MODE  '
+    en
+    return ''
+endfunction "}}}
 set laststatus=2
 set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-set statusline+=%{fugitive#statusline()}
+silent! call fugitive#statusline()
+"if exists("fugitive#statusline")
+"let g:fugitiveStatusline = fugitive#statusline()
+  set statusline+=%{fugitive#statusline()}
+"endif
+set statusline+=\ %{HasPaste()}
 set statusline+=%= "align the rest to right
 set statusline+=[%l,%v][%p%%]
 set statusline+=%#warningmsg#
@@ -186,12 +231,14 @@ set expandtab "}}}"
 set gdefault
 map N Nzz
 map n nzz
-" Search the current file for the word under the cursor and display matches
-nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
-" *** ACK ***
- nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
-" " Use <Leader>A to ack for the word under the cursor
- nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
+if executable('ack')
+    " *** ACK ***
+     nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
+    " " Use <Leader>A to ack for the word under the cursor
+     nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
+    " Search the current file for the word under the cursor and display matches
+    nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
+endif
 set ignorecase
 set smartcase
 set incsearch " do incremental searching }}}
@@ -201,7 +248,7 @@ set complete=.,w,b,u,U,t,i,d
 let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 set wildmenu
-set wildmode=longest,full "}}}"
+set wildmode=list:longest,full "}}}"
 
 " ******* Backup & Undo ******* "{{{
 if has("vms")
@@ -225,6 +272,7 @@ if version >= 703 && has('persistent_undo')
 endif "}}}"
 
 " ******* Files / Dir  management ******* {{{
+set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
@@ -238,7 +286,7 @@ let MRU_Window_Height = 20
 nnoremap <leader>n :NERDTree %<CR>
 let NERDTreeQuitOnOpen = 1
 let NERDTreeChDirMode=2
-" let NERDTreeIgnore = ['\.pyc$', '\.pyo$']'
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
 " *** TAGLIST/TAGBAR ***
 "set tags=$HOME/jdk_tags
 set tags=tags;
@@ -256,7 +304,7 @@ nnoremap <silent> <leader>b :CommandTBuffer<CR>
 nnoremap <silent> <leader>j :CommandTJump<CR>
 " *** CTRL P ***
 let g:ctrlp_map = '<leader>p'
-let g:ctrlp_working_path_mode = 2 
+let g:ctrlp_working_path_mode = 2
 "}}}"
 
 " ******* Git / Fugitive ******* {{{
@@ -272,14 +320,15 @@ function! Git_Repo_Cdup() " Get the relative path to repo root
         " path will be empty, so add './'
         return './' . git_top
     endif
-endfunction 
+endfunction
 
-function! CD_Git_Root() 
+function! CD_Git_Root()
     execute 'cd '.Git_Repo_Cdup()
     let curdir = getcwd()
     echo 'CWD now set to: '.curdir
-endfunction 
+endfunction
 nnoremap <LEADER>gr :call CD_Git_Root()<cr> " change to the git project dir
+nnoremap <silent> <leader>gs :Gstatus<CR>
 " }}}
 
 " ******* Navigation ******* {{{
@@ -299,8 +348,6 @@ map <leader>cd :cd %:p:h<cr>
 " Bash-like command for navigation in Insert Mode
 ino <silent> <c-a> <c-o>b
 ino <silent> <c-e> <esc>ea
-" Kill the current buffer without changing the windows split
-nmap <leader>bd :b#<bar>bd#<CR>
 inoremap jj <Esc>
 " Quickfix / Location List
 nnoremap <leader>qn :cnext<CR>
@@ -320,87 +367,101 @@ noremap <leader>y "*y
 " Pressing v again brings you out of visual mode
 xno v <esc> " }}}
 
-" ******* File Type *******  {{{
-"let g:syntastic_auto_loc_list=0
+" ******* Autocommands *******  {{{
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
-    " Enable file type detection.
-    " Use the default filetype settings, so that mail gets 'tw' set to 72,
-    " 'cindent' is on in C files, etc.
-    " Also load indent files, to automatically do language-dependent indenting.
+  if $HOME !~# '^/Users/'
+    filetype off " Debian preloads this before the runtimepath is set
+  endif
+  if version>600
     filetype plugin indent on
+  else
     filetype on
-    " ###### PHP
-    "au BufRead *.php set ft=php.html
-    "au BufNewFile *.php set ft=php.html
-    au FileType php set omnifunc=phpcomplete#CompletePHP
-    " run file with PHP CLI (CTRL-M)
-    "autocmd FileType php noremap <F5> <esc>:w!<CR>:!php %<CR>
-    " PHP parser check (CTRL-L)
-    "autocmd FileType php noremap <F4> <esc>:w!<CR>:!php -l %<CR>
-    " ###### JAVASCRIPT
-    " Javascript parser check (CTRL-L)
-    autocmd FileType javascript map <F5> :w!<CR>:!node %<CR>
-    autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
-    au FileType javascript setl fen  nocindent
-    let javascript_enable_domhtmlcss=1
+  endif
+  " ###### PHP
+  "au BufRead *.php set ft=php.html
+  "au BufNewFile *.php set ft=php.html
+  " ###### JAVASCRIPT
+  autocmd FileType javascript setl fen  nocindent
+  let javascript_enable_domhtmlcss=1
+  " Display tabs at the beginning of a line in Python mode as bad.
+  autocmd BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
+  " " Make trailing whitespace be flagged as bad.
+  autocmd BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
 
+  augroup FTOptions " {{{2
+    autocmd!
+    autocmd FileType vim  setlocal ai et sta sw=2 sts=2 keywordprg=:help
+    autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
+    autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
     " ###### TWIG
     au BufRead,BufNewFile *.html.twig set ft=html.twig syntax=htmltwig
+    "CSS"
+    autocmd BufNewFile,BufRead *.scss set ft=scss.css
+    autocmd BufNewFile,BufRead *.sass set ft=sass.css
+    autocmd BufNewFile,BufRead *.less set ft=less.css
     ""Less files
     autocmd BufRead,BufNewFile *.less set filetype=css
     autocmd BufRead,BufNewFile *.less set omnifunc=csscomplete#CompleteCSS
-    ""css files
-    autocmd BufRead,BufNewFile *.css set omnifunc=csscomplete#CompleteCSS
-    " make CSS omnicompletion work for SASS and SCSS
-    autocmd BufNewFile,BufRead *.scss             set ft=scss.css
-    autocmd BufNewFile,BufRead *.sass             set ft=sass.css
-    autocmd BufNewFile,BufRead *.less             set ft=less.css
-    autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
-    autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
-    autocmd FileType python set omnifunc=pythoncomplete#Complete
-    " Display tabs at the beginning of a line in Python mode as bad.
-    au BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
-    " " Make trailing whitespace be flagged as bad.
-    au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
-    let python_highlight_all=1
-    autocmd FileType python map <F5> :w!<CR>:!python %<CR>
-    "" Java"
-    autocmd FileType java map <F5> :w!<CR>:!javac %<CR>
-    augroup sh
-        au!
-        "smart indent really only for C like languages
-        au FileType sh set nosmartindent autoindent
-    augroup END
-    "INDENT FORMAT
-    " HTML,xhtml,xml (tab width 2 chr, no wrapping)
-    autocmd FileType html setlocal textwidth=0
-    autocmd FileType html,xhtml,xml setlocal expandtab shiftwidth=2 tabstop=2 softtabstop=2
-
-    " PHP (tab width 4 chr, wrap at 79th char)
-    autocmd FileType php setlocal sw=4 ts=4 sts=4 textwidth=79
-    " Python (tab width 4 chr, wrap at 79th char)
-    autocmd FileType python setlocal sw=4 ts=4 sts=4 textwidth=79 expandtab
-    " CSS (tab width 2 chr, wrap at 79th char)
-    autocmd FileType css setlocal sw=2 ts=2 sts=2 textwidth=79
-    " JavaScript (tab width 4 chr, wrap at 79th)
-    autocmd FileType javascript setlocal sw=4 ts=4 sts=4 textwidth=79
-    "SQL"
-    au FileType sql setlocal completefunc=sqlcomplete#Complete"
+    "OmniFunc"
+    autocmd FileType css        set omnifunc=csscomplete#CompleteCSS
+    autocmd FileType html       set omnifunc=htmlcomplete#CompleteTags
+    autocmd FileType xml        set omnifunc=xmlcomplete#CompleteTags
+    autocmd FileType python     set omnifunc=pythoncomplete#Complete
+    autocmd FileType php        set omnifunc=phpcomplete#CompletePHP
+    autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
+    autocmd FileType sql        setlocal completefunc=sqlcomplete#Complete"
+    autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
+    autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
     " TXT
-    au BufRead,BufNewFile *.txt set ft=txt syntax=txt
-    autocmd FileType txt setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
-    autocmd FileType txt setlocal textwidth=79
-    " Set Cursor line on MRU window"
-    autocmd BufEnter,BufRead __MRU_Files__ set cursorline
-    " Help File speedups, <enter> to follow tag, delete for back
-    au filetype help nnoremap <buffer><cr> <c-]>
-    au filetype help nnoremap <buffer><bs> <c-T>
-    au filetype help nnoremap q :q!<CR>
-    au filetype help set nonumber
-    au FileType help wincmd _
-    set splitbelow
-endif "}}}"
+    autocmd BufNewFile,BufRead *.txt,README,INSTALL,NEWS,TODO if &ft == ""|set ft=text|endif
+    autocmd BufRead,BufNewFile *.txt set ft=txt syntax=txt
+    autocmd FileType text,txt setlocal tw=78 linebreak nolist
+    autocmd FileType txt      setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
+  augroup END "}}}2
+  augroup Compiler " {{{2
+    autocmd FileType java         silent! compiler javac  | setlocal makeprg=javac\ %
+    autocmd FileType javascript   setlocal makeprg=node\ %
+    autocmd FileType python       silent! compiler python | setlocal makeprg=python\ %
+    autocmd FileType perl         silent! compiler perl
+    autocmd FileType sh           setlocal makeprg=sh\ %
+    autocmd FileType zsh          setlocal makeprg=zsh\ %
+    autocmd FileType python map <F5> :w!<CR>:!python %<CR>
+    "autocmd FileType java   map <F5> :w!<CR>:!javac %<CR>
+    " run file with PHP CLI (CTRL-M)
+    autocmd FileType php noremap <F5> <esc>:w!<CR>:!php %<CR>
+    " PHP parser check (CTRL-L)
+    autocmd FileType php noremap <F4> <esc>:w!<CR>:!php -l %<CR>
+  augroup END "}}}2
+  let python_highlight_all=1
+  augroup sh
+    au!
+    "smart indent really only for C like languages
+    au FileType sh set nosmartindent autoindent
+  augroup END
+  augroup Format " {{{2
+    autocmd FileType c,cpp,cs,java  setlocal ai et sta sw=4 sts=4 cin
+    " HTML,xhtml,xml (tab width 2 chr, no wrapping)
+    autocmd FileType html,xhtml,xml setlocal expandtab sw=2 ts=2 sts=2 tw=0
+    autocmd FileType php            setlocal sw=4 ts=4 sts=4 textwidth=79
+    autocmd FileType python         setlocal sw=4 ts=4 sts=4 textwidth=79 expandtab
+    autocmd FileType css            setlocal sw=2 ts=2 sts=2 textwidth=79
+    autocmd FileType javascript     setlocal sw=4 ts=4 sts=4 textwidth=79
+    autocmd FileType yaml,ruby      setlocal ai et sta sw=2 sts=2
+  augroup END "}}}2
+  " Set Cursor line on MRU window"
+  autocmd BufEnter,BufRead __MRU_Files__ set cursorline
+  augroup Help " {{{2
+  " Help File speedups, <enter> to follow tag, delete for back
+  au filetype help nnoremap <buffer><cr> <c-]>
+  au filetype help nnoremap <buffer><bs> <c-T>
+  au filetype help nnoremap q :q!<CR>
+  au filetype help set nonumber
+  au FileType help wincmd _
+  augroup END "}}}2
+  autocmd FileType gitcommit setlocal spell
+  set splitbelow
+endif " has("autocmd")}}}"
 
 "******* Language Specific ********* {{{
 " PHP Generated Code Highlights (HTML & SQL)
@@ -453,16 +514,16 @@ if !exists(":DiffOrig")
     command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
                 \ | wincmd p | diffthis
 endif
+
 set listchars=tab:>-,trail:·,eol:$
+
 command! XCleanHTML :%s#<[^>]\+>##g
-" Remove the Windows ^M - when the encodings gets messed up
+" Remove the Windows ^M - when the encodings gets messed up 
 command! XRemoveControlM :%s/\+$//
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
 " " Save quickly.
 noremap <leader>s :w<CR>
-"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
-"let g:ctrlp_map = '<c-p>'
 inoremap <C-L> <C-V>u2022<Space>
 
 let g:user_zen_leader_key = '<c-e>'
@@ -470,6 +531,27 @@ let g:user_zen_expandabbr_key = '<c-e>'
 let g:use_zen_complete_tag = 1
 " --- SnipMate
 let g:snipMateAllowMatchingDot = 0
+" Don't close window, when deleting a buffer
+command! Bclose call <SID>BufcloseCloseIt()
+function! <SID>BufcloseCloseIt()
+   let l:currentBufNum = bufnr("%")
+   let l:alternateBufNum = bufnr("#")
+
+   if buflisted(l:alternateBufNum)
+     buffer #
+   else
+     bnext
+   endif
+
+   if bufnr("%") == l:currentBufNum
+     new
+   endif
+
+   if buflisted(l:currentBufNum)
+     execute("bdelete! ".l:currentBufNum)
+   endif
+endfunction
+nnoremap <leader>bd :Bclose<cr>
 
 function! ListLeaders() " {{{
      silent! redir @a
@@ -497,15 +579,35 @@ nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 "}}}
 
-set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
-
 " ================ Turn Off Swap Files ==============
 set noswapfile
 set nobackup
 set nowb
-"
+
 " ******* Experimental *******  {{{
 " Preserve indentation while pasting text from the OS X clipboard
 " noremap <leader>p :set paste<CR>:put  *<CR>:set nopaste<CR>
 " Add the unnamed register to the clipboard
 "set clipboard=unnamed
+"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
+"let g:ctrlp_map = '<c-p>'
+"set statusline=[%n]\ %<%.99f\
+"%h%w%m%r%{SL('CapsLockStatusline')}%y%{SL('fugitive#statusline')}%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}%*%=%-14.(%l,%c%V%)\
+"%P
+"set suffixes+=.dvi  " Lower priority in wildcards
+""set tags+=../tags,../../tags,../../../tags,../../../../tags]
+"let g:syntastic_auto_loc_list=0
+" Delete trailing white space on save, useful for Python and CoffeeScript ;)
+"func! DeleteTrailingWS()
+  "exe "normal mz"
+  "%s/\s\+$//ge
+  "exe "normal `z"
+"endfunc
+"autocmd BufWrite *.py :call DeleteTrailingWS()
+"autocmd BufWrite *.coffee :call DeleteTrailingWS()
+"
+" Pressing ,ss will toggle and untoggle spell checking
+map <leader>ss :setlocal spell!<cr>
+set ttimeoutlen=50 " Make Esc work faster
+
+
