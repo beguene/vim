@@ -59,7 +59,12 @@ elseif os == "windows"
     call add(g:pathogen_disabled, 'command-t')
 else
     set shell=/bin/zsh
-endif "}}}"
+endif 
+if os=='windows'
+    let $VIMHOME = $VIM."/vimfiles"
+else
+    let $VIMHOME = $HOME."/.vim"
+endif"}}}"
 
 " ******* Plugins ******* {{{
 " list only the plugin groups you will use
@@ -68,32 +73,38 @@ if !exists('g:active_bundle_groups')
 endif
 " To disable a plugin, add it's bundle name to the following list
 let g:pathogen_disabled = []
-"if !g:me_experimental
-    "call add(g:pathogen_disabled, 'ctrlp')
-"endif
 " for some reason the csscolor plugin is very slow when run on the terminal
 " but not in GVim, so disable it if no GUI is running
 if !has('gui_running')
-    call add(g:pathogen_disabled, 'csscolor')
-    call add(g:pathogen_disabled, 'yankring')
+  call add(g:pathogen_disabled, 'csscolor')
+  call add(g:pathogen_disabled, 'yankring')
 endif
-"if !has('ruby') && :ruby puts RUBY_VERSION >= 1.8
-    "call add(g:pathogen_disabled, 'command-t')
-"endif
+if !has('ruby') || os=='windows'
+  call add(g:pathogen_disabled, 'command-t')
+else
+  call add(g:pathogen_disabled, 'ctrlp')
+endif
 
+" Tags requires ctags
+if !executable("ctags")
+  call add(g:pathogen_disabled, 'tagbar')
+  call add(g:pathogen_disabled, 'taglist-plus')
+  call add(g:pathogen_disabled, 'taglist')
+  call add(g:pathogen_disabled, 'doctor-js')
+endif
 " Gundo requires at least vim 7.3
 if v:version < '703' || !has('python')
-    call add(g:pathogen_disabled, 'gundo')
+  call add(g:pathogen_disabled, 'gundo')
 else
-    nnoremap <leader>u :GundoToggle<CR>
+  nnoremap <leader>u :GundoToggle<CR>
 endif
 
 if v:version < '702'
-    call add(g:pathogen_disabled, 'l9')
+  call add(g:pathogen_disabled, 'l9')
 endif
 call add(g:pathogen_disabled, 'csscolor')
-if executable('ack')
-    call add(g:pathogen_disabled, 'ack')
+if !executable('ack')
+  call add(g:pathogen_disabled, 'ack')
 endif
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
@@ -120,6 +131,9 @@ nmap <leader>c :changes<cr>
 map <F2> :mksession! ~/tmp/vimtoday.ses
 set pastetoggle=<F3>
 nmap <F4> :w<CR>:make<CR>:copen<CR>
+inoremap <C-C> <Esc>:nohls<CR>
+"  CSS properties sort
+nmap <leader>S /{/+1<CR>vi{:sort<CR>
 if exists("+spelllang")
   set spelllang=en_us
 endif
@@ -127,7 +141,6 @@ if has('spell')
   map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
   map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
 endif
-inoremap <C-C> <Esc>:nohls<CR>
 nnoremap <space> *
 " Unbind the cursor keys in insert, normal and visual modes.
 for prefix in ['i']
@@ -276,8 +289,7 @@ set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
-noremap <leader>k :BufExplorer<CR>
-let g:bufExplorerSplitBelow=1        " Split new window below current.
+noremap <leader>k :BufExplorerVerticalSplit<CR>
 " *** MRU ***
 noremap <leader>m :MRU<CR>
 let MRU_Add_Menu = 0
@@ -356,6 +368,7 @@ nnoremap <leader>qq :cclose<CR> "}}}"
 
 " ******* Yank & Paste ******* {{{
 " *** YANKRING ***
+let g:yankring_history_dir = '$VIMHOME'
 nnoremap <silent> <leader>y :YRShow<cr>
 inoremap <silent> <leader>y <ESC>:YRShow<cr>
 "don't move the cursor after pasting
@@ -368,7 +381,6 @@ noremap <leader>y "*y
 xno v <esc> " }}}
 
 " ******* Autocommands *******  {{{
-" Only do this part when compiled with support for autocommands.
 if has("autocmd")
   if $HOME !~# '^/Users/'
     filetype off " Debian preloads this before the runtimepath is set
@@ -383,7 +395,6 @@ if has("autocmd")
   "au BufNewFile *.php set ft=php.html
   " ###### JAVASCRIPT
   autocmd FileType javascript setl fen  nocindent
-  let javascript_enable_domhtmlcss=1
   " Display tabs at the beginning of a line in Python mode as bad.
   autocmd BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
   " " Make trailing whitespace be flagged as bad.
@@ -391,6 +402,8 @@ if has("autocmd")
 
   augroup FTOptions " {{{2
     autocmd!
+    " In Makefiles, use real tabs, not tabs expanded to spaces
+    autocmd FileType make setlocal noexpandtab
     autocmd FileType vim  setlocal ai et sta sw=2 sts=2 keywordprg=:help
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
@@ -433,7 +446,6 @@ if has("autocmd")
     " PHP parser check (CTRL-L)
     autocmd FileType php noremap <F4> <esc>:w!<CR>:!php -l %<CR>
   augroup END "}}}2
-  let python_highlight_all=1
   augroup sh
     au!
     "smart indent really only for C like languages
@@ -472,14 +484,13 @@ let php_parent_error_close = 1
 "For skipping an php end tag, if there exists an open ( or [ without a closing
 ""one: >
 let php_parent_error_open = 1
-"  CSS properties sort
-nmap <leader>S /{/+1<CR>vi{:sort<CR>
-"
 "JAVA
 " Highlight functions using Java style
 let java_highlight_functions="style"
 " Don't flag C++ keywords as errors
 let java_allow_cpp_keywords=1 "}}}"
+let python_highlight_all=1
+let javascript_enable_domhtmlcss=1
 
 "******* Command Mode Related ********* {{{
 set showcmd		" display incomplete commands
