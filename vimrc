@@ -1,6 +1,6 @@
 " Beguene's settings
 " Author: Beguene Permale
-" Version: 0.1
+" Version: 0.2
 
 " Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
@@ -101,6 +101,9 @@ endif
 
 if v:version < '702'
   call add(g:pathogen_disabled, 'l9')
+endif
+if v:version < '700'
+  call add(g:pathogen_disabled, 'supertab')
 endif
 call add(g:pathogen_disabled, 'csscolor')
 if !executable('ack')
@@ -258,10 +261,14 @@ set incsearch " do incremental searching }}}
 
 " ******* Completion ******* "{{{
 set complete=.,w,b,u,U,t,i,d
-let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+"let g:SuperTabDefaultCompletionType = "context"
+"let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 set wildmenu
-set wildmode=list:longest,full "}}}"
+set wildmode=list:longest,full 
+"let g:SuperTabMappingForward = '<c-space>'
+"let g:SuperTabMappingBackward = '<s-c-space>'
+let g:SuperTabDefaultCompletionType = "context
+"}}}"
 
 " ******* Backup & Undo ******* "{{{
 if has("vms")
@@ -484,13 +491,13 @@ let php_parent_error_close = 1
 "For skipping an php end tag, if there exists an open ( or [ without a closing
 ""one: >
 let php_parent_error_open = 1
+let python_highlight_all=1
+let javascript_enable_domhtmlcss=1
 "JAVA
 " Highlight functions using Java style
 let java_highlight_functions="style"
 " Don't flag C++ keywords as errors
 let java_allow_cpp_keywords=1 "}}}"
-let python_highlight_all=1
-let javascript_enable_domhtmlcss=1
 
 "******* Command Mode Related ********* {{{
 set showcmd		" display incomplete commands
@@ -620,5 +627,3 @@ set nowb
 " Pressing ,ss will toggle and untoggle spell checking
 map <leader>ss :setlocal spell!<cr>
 set ttimeoutlen=50 " Make Esc work faster
-
-
