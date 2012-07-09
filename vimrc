@@ -4,7 +4,7 @@
 
 set nocompatible
 
-"The modelines bit prevents some security exploits having to do with modelines in files. I never use modelines so I don’t miss any functionality here.
+"The modelines bit prevents some security exploits having to do with modelines in files.
 set modelines=0
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -27,40 +27,40 @@ let mapleader = ","
 let g:mapleader = ","
 
 fun! MySys()
-    if has('win32') || has('win64') || has('win32unix')
-        return 'windows'
-    elseif has('mac') || has('macunix')
-        return "mac"
-    else
-        return "unix"
+  if has('win32') || has('win64') || has('win32unix')
+    return 'windows'
+  elseif has('mac') || has('macunix')
+    return "mac"
+  else
+    return "unix"
 endfun
 let g:os = MySys()
 let g:snips_author="Beguene Permale" "}}}"
 
 " ******* System & OS ******* {{{
 if os == "mac"
-    set shell=/bin/zsh
-    "Backup and Dir
-    set dir=~/tmp/vimbackup
-    set backupdir=~/tmp/vimbackup
+  set shell=/bin/zsh
+  "Backup and Dir
+  set dir=~/tmp/vimbackup
+  set backupdir=~/tmp/vimbackup
 elseif os == "windows"
-    if $PATH =~? 'cygwin' && ! exists("g:no_cygwin_shell")
-        set shell=bash
-        set shellpipe=2>&1\|tee
-        set shellslash
-    endif
-    " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-    " let &guioptions = substitute(&guioptions, "t", "", "g")
-    set dir=C:\Windows\Temp
-    set backupdir=C:\Windows\Temp
-    call add(g:pathogen_disabled, 'doctorjs')
+  if $PATH =~? 'cygwin' && ! exists("g:no_cygwin_shell")
+    set shell=bash
+    set shellpipe=2>&1\|tee
+    set shellslash
+  endif
+  " For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+  " let &guioptions = substitute(&guioptions, "t", "", "g")
+  set dir=C:\Windows\Temp
+  set backupdir=C:\Windows\Temp
+  call add(g:pathogen_disabled, 'doctorjs')
 else
-    set shell=/bin/zsh
+  set shell=/bin/zsh
 endif 
 if os=='windows'
-    let $VIMHOME = $VIM."/vimfiles"
+  let $VIMHOME = $VIM."/vimfiles"
 else
-    let $VIMHOME = $HOME."/.vim"
+  let $VIMHOME = $HOME."/.vim"
 endif"}}}"
 
 " ******* Plugins ******* {{{
@@ -126,8 +126,8 @@ set showcmd
 set textwidth=79 " }}}"
 
 " ******* Mappings ******* {{{
-nmap <leader>r :reg<cr>
-nmap <leader>c :changes<cr>
+nnoremap <leader>r :reg<cr>
+nnoremap <leader>c :changes<cr>
 map <F2> :mksession! ~/tmp/vimtoday.ses
 set pastetoggle=<F3>
 nmap <F4> :w<CR>:make<CR>:copen<CR>
@@ -140,6 +140,8 @@ endif
 if has('spell')
   map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
   map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
+  " Pressing ,ss will toggle and untoggle spell checking
+  nnoremap <leader>ss :setlocal spell!<cr>
 endif
 nnoremap <space> *
 " Unbind the cursor keys in insert, normal and visual modes.
@@ -158,12 +160,12 @@ highlight BadWhitespace ctermbg=red guibg=red
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
-    syntax on
-    set hlsearch
-    au GUIEnter * set fullscreen
+  syntax on
+  set hlsearch
+  au GUIEnter * set fullscreen
 endif
 if &diff
-    syntax off
+  syntax off
 endif
 hi clear SpellBad
 "hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
@@ -191,14 +193,14 @@ if has("gui_running")
   colo wombat
   "colorscheme lucius
 else
-    set background=dark
-    "colorscheme mustang
-    "colorscheme wombat256mod
-    silent! colorscheme solarized
-    let g:solarized_termtrans=1
-    let g:solarized_termcolors=256
-    let g:solarized_contrast="high"
-    let g:solarized_visibility="high"
+  set background=dark
+  "colorscheme mustang
+  "colorscheme wombat256mod
+  silent! colorscheme solarized
+  let g:solarized_termtrans=1
+  let g:solarized_termcolors=256
+  let g:solarized_contrast="high"
+  let g:solarized_visibility="high"
 endif
 set encoding=utf-8
 set ic
@@ -532,7 +534,7 @@ endif
 set listchars=tab:>-,trail:·,eol:$
 
 command! XCleanHTML :%s#<[^>]\+>##g
-" Remove the Windows ^M - when the encodings gets messed up 
+" Remove the Windows ^M - 
 command! XRemoveControlM :%s/\+$//
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
@@ -617,8 +619,6 @@ set nowb
 "autocmd BufWrite *.py :call DeleteTrailingWS()
 "autocmd BufWrite *.coffee :call DeleteTrailingWS()
 "
-" Pressing ,ss will toggle and untoggle spell checking
-map <leader>ss :setlocal spell!<cr>
 set ttimeoutlen=50 " Make Esc work faster
 let g:user_zen_leader_key = '<c-e>'
 let g:user_zen_expandabbr_key = '<c-e>'
