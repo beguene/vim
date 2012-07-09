@@ -2,8 +2,6 @@
 " Author: Beguene Permale
 " Version: 0.2
 
-" Vim settings, rather then Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
 set nocompatible
 
 "The modelines bit prevents some security exploits having to do with modelines in files. I never use modelines so I don’t miss any functionality here.
@@ -56,7 +54,6 @@ elseif os == "windows"
     set dir=C:\Windows\Temp
     set backupdir=C:\Windows\Temp
     call add(g:pathogen_disabled, 'doctorjs')
-    call add(g:pathogen_disabled, 'command-t')
 else
     set shell=/bin/zsh
 endif 
@@ -267,7 +264,7 @@ set wildmenu
 set wildmode=list:longest,full 
 "let g:SuperTabMappingForward = '<c-space>'
 "let g:SuperTabMappingBackward = '<s-c-space>'
-let g:SuperTabDefaultCompletionType = "context
+let g:SuperTabDefaultCompletionType = "context"
 "}}}"
 
 " ******* Backup & Undo ******* "{{{
@@ -296,7 +293,7 @@ set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
-noremap <leader>k :BufExplorerVerticalSplit<CR>
+noremap <leader>k :BufExplorerVerticalSplit<CR>j
 " *** MRU ***
 noremap <leader>m :MRU<CR>
 let MRU_Add_Menu = 0
@@ -511,7 +508,6 @@ cnoremap <C-N> <Down> "}}}"
 "******* Special ********* {{{
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
-    " Put these in an autocmd group, so that we can delete them easily.
     augroup vimrcEx
         au!
         " When editing a file, always jump to the last known cursor position.
@@ -544,14 +540,11 @@ command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Ba
 noremap <leader>s :w<CR>
 inoremap <C-L> <C-V>u2022<Space>
 
-let g:user_zen_leader_key = '<c-e>'
-let g:user_zen_expandabbr_key = '<c-e>'
-let g:use_zen_complete_tag = 1
 " --- SnipMate
 let g:snipMateAllowMatchingDot = 0
 " Don't close window, when deleting a buffer
 command! Bclose call <SID>BufcloseCloseIt()
-function! <SID>BufcloseCloseIt()
+function! <SID>BufcloseCloseIt() "{{{"
    let l:currentBufNum = bufnr("%")
    let l:alternateBufNum = bufnr("#")
 
@@ -568,7 +561,7 @@ function! <SID>BufcloseCloseIt()
    if buflisted(l:currentBufNum)
      execute("bdelete! ".l:currentBufNum)
    endif
-endfunction
+endfunction "}}}"
 nnoremap <leader>bd :Bclose<cr>
 
 function! ListLeaders() " {{{
@@ -627,3 +620,8 @@ set nowb
 " Pressing ,ss will toggle and untoggle spell checking
 map <leader>ss :setlocal spell!<cr>
 set ttimeoutlen=50 " Make Esc work faster
+let g:user_zen_leader_key = '<c-e>'
+let g:user_zen_expandabbr_key = '<c-e>'
+let g:use_zen_complete_tag = 1
+au InsertLeave * hi Cursor guibg=red
+au InsertEnter * hi Cursor guibg=green
