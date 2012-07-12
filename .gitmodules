@@ -76,3 +76,6 @@
 [submodule "bundle-archive/vim-snipmate"]
 	path = bundle-archive/vim-snipmate
 	url = git://github.com/garbas/vim-snipmate.git
+[submodule "bundle-archive/vim-web-indent"]
+	path = bundle-archive/vim-web-indent
+	url = https://github.com/lukaszb/vim-web-indent.git
