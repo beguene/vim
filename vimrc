@@ -56,7 +56,7 @@ elseif os == "windows"
   call add(g:pathogen_disabled, 'doctorjs')
 else
   set shell=/bin/zsh
-endif 
+endif
 if os=='windows'
   let $VIMHOME = $VIM."/vimfiles"
 else
@@ -144,6 +144,8 @@ if has('spell')
   nnoremap <leader>ss :setlocal spell!<cr>
 endif
 nnoremap <space> *
+nnoremap <return> *
+nnoremap <backspace> diw
 " Unbind the cursor keys in insert, normal and visual modes.
 for prefix in ['i']
   for key in ['<Up>', '<Down>', '<Left>', '<Right>']
@@ -203,6 +205,7 @@ else
   let g:solarized_visibility="high"
 endif
 set encoding=utf-8
+set fileencoding=utf-8
 set ic
 set nu
 set noerrorbells
@@ -218,25 +221,25 @@ function! HasPaste() "{{{2
     return ''
 endfunction "}}}
 set laststatus=2
-set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-silent! call fugitive#statusline()
-"if exists("fugitive#statusline")
-"let g:fugitiveStatusline = fugitive#statusline()
-  set statusline+=%{fugitive#statusline()}
-"endif
-set statusline+=\ %{HasPaste()}
-set statusline+=%= "align the rest to right
-set statusline+=[%l,%v][%p%%]
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%* "}}}"
+"set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
+"silent! call fugitive#statusline()
+""if exists("fugitive#statusline")
+""let g:fugitiveStatusline = fugitive#statusline()
+  ""set statusline+=%{fugitive#statusline()}
+""endif
+"set statusline+=\ %{HasPaste()}
+"set statusline+=%= "align the rest to right
+"set statusline+=[%l,%v][%p%%]
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%* "}}}"
 
 " ******* Tab & Indent ******* "{{{
 set shiftwidth=4
 set tabstop=4
 set softtabstop=4
 set smarttab
-set smartindent
+"set smartindent
 set autoindent
 set expandtab "}}}"
 
@@ -263,7 +266,7 @@ set complete=.,w,b,u,U,t,i,d
 "let g:SuperTabDefaultCompletionType = "context"
 "let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 set wildmenu
-set wildmode=list:longest,full 
+set wildmode=list:longest,full
 "let g:SuperTabMappingForward = '<c-space>'
 "let g:SuperTabMappingBackward = '<s-c-space>'
 let g:SuperTabDefaultCompletionType = "context"
@@ -467,6 +470,7 @@ if has("autocmd")
     autocmd FileType javascript     setlocal sw=4 ts=4 sts=4 textwidth=79
     autocmd FileType yaml,ruby      setlocal ai et sta sw=2 sts=2
   augroup END "}}}2
+  autocmd BufEnter,BufRead __MRU_Files__ set ft=mru
   " Set Cursor line on MRU window"
   autocmd BufEnter,BufRead __MRU_Files__ set cursorline
   augroup Help " {{{2
@@ -478,6 +482,14 @@ if has("autocmd")
   au FileType help wincmd _
   augroup END "}}}2
   autocmd FileType gitcommit setlocal spell
+  augroup extraSpaces "{{{"
+    au!
+    highlight ExtraWhitespace ctermbg=red guibg=red
+    au ColorScheme * highlight ExtraWhitespace guibg=red
+    au BufEnter * match ExtraWhitespace /\s\+$/
+    au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    au InsertLeave * match ExtraWhiteSpace /\s\+$/
+  augroup END "}}}"
   set splitbelow
 endif " has("autocmd")}}}"
 
@@ -534,13 +546,14 @@ endif
 set listchars=tab:>-,trail:·,eol:$
 
 command! XCleanHTML :%s#<[^>]\+>##g
-" Remove the Windows ^M - 
+" Remove the Windows ^M -
 command! XRemoveControlM :%s/\+$//
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
 " " Save quickly.
 noremap <leader>s :w<CR>
 inoremap <C-L> <C-V>u2022<Space>
+nnoremap <Up> :XRemoveTrailingWhitespace<cr>
 
 " --- SnipMate
 let g:snipMateAllowMatchingDot = 0
@@ -596,32 +609,6 @@ nmap <silent> <leader>sv :so $MYVIMRC<CR>
 set noswapfile
 set nobackup
 set nowb
-
+call Pl#Theme#InsertSegment('ws_marker', 'after', 'lineinfo')
 " ******* Experimental *******  {{{
-" Preserve indentation while pasting text from the OS X clipboard
-" noremap <leader>p :set paste<CR>:put  *<CR>:set nopaste<CR>
-" Add the unnamed register to the clipboard
-"set clipboard=unnamed
-"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
-"let g:ctrlp_map = '<c-p>'
-"set statusline=[%n]\ %<%.99f\
-"%h%w%m%r%{SL('CapsLockStatusline')}%y%{SL('fugitive#statusline')}%#ErrorMsg#%{SL('SyntasticStatuslineFlag')}%*%=%-14.(%l,%c%V%)\
-"%P
-"set suffixes+=.dvi  " Lower priority in wildcards
-""set tags+=../tags,../../tags,../../../tags,../../../../tags]
-"let g:syntastic_auto_loc_list=0
-" Delete trailing white space on save, useful for Python and CoffeeScript ;)
-"func! DeleteTrailingWS()
-  "exe "normal mz"
-  "%s/\s\+$//ge
-  "exe "normal `z"
-"endfunc
-"autocmd BufWrite *.py :call DeleteTrailingWS()
-"autocmd BufWrite *.coffee :call DeleteTrailingWS()
-"
-set ttimeoutlen=50 " Make Esc work faster
-let g:user_zen_leader_key = '<c-e>'
-let g:user_zen_expandabbr_key = '<c-e>'
-let g:use_zen_complete_tag = 1
-au InsertLeave * hi Cursor guibg=red
-au InsertEnter * hi Cursor guibg=green
+source $HOME/.vim/experimental.vim
