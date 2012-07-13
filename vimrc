@@ -9,7 +9,7 @@ set modelines=0
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
-" Disable annoying mouse
+" Disable useless mouse
 set mouse=
 set nomousef
 
@@ -213,26 +213,27 @@ set vb t_vb=
 set fileformats=unix,mac,dos "}}}"
 
 " ******* Status Line ******* "{{{
-" Returns true if paste mode is enabled
-function! HasPaste() "{{{2
-    if &paste
-        return 'PASTE MODE  '
-    en
-    return ''
-endfunction "}}}
 set laststatus=2
-"set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-"silent! call fugitive#statusline()
-""if exists("fugitive#statusline")
-""let g:fugitiveStatusline = fugitive#statusline()
-  ""set statusline+=%{fugitive#statusline()}
-""endif
-"set statusline+=\ %{HasPaste()}
-"set statusline+=%= "align the rest to right
-"set statusline+=[%l,%v][%p%%]
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%* "}}}"
+if exists("Pl#Theme#InsertSegment")
+  call Pl#Theme#InsertSegment('ws_marker', 'after', 'lineinfo')
+else " Build custom statusline if not Powerline"
+  " Returns true if paste mode is enabled
+  function! HasPaste() "{{{2
+      if &paste
+          return 'PASTE MODE  '
+      en
+      return ''
+  endfunction "}}}
+  set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
+  silent set statusline+=%{fugitive#statusline()}
+  set statusline+=\ %{HasPaste()}
+  set statusline+=%= "align the rest to right
+  set statusline+=[%l,%v][%p%%]
+  set statusline+=%#warningmsg#
+  set statusline+=%{SyntasticStatuslineFlag()}
+  set statusline+=%*
+endif
+  "}}}"
 
 " ******* Tab & Indent ******* "{{{
 set shiftwidth=4
@@ -554,6 +555,7 @@ command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Ba
 noremap <leader>s :w<CR>
 inoremap <C-L> <C-V>u2022<Space>
 nnoremap <Up> :XRemoveTrailingWhitespace<cr>
+    "highlight VertSplit ctermbg=black ctermfg=black
 
 " --- SnipMate
 let g:snipMateAllowMatchingDot = 0
@@ -578,6 +580,26 @@ function! <SID>BufcloseCloseIt() "{{{"
    endif
 endfunction "}}}"
 nnoremap <leader>bd :Bclose<cr>
+highlight VertSplit ctermbg=8 ctermfg=8
+
+" Toggle Distraction Free mode
+function! <SID>ToggleDistractionFree() "{{{"
+    if !exists("g:isDistractionFree")
+        let g:isDistractionFree = 'false'
+    endif
+  if g:isDistractionFree == 'false'
+    set nonu
+    set laststatus=0
+    let g:isDistractionFree = 'true'
+  else
+    set nu
+    set laststatus=2
+    colorscheme solarized
+    let g:isDistractionFree = 'false'
+  endif
+endfunction "}}}"
+command! ToggleDistractionFree call <SID>ToggleDistractionFree()
+nnoremap <leader>di :ToggleDistractionFree<cr>
 
 function! ListLeaders() " {{{
      silent! redir @a
@@ -609,6 +631,5 @@ nmap <silent> <leader>sv :so $MYVIMRC<CR>
 set noswapfile
 set nobackup
 set nowb
-call Pl#Theme#InsertSegment('ws_marker', 'after', 'lineinfo')
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
