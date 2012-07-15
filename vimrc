@@ -43,6 +43,8 @@ if os == "mac"
   "Backup and Dir
   set dir=~/tmp/vimbackup
   set backupdir=~/tmp/vimbackup
+  "Open current file in browser
+  nnoremap <silent> <leader>o :!open -a Google\ Chrome '%' &<cr>
 elseif os == "windows"
   if $PATH =~? 'cygwin' && ! exists("g:no_cygwin_shell")
     set shell=bash
@@ -56,6 +58,7 @@ elseif os == "windows"
   call add(g:pathogen_disabled, 'doctorjs')
 else
   set shell=/bin/zsh
+  nnoremap <silent> <leader>o :!open -a chomium-browser '%' &<cr>
 endif
 if os=='windows'
   let $VIMHOME = $VIM."/vimfiles"
