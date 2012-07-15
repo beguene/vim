@@ -149,6 +149,10 @@ endif
 nnoremap <space> *
 nnoremap <return> *
 nnoremap <backspace> diw
+" Re-map Zen Coding
+let g:user_zen_expandabbr_key = '<c-z>'
+let g:user_zen_leader_key     = '<c-z>'
+let g:use_zen_complete_tag = 1
 " Unbind the cursor keys in insert, normal and visual modes.
 for prefix in ['i']
   for key in ['<Up>', '<Down>', '<Left>', '<Right>']
@@ -254,12 +258,12 @@ set gdefault
 map N Nzz
 map n nzz
 if executable('ack')
-    " *** ACK ***
-     nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
-    " " Use <Leader>A to ack for the word under the cursor
-     nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
-    " Search the current file for the word under the cursor and display matches
-    nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
+  " *** ACK ***
+  nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
+  " " Use <Leader>A to ack for the word under the cursor
+  nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
+  " Search the current file for the word under the cursor and display matches
+  nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
 endif
 set ignorecase
 set smartcase
@@ -302,7 +306,7 @@ set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
-noremap <leader>k :BufExplorerVerticalSplit<CR>j
+nnoremap <leader>k :BufExplorer<CR>j
 " *** MRU ***
 noremap <leader>m :MRU<CR>
 let MRU_Add_Menu = 0
@@ -314,7 +318,7 @@ let NERDTreeChDirMode=2
 let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
 " *** TAGLIST/TAGBAR ***
 "set tags=$HOME/jdk_tags
-set tags=tags;
+set tags+=~/tags;
 nmap <leader>b :TagbarToggle<CR>
 set cpt=k,.,w,b,u,t,i
 noremap <leader>l :TlistToggle<CR>
