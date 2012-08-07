@@ -88,3 +88,6 @@
 [submodule "bundle-archive/vimroom"]
 	path = bundle-archive/vimroom
 	url = https://github.com/mikewest/vimroom.git
+[submodule "bundle-archive/vim-abolish"]
+	path = bundle-archive/vim-abolish
+	url = https://github.com/tpope/vim-abolish.git
