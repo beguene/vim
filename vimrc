@@ -131,6 +131,7 @@ set textwidth=79 " }}}"
 " ******* Mappings ******* {{{
 nnoremap <leader>r :reg<cr>
 nnoremap <leader>c :changes<cr>
+nnoremap SS :w<cr> "Quick save
 map <F2> :mksession! ~/tmp/vimtoday.ses
 set pastetoggle=<F3>
 nmap <F4> :w<CR>:make<CR>:copen<CR>
@@ -149,6 +150,8 @@ endif
 nnoremap <space> *
 nnoremap <return> *
 nnoremap <backspace> diw
+nnoremap <tab> >>
+nnoremap <s-tab> <<
 " Re-map Zen Coding
 let g:user_zen_expandabbr_key = '<c-z>'
 let g:user_zen_leader_key     = '<c-z>'
@@ -433,6 +436,9 @@ if has("autocmd")
     ""Less files
     autocmd BufRead,BufNewFile *.less set filetype=css
     autocmd BufRead,BufNewFile *.less set omnifunc=csscomplete#CompleteCSS
+    " Other"
+    au BufRead,BufNewFile Gemfile set filetype=ruby
+    au BufRead,BufNewFile *.md set filetype=markdown
     "OmniFunc"
     autocmd FileType css        set omnifunc=csscomplete#CompleteCSS
     autocmd FileType html       set omnifunc=htmlcomplete#CompleteTags
