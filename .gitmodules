@@ -91,3 +91,6 @@
 [submodule "bundle-archive/vim-abolish"]
 	path = bundle-archive/vim-abolish
 	url = https://github.com/tpope/vim-abolish.git
+[submodule "bundle-archive/vim-surround"]
+	path = bundle-archive/vim-surround
+	url = https://github.com/tpope/vim-surround.git
