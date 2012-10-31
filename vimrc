@@ -207,8 +207,9 @@ if has("gui_running")
 else
   set background=dark
   "colorscheme mustang
+  colorscheme solarized
+  "colorscheme xoria256
   "colorscheme wombat256mod
-  silent! colorscheme solarized
   let g:solarized_termtrans=1
   let g:solarized_termcolors=256
   let g:solarized_contrast="high"
@@ -331,6 +332,8 @@ let Tlist_Use_Right_Window   = 1
 let Tlist_Show_One_File = 1
 " *** COMMAND_T ***
 let g:CommandTMatchWindowReverse = 1
+let g:CommandTMaxCachedDirectories=0
+let g:CommandTMaxHeight=30
 nnoremap <silent> <leader>t :call CD_Git_Root()<CR>:CommandT<CR>
 nnoremap <silent> <leader>b :CommandTBuffer<CR>
 nnoremap <silent> <leader>j :CommandTJump<CR>
@@ -646,3 +649,5 @@ set nobackup
 set nowb
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
+
+set t_Co=256
