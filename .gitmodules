@@ -94,3 +94,6 @@
 [submodule "bundle-archive/vim-surround"]
 	path = bundle-archive/vim-surround
 	url = https://github.com/tpope/vim-surround.git
+[submodule "bundle-archive/colorizer"]
+	path = bundle-archive/colorizer
+	url = https://github.com/lilydjwg/colorizer.git
