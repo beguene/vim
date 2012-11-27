@@ -82,9 +82,6 @@
 [submodule "bundle-archive/vim-powerline"]
 	path = bundle-archive/vim-powerline
 	url = https://github.com/Lokaltog/vim-powerline.git
-[submodule "bundle-archive/vim-css-color"]
-	path = bundle-archive/vim-css-color
-	url = https://github.com/ap/vim-css-color.git
 [submodule "bundle-archive/vimroom"]
 	path = bundle-archive/vimroom
 	url = https://github.com/mikewest/vimroom.git

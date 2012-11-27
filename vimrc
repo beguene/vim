@@ -1,6 +1,6 @@
 " Beguene's settings
 " Author: Beguene Permale
-" Version: 0.2
+" Version: 0.3
 
 set nocompatible
 
@@ -16,13 +16,153 @@ set nomousef
 " Sets how many lines of history VIM has to remember
 set history=700
 set hidden
+set fileformats=unix,mac,dos
+set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
 set confirm
 set foldmethod=marker
-set showmatch "Show matching bracket
 set ttyfast
+" ******* Format ******* {{{
+" Don't use Ex mode, use Q for formatting
+map Q gq
+" Set to auto read when a file is changed from the outside
+set autoread
+" wrap lines rather than make use of the horizontal scrolling
+set wrap
+" " try not to wrap in the middle of a word
+set linebreak
+set formatoptions=tcrqn21
+set formatoptions-=o "dont continue comments when pushing o/O
+set listchars=tab:>-,trail:·,eol:$
+set showcmd
+" " use an 79-character line limit
+set textwidth=79 " }}}"
+"
+"******* Special ********* {{{
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+    augroup vimrcEx
+        au!
+        " When editing a file, always jump to the last known cursor position.
+        " Don't do it when the position is invalid or when inside an event handler
+        " (happens when dropping a file on gvim).
+        " Also don't do it when the mark is in the first line, that is the default
+        " position when opening a file.
+        autocmd BufReadPost *
+                    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+                    \   exe "normal! g`\"" |
+                    \ endif
+    augroup END
+endif " has("autocmd")
+" Convenient command to see the difference between the current buffer and the
+" file it was loaded from, thus the changes you made.
+" Only define it when not defined already.
+if !exists(":DiffOrig")
+    command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+                \ | wincmd p | diffthis
+endif
+"}}}"
+
+" ******* Backup & Undo ******* "{{{
+if has("vms")
+    set nobackup		" do not keep a backup file, use versions instead
+else
+    set backup		" keep a backup file
+endif
+"persistent undo
+if version >= 703 && has('persistent_undo')
+    try
+        if MySys() == "windows"
+            set undodir=C:\Windows\Temp
+        else
+            set undodir=~/tmp/undodir
+        endif
+    catch
+    endtry
+    set undofile                "so is persistent undo ...
+    set undolevels=1000         "maximum number of changes that can be undone
+    set undoreload=10000        "maximum number lines to save for undo on a buffer reload
+endif
+set noswapfile
+set nowb
+"}}}"
+
+" ******* Tab & Indent ******* "{{{
+set shiftwidth=4
+set tabstop=4
+set softtabstop=4
+set smarttab
+"set smartindent
+set autoindent
+set expandtab "}}}"
+
+" ******* Completion ******* "{{{
+set complete=.,w,b,u,U,t,i,d
+"let g:SuperTabDefaultCompletionType = "context"
+"let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+set wildmenu
+set wildmode=list:longest,full
+"}}}"
+
+" ******* Search ******* "{{{
+"gdefault applies substitutions globally on lines. For example, instead of
+":%s/foo/bar/g you just type :%s/foo/bar/.
+set gdefault
+map N Nzz
+map n nzz
+set ignorecase
+set smartcase
+set incsearch " do incremental searching }}}
+
+" ******* Navigation ******* {{{
+"  H/L go to start/end of line.
+noremap H ^
+noremap L $
+" gj/gk treat wrapped lines as separate
+" " (i.e. you can move up/down in one wrapped line)
+nn j gj
+nn k gk
+nn gj j
+nn gk k
+nnoremap <C-K> :bp<CR> " go to previous buffer"
+nnoremap <C-J> :bn<CR> " go to next buffer"
+" When pressing <leader>cd switch to the directory of the open buffer
+map <leader>cd :cd %:p:h<cr>
+" Bash-like command for navigation in Insert Mode
+ino <silent> <c-a> <c-o>b
+ino <silent> <c-e> <esc>ea
+inoremap jj <Esc>
+" Quickfix / Location List
+nnoremap <leader>qn :cnext<CR>
+nnoremap <leader>qp :cprev<CR>
+nnoremap <leader>qq :cclose<CR> "}}}"
+
+"******* Language Specific ********* {{{
+" PHP Generated Code Highlights (HTML & SQL)
+let php_sql_query=1
+let php_htmlInStrings=1
+"For highlighting parent error ] or ): >
+let php_parent_error_close = 1
+"For skipping an php end tag, if there exists an open ( or [ without a closing
+""one: >
+let php_parent_error_open = 1
+let python_highlight_all=1
+let javascript_enable_domhtmlcss=1
+"JAVA
+" Highlight functions using Java style
+let java_highlight_functions="style"
+" Don't flag C++ keywords as errors
+let java_allow_cpp_keywords=1 "}}}"
+
+"******* Command Mode Related ********* {{{
+set showcmd		" display incomplete commands
+" Bash like keys for the command line
+cnoremap <C-A>      <Home>
+cnoremap <C-E>      <End>
+cnoremap <C-K>      <C-U>
+cnoremap <C-P> <Up>
+cnoremap <C-N> <Down> "}}}"
 
 " ******* Init & Constants ******* {{{
-" With a map leader it's possible to do extra key combinations
 let mapleader = ","
 let g:mapleader = ","
 
@@ -35,7 +175,8 @@ fun! MySys()
     return "unix"
 endfun
 let g:os = MySys()
-let g:snips_author="Beguene Permale" "}}}"
+let g:snips_author="Beguene Permale"
+"}}}"
 
 " ******* System & OS ******* {{{
 if os == "mac"
@@ -79,11 +220,6 @@ if !has('gui_running')
   call add(g:pathogen_disabled, 'csscolor')
   call add(g:pathogen_disabled, 'yankring')
 endif
-if !has('ruby') || os=='windows'
-  call add(g:pathogen_disabled, 'command-t')
-else
-  call add(g:pathogen_disabled, 'ctrlp')
-endif
 
 " Tags requires ctags
 if !executable("ctags")
@@ -113,21 +249,6 @@ call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 call pathogen#infect() " }}}"
 
-" ******* Format ******* {{{
-" Don't use Ex mode, use Q for formatting
-map Q gq
-" Set to auto read when a file is changed from the outside
-set autoread
-" wrap lines rather than make use of the horizontal scrolling
-set wrap
-" " try not to wrap in the middle of a word
-set linebreak
-set formatoptions=tcrqn21
-set formatoptions-=o "dont continue comments when pushing o/O
-set showcmd
-" " use an 79-character line limit
-set textwidth=79 " }}}"
-
 " ******* Mappings ******* {{{
 nnoremap <leader>r :reg<cr>
 nnoremap <leader>c :changes<cr>
@@ -147,9 +268,8 @@ if has('spell')
   " Pressing ,ss will toggle and untoggle spell checking
   nnoremap <leader>ss :setlocal spell!<cr>
 endif
-nnoremap <space> *
+nnoremap <space> /
 nnoremap <return> *
-nnoremap <backspace> diw
 nnoremap <tab> >>
 nnoremap <s-tab> <<
 " Re-map Zen Coding
@@ -166,9 +286,8 @@ endfor "}}}"
 " ******* Theme and Layout ******* {{{
 set scrolloff=6 " keep at least 6 lines above/below
 set splitright
+set showmatch "Show matching bracket
 set ruler		" show the cursor position all the time
-" Use the below highlight group when displaying bad whitespace is desired.
-highlight BadWhitespace ctermbg=red guibg=red
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
@@ -181,6 +300,8 @@ if &diff
 endif
 hi clear SpellBad
 "hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
+" Use the below highlight group when displaying bad whitespace is desired.
+highlight BadWhitespace ctermbg=red guibg=red
 if has("gui_running")
   set background=dark
   if exists("&guifont")
@@ -215,13 +336,7 @@ else
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
 endif
-set encoding=utf-8
-set fileencoding=utf-8
-set ic
-set nu
-set noerrorbells
-set vb t_vb=
-set fileformats=unix,mac,dos "}}}"
+"}}}"
 
 " ******* Status Line ******* "{{{
 set laststatus=2
@@ -246,21 +361,7 @@ else " Build custom statusline if not Powerline"
 endif
   "}}}"
 
-" ******* Tab & Indent ******* "{{{
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
-set smarttab
-"set smartindent
-set autoindent
-set expandtab "}}}"
-
-" ******* Search ******* "{{{
-"gdefault applies substitutions globally on lines. For example, instead of
-":%s/foo/bar/g you just type :%s/foo/bar/.
-set gdefault
-map N Nzz
-map n nzz
+" ******* Ack ******* "{{{
 if executable('ack')
   " *** ACK ***
   nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
@@ -269,52 +370,19 @@ if executable('ack')
   " Search the current file for the word under the cursor and display matches
   nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
 endif
-set ignorecase
-set smartcase
-set incsearch " do incremental searching }}}
+" }}}
 
-" ******* Completion ******* "{{{
-set complete=.,w,b,u,U,t,i,d
-"let g:SuperTabDefaultCompletionType = "context"
-"let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
-set wildmenu
-set wildmode=list:longest,full
+" ******* SuperTab ******* "{{{
 "let g:SuperTabMappingForward = '<c-space>'
 "let g:SuperTabMappingBackward = '<s-c-space>'
 let g:SuperTabDefaultCompletionType = "context"
 "}}}"
 
-" ******* Backup & Undo ******* "{{{
-if has("vms")
-    set nobackup		" do not keep a backup file, use versions instead
-else
-    set backup		" keep a backup file
-endif
-"persistent undo
-if version >= 703 && has('persistent_undo')
-    try
-        if MySys() == "windows"
-            set undodir=C:\Windows\Temp
-        else
-            set undodir=~/tmp/undodir
-        endif
-    catch
-    endtry
-    set undofile                "so is persistent undo ...
-    set undolevels=1000         "maximum number of changes that can be undone
-    set undoreload=10000        "maximum number lines to save for undo on a buffer reload
-endif "}}}"
-
 " ******* Files / Dir  management ******* {{{
-set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
-nnoremap ,cd :cd %:p:h<CR>:pwd<CR
+nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
 nnoremap <leader>k :BufExplorer<CR>j
-" *** MRU ***
-noremap <leader>m :MRU<CR>
-let MRU_Add_Menu = 0
-let MRU_Window_Height = 20
 " *** NERDTree ***
 nnoremap <leader>n :NERDTree %<CR>
 let NERDTreeQuitOnOpen = 1
@@ -330,16 +398,29 @@ let Tlist_Exit_OnlyWindow = 1
 let Tlist_GainFocus_On_ToggleOpen = 1
 let Tlist_Use_Right_Window   = 1
 let Tlist_Show_One_File = 1
-" *** COMMAND_T ***
-let g:CommandTMatchWindowReverse = 1
-let g:CommandTMaxCachedDirectories=0
-let g:CommandTMaxHeight=30
-nnoremap <silent> <leader>t :call CD_Git_Root()<CR>:CommandT<CR>
-nnoremap <silent> <leader>b :CommandTBuffer<CR>
-nnoremap <silent> <leader>j :CommandTJump<CR>
 " *** CTRL P ***
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_working_path_mode = 2
+let g:ctrlp_max_height = 15
+let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
+let g:ctrlp_clear_cache_on_exit = 0
+"let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
+let g:ctrlp_open_multiple_files = '1rv'
+let g:ctrlp_mruf_max = 250
+let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir']
+nnoremap <Space> :CtrlP<CR>
+vnoremap <Space> <esc>:CtrlP<CR>
+nnoremap <C-@> <C-Space>
+if !has("gui_running")
+    nnoremap <C-@> :CtrlPBuffer<CR>
+    vnoremap <C-@> <esc>:CtrlPBuffer<CR>
+else
+    nnoremap <C-Space> :CtrlPBuffer<CR>
+    vnoremap <C-Space> <esc>:CtrlPBuffer<CR>
+endif
+" *** MRU ***
+noremap <leader>m :CtrlPMRU<CR>
+let g:ctrlp_mruf_exclude = '.git/*'
 "}}}"
 
 " ******* Git / Fugitive ******* {{{
@@ -365,29 +446,6 @@ endfunction
 nnoremap <LEADER>gr :call CD_Git_Root()<cr> " change to the git project dir
 nnoremap <silent> <leader>gs :Gstatus<CR>
 " }}}
-
-" ******* Navigation ******* {{{
-"  H/L go to start/end of line.
-noremap H ^
-noremap L $
-" gj/gk treat wrapped lines as separate
-" " (i.e. you can move up/down in one wrapped line)
-nn j gj
-nn k gk
-nn gj j
-nn gk k
-nnoremap <C-K> :bp<CR> " go to previous buffer"
-nnoremap <C-J> :bn<CR> " go to next buffer"
-" When pressing <leader>cd switch to the directory of the open buffer
-map <leader>cd :cd %:p:h<cr>
-" Bash-like command for navigation in Insert Mode
-ino <silent> <c-a> <c-o>b
-ino <silent> <c-e> <esc>ea
-inoremap jj <Esc>
-" Quickfix / Location List
-nnoremap <leader>qn :cnext<CR>
-nnoremap <leader>qp :cprev<CR>
-nnoremap <leader>qq :cclose<CR> "}}}"
 
 " ******* Yank & Paste ******* {{{
 " *** YANKRING ***
@@ -418,6 +476,9 @@ if has("autocmd")
   "au BufNewFile *.php set ft=php.html
   " ###### JAVASCRIPT
   autocmd FileType javascript setl fen  nocindent
+  au FileType javascript setlocal foldmethod=marker
+  au FileType javascript setlocal foldmarker={,}
+  " ###### PYTHON
   " Display tabs at the beginning of a line in Python mode as bad.
   autocmd BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
   " " Make trailing whitespace be flagged as bad.
@@ -432,12 +493,10 @@ if has("autocmd")
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
     " ###### TWIG
     au BufRead,BufNewFile *.html.twig set ft=html.twig syntax=htmltwig
-    "CSS"
+    " ###### CSS
     autocmd BufNewFile,BufRead *.scss set ft=scss.css
     autocmd BufNewFile,BufRead *.sass set ft=sass.css
     autocmd BufNewFile,BufRead *.less set ft=less.css
-    ""Less files
-    autocmd BufRead,BufNewFile *.less set filetype=css
     autocmd BufRead,BufNewFile *.less set omnifunc=csscomplete#CompleteCSS
     " Other"
     au BufRead,BufNewFile Gemfile set filetype=ruby
@@ -457,6 +516,7 @@ if has("autocmd")
     autocmd BufRead,BufNewFile *.txt set ft=txt syntax=txt
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType txt      setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
+    autocmd BufNewFile,BufRead *.json set ft=javascript
   augroup END "}}}2
   augroup Compiler " {{{2
     autocmd FileType java         silent! compiler javac  | setlocal makeprg=javac\ %
@@ -510,57 +570,6 @@ if has("autocmd")
   set splitbelow
 endif " has("autocmd")}}}"
 
-"******* Language Specific ********* {{{
-" PHP Generated Code Highlights (HTML & SQL)
-let php_sql_query=1
-let php_htmlInStrings=1
-"For highlighting parent error ] or ): >
-let php_parent_error_close = 1
-"For skipping an php end tag, if there exists an open ( or [ without a closing
-""one: >
-let php_parent_error_open = 1
-let python_highlight_all=1
-let javascript_enable_domhtmlcss=1
-"JAVA
-" Highlight functions using Java style
-let java_highlight_functions="style"
-" Don't flag C++ keywords as errors
-let java_allow_cpp_keywords=1 "}}}"
-
-"******* Command Mode Related ********* {{{
-set showcmd		" display incomplete commands
-" Bash like keys for the command line
-cnoremap <C-A>      <Home>
-cnoremap <C-E>      <End>
-cnoremap <C-K>      <C-U>
-cnoremap <C-P> <Up>
-cnoremap <C-N> <Down> "}}}"
-
-"******* Special ********* {{{
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
-    augroup vimrcEx
-        au!
-        " When editing a file, always jump to the last known cursor position.
-        " Don't do it when the position is invalid or when inside an event handler
-        " (happens when dropping a file on gvim).
-        " Also don't do it when the mark is in the first line, that is the default
-        " position when opening a file.
-        autocmd BufReadPost *
-                    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-                    \   exe "normal! g`\"" |
-                    \ endif
-    augroup END
-endif " has("autocmd")
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-    command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-                \ | wincmd p | diffthis
-endif
-
-set listchars=tab:>-,trail:·,eol:$
 
 command! XCleanHTML :%s#<[^>]\+>##g
 " Remove the Windows ^M -
@@ -596,7 +605,7 @@ function! <SID>BufcloseCloseIt() "{{{"
    endif
 endfunction "}}}"
 nnoremap <leader>bd :Bclose<cr>
-highlight VertSplit ctermbg=8 ctermfg=8
+highlight VertSplit ctermbg=0 ctermfg=0
 
 " Toggle Distraction Free mode
 function! <SID>ToggleDistractionFree() "{{{"
@@ -642,12 +651,10 @@ command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 "}}}
+nnoremap <a-Space> /
 
-" ================ Turn Off Swap Files ==============
-set noswapfile
-set nobackup
-set nowb
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
-
 set t_Co=256
+
+
