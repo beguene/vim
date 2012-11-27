@@ -4,7 +4,6 @@
 "set suffixes+=.dvi  " Lower priority in wildcards
 ""set tags+=../tags,../../tags,../../../tags,../../../../tags]
 "let g:syntastic_auto_loc_list=0
-set ttimeoutlen=50 " Make Esc work faster
 autocmd FocusLost * :colorscheme solarized
 autocmd FocusGained * :colorscheme default
 highlight Cursor guifg=white guibg=black
@@ -95,11 +94,33 @@ let g:SuperTabCrMapping = 1
 
 "}}}
 " Syntastic {{{
-
 let g:syntastic_enable_signs = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_disabled_filetypes = ['html', 'rst']
 let g:syntastic_stl_format = '[%E{%e Errors}%B{, }%W{%w Warnings}]'
 let g:syntastic_jsl_conf = '$HOME/.vim/jsl.conf'
 
+let g:syntastic_error_symbol = '✗'
+let g:syntastic_style_error_symbol = '✠'
+let g:syntastic_warning_symbol = '∆'
+let g:syntastic_style_warning_symbol = '≈'
+
 " }}}
+" custom configuration for surround.vim
+let g:surround_{char2nr('-')} = "<% \r %>"
+let g:surround_{char2nr('=')} = "<%= \r %>"
+let g:surround_{char2nr('8')} = "/* \r */"
+let g:surround_{char2nr('s')} = " \r"
+let g:surround_{char2nr('^')} = "/^\r$/"
+let g:surround_indent = 1")
+"Switching to the previously edited buffer
+ map ù :b#<CR>
+" Disable middle-click paste
+map <MiddleMouse> <Nop>
+imap <MiddleMouse> <Nop>
+map <2-MiddleMouse> <Nop>
+imap <2-MiddleMouse> <Nop>
+map <3-MiddleMouse> <Nop>
+imap <3-MiddleMouse> <Nop>
+map <4-MiddleMouse> <Nop>
+imap <4-MiddleMouse> <Nop>

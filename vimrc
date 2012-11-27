@@ -252,7 +252,8 @@ call pathogen#infect() " }}}"
 " ******* Mappings ******* {{{
 nnoremap <leader>r :reg<cr>
 nnoremap <leader>c :changes<cr>
-nnoremap SS :w<cr> "Quick save
+" Expand current buffer full window
+noremap <leader>f :only <CR>
 map <F2> :mksession! ~/tmp/vimtoday.ses
 set pastetoggle=<F3>
 nmap <F4> :w<CR>:make<CR>:copen<CR>
@@ -327,14 +328,11 @@ if has("gui_running")
   "colorscheme lucius
 else
   set background=dark
-  "colorscheme mustang
-  colorscheme solarized
-  "colorscheme xoria256
-  "colorscheme wombat256mod
   let g:solarized_termtrans=1
   let g:solarized_termcolors=256
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
+  colorscheme solarized
 endif
 "}}}"
 
@@ -364,7 +362,7 @@ endif
 " ******* Ack ******* "{{{
 if executable('ack')
   " *** ACK ***
-  nnoremap <leader>a :Ack!<SPACE>"<LEFT>"
+  nnoremap <Leader>a :Ack
   " " Use <Leader>A to ack for the word under the cursor
   nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
   " Search the current file for the word under the cursor and display matches
@@ -401,11 +399,16 @@ let Tlist_Show_One_File = 1
 " *** CTRL P ***
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_working_path_mode = 2
+let g:ctrlp_custom_ignore = {
+    \ 'dir':  '\.git$\|\.hg$\|\.svn$',
+    \ 'file': '\.pyc$\|\.pyo$\|\.rbc$|\.rbo$\|\.class$\|\.o$\|\~$\'
+    \ }
 let g:ctrlp_max_height = 15
 let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
 let g:ctrlp_clear_cache_on_exit = 0
 "let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
 let g:ctrlp_open_multiple_files = '1rv'
+let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_mruf_max = 250
 let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir']
 nnoremap <Space> :CtrlP<CR>
@@ -420,6 +423,7 @@ else
 endif
 " *** MRU ***
 noremap <leader>m :CtrlPMRU<CR>
+let g:ctrlp_mruf_default_order = 1
 let g:ctrlp_mruf_exclude = '.git/*'
 "}}}"
 
@@ -570,7 +574,6 @@ if has("autocmd")
   set splitbelow
 endif " has("autocmd")}}}"
 
-
 command! XCleanHTML :%s#<[^>]\+>##g
 " Remove the Windows ^M -
 command! XRemoveControlM :%s/\+$//
@@ -652,9 +655,9 @@ nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 "}}}
 nnoremap <a-Space> /
+set ttimeoutlen=50 " Make Esc work faster
 
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
 set t_Co=256
-
 
