@@ -68,14 +68,14 @@ if has("vms")
 else
     set backup		" keep a backup file
 endif
+
 "persistent undo
 if version >= 703 && has('persistent_undo')
     try
-        if MySys() == "windows"
-            set undodir=C:\Windows\Temp
-        else
-            set undodir=~/tmp/undodir
-        endif
+      set undodir=~/tmp/undodir
+      if os == "windows"
+        set undodir=C:\Windows\Temp
+      endif
     catch
     endtry
     set undofile                "so is persistent undo ...
@@ -174,6 +174,7 @@ fun! MySys()
   else
     return "unix"
 endfun
+
 let g:os = MySys()
 let g:snips_author="Beguene Permale"
 "}}}"
@@ -323,15 +324,16 @@ if has("gui_running")
   "colorscheme mustang
   "colors peaksea
   "colorscheme clouds_midnight
-  "colo vividchalk
   colo wombat
   "colorscheme lucius
 else
   set background=dark
+  set guifont=Menlo:h12
   let g:solarized_termtrans=1
   let g:solarized_termcolors=256
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
+  "colorscheme Tomorrow-Night-Bright
   colorscheme solarized
 endif
 "}}}"
