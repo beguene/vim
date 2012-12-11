@@ -94,3 +94,6 @@
 [submodule "bundle-archive/colorizer"]
 	path = bundle-archive/colorizer
 	url = https://github.com/lilydjwg/colorizer.git
+[submodule "bundle-archive/vim-coffee-script"]
+	path = bundle-archive/vim-coffee-script
+	url = https://github.com/kchmck/vim-coffee-script
