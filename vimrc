@@ -1,6 +1,6 @@
 " Beguene's settings
 " Author: Beguene Permale
-" Version: 0.3
+" Version: 0.4
 
 set nocompatible
 
@@ -9,9 +9,24 @@ set modelines=0
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
-" Disable useless mouse
+" Disable useless {{{
 set mouse=
 set nomousef
+" Disable middle-click paste
+map <MiddleMouse> <Nop>
+imap <MiddleMouse> <Nop>
+map <2-MiddleMouse> <Nop>
+imap <2-MiddleMouse> <Nop>
+map <3-MiddleMouse> <Nop>
+imap <3-MiddleMouse> <Nop>
+map <4-MiddleMouse> <Nop>
+imap <4-MiddleMouse> <Nop>
+" Unbind the cursor keys in insert, normal and visual modes.
+for prefix in ['i']
+  for key in ['<Up>', '<Down>', '<Left>', '<Right>']
+    exe prefix . "noremap " . key . " <Nop>"
+  endfor
+endfor "}}}
 
 " Sets how many lines of history VIM has to remember
 set history=700
@@ -21,6 +36,7 @@ set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.
 set confirm
 set foldmethod=marker
 set ttyfast
+
 " ******* Format ******* {{{
 " Don't use Ex mode, use Q for formatting
 map Q gq
@@ -111,6 +127,9 @@ map N Nzz
 map n nzz
 set ignorecase
 set smartcase
+" Autoscroll to middle of the screen when searching
+autocmd CmdwinEnter * :set scrolloff=9999
+autocmd CmdwinLeave * :set scrolloff=0
 set incsearch " do incremental searching }}}
 
 " ******* Navigation ******* {{{
@@ -250,41 +269,6 @@ call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 call pathogen#infect() " }}}"
 
-" ******* Mappings ******* {{{
-nnoremap <leader>r :reg<cr>
-nnoremap <leader>c :changes<cr>
-" Expand current buffer full window
-noremap <leader>f :only <CR>
-map <F2> :mksession! ~/tmp/vimtoday.ses
-set pastetoggle=<F3>
-nmap <F4> :w<CR>:make<CR>:copen<CR>
-inoremap <C-C> <Esc>:nohls<CR>
-"  CSS properties sort
-nmap <leader>S /{/+1<CR>vi{:sort<CR>
-if exists("+spelllang")
-  set spelllang=en_us
-endif
-if has('spell')
-  map <silent> <F6> :silent setlocal spell! spelllang=en<CR>
-  map <silent> <F7> :silent setlocal spell! spelllang=fr<CR>
-  " Pressing ,ss will toggle and untoggle spell checking
-  nnoremap <leader>ss :setlocal spell!<cr>
-endif
-nnoremap <space> /
-nnoremap <return> *
-nnoremap <tab> >>
-nnoremap <s-tab> <<
-" Re-map Zen Coding
-let g:user_zen_expandabbr_key = '<c-z>'
-let g:user_zen_leader_key     = '<c-z>'
-let g:use_zen_complete_tag = 1
-" Unbind the cursor keys in insert, normal and visual modes.
-for prefix in ['i']
-  for key in ['<Up>', '<Down>', '<Left>', '<Right>']
-    exe prefix . "noremap " . key . " <Nop>"
-  endfor
-endfor "}}}"
-
 " ******* Theme and Layout ******* {{{
 set scrolloff=6 " keep at least 6 lines above/below
 set splitright
@@ -336,6 +320,8 @@ else
   "colorscheme Tomorrow-Night-Bright
   colorscheme solarized
 endif
+" Styling vertical split bar
+highlight VertSplit ctermbg=13 ctermfg=13
 "}}}"
 
 " ******* Status Line ******* "{{{
@@ -467,6 +453,20 @@ noremap <leader>y "*y
 " Pressing v again brings you out of visual mode
 xno v <esc> " }}}
 
+" ******* Syntastic *******  {{{
+let g:syntastic_enable_signs = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_disabled_filetypes = ['html', 'rst']
+let g:syntastic_stl_format = '[%E{%e Errors}%B{, }%W{%w Warnings}]'
+let g:syntastic_jsl_conf = '$HOME/.vim/jsl.conf'
+
+let g:syntastic_error_symbol = '✗'
+let g:syntastic_style_error_symbol = '✠'
+let g:syntastic_warning_symbol = '∆'
+let g:syntastic_style_warning_symbol = '≈'
+
+" }}}
+
 " ******* Autocommands *******  {{{
 if has("autocmd")
   if $HOME !~# '^/Users/'
@@ -477,21 +477,24 @@ if has("autocmd")
   else
     filetype on
   endif
-  " ###### PHP
-  "au BufRead *.php set ft=php.html
-  "au BufNewFile *.php set ft=php.html
-  " ###### JAVASCRIPT
-  autocmd FileType javascript setl fen  nocindent
-  au FileType javascript setlocal foldmethod=marker
-  au FileType javascript setlocal foldmarker={,}
-  " ###### PYTHON
-  " Display tabs at the beginning of a line in Python mode as bad.
-  autocmd BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
-  " " Make trailing whitespace be flagged as bad.
-  autocmd BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
+
+  augroup FileTypeSpecifics " {{{
+    au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
+    " ###### PHP
+    "au BufRead *.php set ft=php.html
+    "au BufNewFile *.php set ft=php.html
+    " ###### JAVASCRIPT
+    autocmd FileType javascript setl fen  nocindent
+    au FileType javascript setlocal foldmethod=marker
+    au FileType javascript setlocal foldmarker={,}
+    " ###### PYTHON
+    " Display tabs at the beginning of a line in Python mode as bad.
+    autocmd BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
+    " " Make trailing whitespace be flagged as bad.
+    autocmd BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
+  augroup END "}}}
 
   augroup FTOptions " {{{2
-    autocmd!
     " In Makefiles, use real tabs, not tabs expanded to spaces
     autocmd FileType make setlocal noexpandtab
     autocmd FileType vim  setlocal ai et sta sw=2 sts=2 keywordprg=:help
@@ -519,30 +522,37 @@ if has("autocmd")
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
     " TXT
     autocmd BufNewFile,BufRead *.txt,README,INSTALL,NEWS,TODO if &ft == ""|set ft=text|endif
-    autocmd BufRead,BufNewFile *.txt set ft=txt syntax=txt
+    autocmd BufNewFile,BufRead *.txt set ft=txt syntax=txt
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType txt      setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
     autocmd BufNewFile,BufRead *.json set ft=javascript
   augroup END "}}}2
+
   augroup Compiler " {{{2
     autocmd FileType java         silent! compiler javac  | setlocal makeprg=javac\ %
-    autocmd FileType javascript   setlocal makeprg=node\ %
-    autocmd FileType python       silent! compiler python | setlocal makeprg=python\ %
+    autocmd FileType javascript   silent! compiler node | setlocal makeprg=node\ %
+    autocmd FileType javascript   noremap <F6> <esc>:w!<CR>:!node %<CR>
     autocmd FileType perl         silent! compiler perl
     autocmd FileType sh           setlocal makeprg=sh\ %
     autocmd FileType zsh          setlocal makeprg=zsh\ %
+    autocmd FileType python       silent! compiler python | setlocal makeprg=python\ %
     autocmd FileType python map <F5> :w!<CR>:!python %<CR>
     "autocmd FileType java   map <F5> :w!<CR>:!javac %<CR>
     " run file with PHP CLI (CTRL-M)
     autocmd FileType php noremap <F5> <esc>:w!<CR>:!php %<CR>
     " PHP parser check (CTRL-L)
     autocmd FileType php noremap <F4> <esc>:w!<CR>:!php -l %<CR>
+    au BufNewFile,BufReadPost *.coffee noremap <F4> <esc>:CoffeeLint<CR>
+    au BufNewFile,BufReadPost *.coffee noremap <F5> <esc>:CoffeeMake<CR>
+    au BufNewFile,BufReadPost *.coffee noremap <F6> <esc>:CoffeeRun<CR>
   augroup END "}}}2
+
   augroup sh
     au!
     "smart indent really only for C like languages
     au FileType sh set nosmartindent autoindent
   augroup END
+
   augroup Format " {{{2
     autocmd FileType c,cpp,cs,java  setlocal ai et sta sw=4 sts=4 cin
     " HTML,xhtml,xml (tab width 2 chr, no wrapping)
@@ -552,10 +562,12 @@ if has("autocmd")
     autocmd FileType css            setlocal sw=2 ts=2 sts=2 textwidth=79
     autocmd FileType javascript     setlocal sw=4 ts=4 sts=4 textwidth=79
     autocmd FileType yaml,ruby      setlocal ai et sta sw=2 sts=2
+    au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
   augroup END "}}}2
-  autocmd BufEnter,BufRead __MRU_Files__ set ft=mru
+
   " Set Cursor line on MRU window"
   autocmd BufEnter,BufRead __MRU_Files__ set cursorline
+  autocmd BufEnter,BufRead __MRU_Files__ set ft=mru
   augroup Help " {{{2
   " Help File speedups, <enter> to follow tag, delete for back
   au filetype help nnoremap <buffer><cr> <c-]>
@@ -565,27 +577,23 @@ if has("autocmd")
   au FileType help wincmd _
   augroup END "}}}2
   autocmd FileType gitcommit setlocal spell
-  augroup extraSpaces "{{{"
+  augroup extraSpaces "{{{
     au!
     highlight ExtraWhitespace ctermbg=red guibg=red
     au ColorScheme * highlight ExtraWhitespace guibg=red
     au BufEnter * match ExtraWhitespace /\s\+$/
     au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
     au InsertLeave * match ExtraWhiteSpace /\s\+$/
-  augroup END "}}}"
-  set splitbelow
+  augroup END "}}}
+  set splitright
 endif " has("autocmd")}}}"
 
+" ******* Custom Functions *******  {{{
 command! XCleanHTML :%s#<[^>]\+>##g
 " Remove the Windows ^M -
 command! XRemoveControlM :%s/\+$//
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
-" " Save quickly.
-noremap <leader>s :w<CR>
-inoremap <C-L> <C-V>u2022<Space>
-nnoremap <Up> :XRemoveTrailingWhitespace<cr>
-    "highlight VertSplit ctermbg=black ctermfg=black
 
 " --- SnipMate
 let g:snipMateAllowMatchingDot = 0
@@ -609,8 +617,6 @@ function! <SID>BufcloseCloseIt() "{{{"
      execute("bdelete! ".l:currentBufNum)
    endif
 endfunction "}}}"
-nnoremap <leader>bd :Bclose<cr>
-highlight VertSplit ctermbg=0 ctermfg=0
 
 " Toggle Distraction Free mode
 function! <SID>ToggleDistractionFree() "{{{"
@@ -629,7 +635,6 @@ function! <SID>ToggleDistractionFree() "{{{"
   endif
 endfunction "}}}"
 command! ToggleDistractionFree call <SID>ToggleDistractionFree()
-nnoremap <leader>di :ToggleDistractionFree<cr>
 
 function! ListLeaders() " {{{
      silent! redir @a
@@ -651,18 +656,55 @@ function! FindTODOFIXME(args) "{{{
     echo a:args
 endfunction "}}}
 command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
+ " }}}
 
+set ttimeoutlen=50 " Make Esc work faster
+set t_Co=256
+
+" ******* Mappings ******* {{{
 " Quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
-"}}}
+nnoremap <leader>r :reg<cr>
+nnoremap <leader>c :changes<cr>
+" Expand current buffer full window
+noremap <leader>f :only <CR>
+nnoremap <return> *
+map <F2> :mksession! ~/tmp/vimtoday.ses
+set pastetoggle=<F3>
+" F4 lint
+" F5 compile/make
+" F6 run
+nmap <F5> :w<CR>:make<CR>:copen<CR>
 nnoremap <a-Space> /
-set ttimeoutlen=50 " Make Esc work faster
+"  CSS properties sort
+nmap <leader>S /{/+1<CR>vi{:sort<CR>
+inoremap <C-L> <C-V>u2022<Space>
+nnoremap <Up> :XRemoveTrailingWhitespace<cr>
+nnoremap <leader>bd :Bclose<cr>
+nnoremap <leader>di :ToggleDistractionFree<cr>
+
+if exists("+spelllang")
+  set spelllang=en_us
+endif
+if has('spell')
+  map <silent> <F7> :silent setlocal spell! spelllang=en<CR>
+  map <silent> <F8> :silent setlocal spell! spelllang=fr<CR>
+  " Pressing ,ss will toggle and untoggle spell checking
+  nnoremap <leader>ss :setlocal spell!<cr>
+endif
+
+" Re-map Zen Coding
+let g:use_zen_complete_tag = 1
+let g:user_zen_expandabbr_key = '<c-z>'
+let g:user_zen_leader_key     = '<c-z>'
+" Kill window
+nnoremap K :q<cr>
+" Sort lines
+nnoremap <leader>s vip:!sort<cr>
+vnoremap <leader>s :!sort<cr>
+" }}}
 
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
-set t_Co=256
-" in
-autocmd CmdwinEnter * :set scrolloff=9999
-autocmd CmdwinLeave * :set scrolloff=0
 
