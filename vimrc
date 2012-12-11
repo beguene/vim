@@ -225,7 +225,9 @@ if os=='windows'
   let $VIMHOME = $VIM."/vimfiles"
 else
   let $VIMHOME = $HOME."/.vim"
-endif"}}}"
+endif
+let $SESSIONS_HOME = $VIMHOME."/sessions/"
+"}}}"
 
 " ******* Plugins ******* {{{
 " list only the plugin groups you will use
@@ -708,3 +710,5 @@ vnoremap <leader>s :!sort<cr>
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
 
+nnoremap SC :wa<CR>:mksession! <c-r>=$SESSIONS_HOME<cr><c-d>
+nnoremap SO :wa<CR>:so <c-r>=$SESSIONS_HOME<cr><c-d>
