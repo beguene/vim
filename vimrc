@@ -662,4 +662,7 @@ set ttimeoutlen=50 " Make Esc work faster
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
 set t_Co=256
+" in
+autocmd CmdwinEnter * :set scrolloff=9999
+autocmd CmdwinLeave * :set scrolloff=0
 

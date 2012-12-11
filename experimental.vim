@@ -117,4 +117,4 @@ imap <3-MiddleMouse> <Nop>
 map <4-MiddleMouse> <Nop>
 imap <4-MiddleMouse> <Nop>
 " scroll to show result in middle whiel searching
-set so=999
+"set so=999
