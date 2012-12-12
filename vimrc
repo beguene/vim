@@ -130,6 +130,7 @@ set smartcase
 " Autoscroll to middle of the screen when searching
 autocmd CmdwinEnter * :set scrolloff=9999
 autocmd CmdwinLeave * :set scrolloff=0
+nnoremap <a-Space> /
 set incsearch " do incremental searching }}}
 
 " ******* Navigation ******* {{{
@@ -660,9 +661,6 @@ endfunction "}}}
 command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
  " }}}
 
-set ttimeoutlen=50 " Make Esc work faster
-set t_Co=256
-
 " ******* Mappings ******* {{{
 " Quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
@@ -672,15 +670,11 @@ nnoremap <leader>c :changes<cr>
 " Expand current buffer full window
 noremap <leader>f :only <CR>
 nnoremap <return> *
-map <F2> :mksession! ~/tmp/vimtoday.ses
 set pastetoggle=<F3>
 " F4 lint
 " F5 compile/make
 " F6 run
 nmap <F5> :w<CR>:make<CR>:copen<CR>
-nnoremap <a-Space> /
-"  CSS properties sort
-nmap <leader>S /{/+1<CR>vi{:sort<CR>
 inoremap <C-L> <C-V>u2022<Space>
 nnoremap <Up> :XRemoveTrailingWhitespace<cr>
 nnoremap <leader>bd :Bclose<cr>
@@ -702,13 +696,17 @@ let g:user_zen_expandabbr_key = '<c-z>'
 let g:user_zen_leader_key     = '<c-z>'
 " Kill window
 nnoremap K :q<cr>
+"  CSS properties sort
+nmap <leader>S /{/+1<CR>vi{:sort<CR>
 " Sort lines
 nnoremap <leader>s vip:!sort<cr>
 vnoremap <leader>s :!sort<cr>
 " }}}
 
-" ******* Experimental *******  {{{
-source $HOME/.vim/experimental.vim
-
 nnoremap SC :wa<CR>:mksession! <c-r>=$SESSIONS_HOME<cr><c-d>
 nnoremap SO :wa<CR>:so <c-r>=$SESSIONS_HOME<cr><c-d>
+set ttimeoutlen=50 " Make Esc work faster
+set t_Co=256
+
+" ******* Experimental *******  {{{
+source $HOME/.vim/experimental.vim
