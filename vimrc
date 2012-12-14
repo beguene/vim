@@ -131,6 +131,8 @@ set smartcase
 autocmd CmdwinEnter * :set scrolloff=9999
 autocmd CmdwinLeave * :set scrolloff=0
 nnoremap <a-Space> /
+nnoremap / /\v
+vnoremap / /\v
 set incsearch " do incremental searching }}}
 
 " ******* Navigation ******* {{{
@@ -371,7 +373,7 @@ let g:SuperTabDefaultCompletionType = "context"
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
-nnoremap <leader>k :BufExplorer<CR>j
+nnoremap <leader>k :CtrlPBuffer<CR>
 " *** NERDTree ***
 nnoremap <leader>n :NERDTree %<CR>
 let NERDTreeQuitOnOpen = 1
@@ -639,6 +641,19 @@ function! <SID>ToggleDistractionFree() "{{{"
 endfunction "}}}"
 command! ToggleDistractionFree call <SID>ToggleDistractionFree()
 
+"RENAME CURRENT FILE (thanks Gary Bernhardt)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! RenameFile()
+    let old_name = expand('%')
+    let new_name = input('New file name: ', expand('%'), 'file')
+    if new_name != '' && new_name != old_name
+        exec ':saveas ' . new_name
+        exec ':silent !rm ' . old_name
+        redraw!
+    endif
+endfunction
+command! RenameFile call RenameFile()
+
 function! ListLeaders() " {{{
      silent! redir @a
      silent! nmap <LEADER>
@@ -709,4 +724,11 @@ set ttimeoutlen=50 " Make Esc work faster
 set t_Co=256
 
 " ******* Experimental *******  {{{
+nnoremap <tab> %
+vnoremap <tab> %
+" Pull word under cursor into LHS of a substitute (for quick search and
+" " replace)
+nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
+map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
+
 source $HOME/.vim/experimental.vim
