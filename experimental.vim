@@ -6,8 +6,8 @@
 "let g:syntastic_auto_loc_list=0
 autocmd FocusLost * :colorscheme solarized
 autocmd FocusGained * :colorscheme default
-highlight Cursor guifg=white guibg=black
-highlight iCursor guifg=red guibg=steelblue
+"highlight Cursor guifg=white guibg=black
+"highlight iCursor guifg=red guibg=steelblue
 
 " Select (charwise) the contents of the current line, excluding indentation.
 " Great for pasting Python lines into REPLs.
@@ -16,16 +16,6 @@ nnoremap vv ^vg_
 "nnoremap <leader>n :setlocal number!<cr>
 " Easier linewise reselection
 nnoremap <leader>V V`]
-" Keep the cursor in place while joining lines
-"nnoremap J mzJ`z
-noremap <C-h> <C-w>h
-noremap <C-l> <C-w>l
-" List navigation {{{
-nnoremap <left>  :cprev<cr>zvzz
-nnoremap <right> :cnext<cr>zvzz
-nnoremap <up>    :lprev<cr>zvzz
-nnoremap <down>  :lnext<cr>zvzz
-" }}}
 " CSS and LessCSS {{{
 augroup ft_css
     au!
@@ -64,20 +54,6 @@ augroup ft_css
 augroup END
 
 " }}}
-" Java {{{
-
-augroup ft_java
-    au!
-    au FileType java setlocal foldmethod=marker
-    au FileType java setlocal foldmarker={,}
-augroup END
-
-" }}}
-" Supertab {{{
-let g:SuperTabDefaultCompletionType = "<c-n>"
-let g:SuperTabLongestHighlight = 1
-let g:SuperTabCrMapping = 1
-"}}}
 " custom configuration for surround.vim
 let g:surround_{char2nr('-')} = "<% \r %>"
 let g:surround_{char2nr('=')} = "<%= \r %>"

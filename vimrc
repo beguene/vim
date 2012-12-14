@@ -1,6 +1,6 @@
 " Beguene's settings
 " Author: Beguene Permale
-" Version: 0.4
+" Version: 0.5
 
 set nocompatible
 
@@ -112,17 +112,24 @@ set autoindent
 set expandtab "}}}"
 
 " ******* Completion ******* "{{{
-set complete=.,w,b,u,U,t,i,d
-"let g:SuperTabDefaultCompletionType = "context"
-"let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 set wildmenu
 set wildmode=list:longest,full
+set complete=.,w,b,u,U,t,i,d
+let g:SuperTabDefaultCompletionType = "<c-n>"
+let g:SuperTabLongestHighlight = 1
+let g:SuperTabCrMapping = 1
+"let g:SuperTabDefaultCompletionType = "context"
+"let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+" --- SnipMate
+let g:snipMateAllowMatchingDot = 0
+
 "}}}"
 
 " ******* Search ******* "{{{
 "gdefault applies substitutions globally on lines. For example, instead of
 ":%s/foo/bar/g you just type :%s/foo/bar/.
 set gdefault
+set incsearch " do incremental searching
 map N Nzz
 map n nzz
 set ignorecase
@@ -133,9 +140,18 @@ autocmd CmdwinLeave * :set scrolloff=0
 nnoremap <a-Space> /
 nnoremap / /\v
 vnoremap / /\v
-set incsearch " do incremental searching }}}
+" ******* Ack ******* "{{{
+if executable('ack')
+  " *** ACK ***
+  nnoremap <leader>a :Ack
+  " " Use <Leader>A to ack for the word under the cursor
+  nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
+endif
+" }}}
+"}}}
 
 " ******* Navigation ******* {{{
+inoremap jj <Esc>
 "  H/L go to start/end of line.
 noremap H ^
 noremap L $
@@ -145,15 +161,20 @@ nn j gj
 nn k gk
 nn gj j
 nn gk k
-nnoremap <C-K> :bp<CR> " go to previous buffer"
-nnoremap <C-J> :bn<CR> " go to next buffer"
+nnoremap <C-K> :bp<CR> "go to previous buffer
+nnoremap <C-J> :bn<CR> "go to next buffer
 " When pressing <leader>cd switch to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>
 " Bash-like command for navigation in Insert Mode
 ino <silent> <c-a> <c-o>b
 ino <silent> <c-e> <esc>ea
-inoremap jj <Esc>
+nnoremap <tab> %
+vnoremap <tab> %
 " Quickfix / Location List
+nnoremap <up>  :cprev<cr>zvzz
+nnoremap <down> :cnext<cr>zvzz
+nnoremap <left>    :lprev<cr>zvzz
+nnoremap <right>  :lnext<cr>zvzz
 nnoremap <leader>qn :cnext<CR>
 nnoremap <leader>qp :cprev<CR>
 nnoremap <leader>qq :cclose<CR> "}}}"
@@ -229,7 +250,6 @@ if os=='windows'
 else
   let $VIMHOME = $HOME."/.vim"
 endif
-let $SESSIONS_HOME = $VIMHOME."/sessions/"
 "}}}"
 
 " ******* Plugins ******* {{{
@@ -268,10 +288,12 @@ call pathogen#helptags()
 call pathogen#infect() " }}}"
 
 " ******* Theme and Layout ******* {{{
+set shortmess+=I " Disable splash screen
 set scrolloff=6 " keep at least 6 lines above/below
 set splitright
 set showmatch "Show matching bracket
 set ruler		" show the cursor position all the time
+set t_Co=256
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
@@ -344,15 +366,6 @@ else " Build custom statusline if not Powerline"
   set statusline+=%*
 endif
   "}}}"
-
-" ******* Ack ******* "{{{
-if executable('ack')
-  " *** ACK ***
-  nnoremap <Leader>a :Ack
-  " " Use <Leader>A to ack for the word under the cursor
-  nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
-endif
-" }}}
 
 " ******* SuperTab ******* "{{{
 "let g:SuperTabMappingForward = '<c-space>'
@@ -473,6 +486,14 @@ if has("autocmd")
   else
     filetype on
   endif
+  " Java {{{
+  augroup ft_java
+    au!
+    au FileType java setlocal foldmethod=marker
+    au FileType java setlocal foldmarker={,}
+  augroup END
+
+  " }}}
 
   augroup FileTypeSpecifics " {{{
     au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
@@ -591,8 +612,6 @@ command! XRemoveControlM :%s/\+$//
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
 
-" --- SnipMate
-let g:snipMateAllowMatchingDot = 0
 " Don't close window, when deleting a buffer
 command! Bclose call <SID>BufcloseCloseIt()
 function! <SID>BufcloseCloseIt() "{{{"
@@ -632,8 +651,7 @@ function! <SID>ToggleDistractionFree() "{{{"
 endfunction "}}}"
 command! ToggleDistractionFree call <SID>ToggleDistractionFree()
 
-"RENAME CURRENT FILE (thanks Gary Bernhardt)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" RENAME CURRENT FILE (thanks Gary Bernhardt) {{{
 function! RenameFile()
     let old_name = expand('%')
     let new_name = input('New file name: ', expand('%'), 'file')
@@ -643,12 +661,12 @@ function! RenameFile()
         redraw!
     endif
 endfunction
-command! RenameFile call RenameFile()
+command! RenameFile call RenameFile() "}}}
 
-" BEClose {{{1
+" BufferClose {{{
 function! s:BufferClose()
     exec "wincmd c"
-endfunction
+endfunction " }}}
 
 function! ListLeaders() " {{{
      silent! redir @a
@@ -670,15 +688,7 @@ function! ListLeaders() " {{{
      setlocal nomodifiable
 endfunction "}}}
 command! XListLeaders :call ListLeaders()
-
-function! FindTODOFIXME(args) "{{{
-    let l:grepargs = a:args
-    noautocmd vimgrep /TODO/ "".a:args
-    "silent! copen
-    echo a:args
-endfunction "}}}
-command! XFindTODOFIXME :call FindTODOFIXME("src/**/*.php")
- " }}}
+"}}}
 
 " ******* Mappings ******* {{{
 " Quickly edit/reload the vimrc file
@@ -686,10 +696,13 @@ nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 nnoremap <leader>r :reg<cr>
 nnoremap <leader>c :changes<cr>
+map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 " Expand current buffer full window
 noremap <leader>f :only <CR>
 nnoremap <return> *
+noremap <F2> :CtrlPSession<cr>
 set pastetoggle=<F3>
+" F2 mgt sessions
 " F4 lint
 " F5 compile/make
 " F6 run
@@ -720,19 +733,16 @@ nmap <leader>S /{/+1<CR>vi{:sort<CR>
 " Sort lines
 nnoremap <leader>s vip:!sort<cr>
 vnoremap <leader>s :!sort<cr>
+
 " }}}
 
 nnoremap SC :wa<CR>:mksession! <c-r>=$SESSIONS_HOME<cr><c-d>
 nnoremap SO :wa<CR>:so <c-r>=$SESSIONS_HOME<cr><c-d>
 set ttimeoutlen=50 " Make Esc work faster
-set t_Co=256
 
 " ******* Experimental *******  {{{
-nnoremap <tab> %
-vnoremap <tab> %
 " Pull word under cursor into LHS of a substitute (for quick search and
 " " replace)
 nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
-map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 
 source $HOME/.vim/experimental.vim
