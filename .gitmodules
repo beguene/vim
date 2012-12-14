@@ -100,3 +100,6 @@
 [submodule "bundle-archive/sessionman.vim"]
 	path = bundle-archive/sessionman.vim
 	url = https://github.com/bpermale/sessionman.vim.git
+[submodule "bundle-archive/vim-javascript"]
+	path = bundle-archive/vim-javascript
+	url = https://github.com/pangloss/vim-javascript.git
