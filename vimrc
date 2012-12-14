@@ -253,12 +253,6 @@ if !executable("ctags")
   call add(g:pathogen_disabled, 'taglist')
   call add(g:pathogen_disabled, 'doctor-js')
 endif
-" Gundo requires at least vim 7.3
-if v:version < '703' || !has('python')
-  call add(g:pathogen_disabled, 'gundo')
-else
-  nnoremap <leader>u :GundoToggle<CR>
-endif
 
 if v:version < '702'
   call add(g:pathogen_disabled, 'l9')
@@ -266,7 +260,6 @@ endif
 if v:version < '700'
   call add(g:pathogen_disabled, 'supertab')
 endif
-call add(g:pathogen_disabled, 'csscolor')
 if !executable('ack')
   call add(g:pathogen_disabled, 'ack')
 endif
@@ -358,8 +351,6 @@ if executable('ack')
   nnoremap <Leader>a :Ack
   " " Use <Leader>A to ack for the word under the cursor
   nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
-  " Search the current file for the word under the cursor and display matches
-  nmap <silent> <leader>gw :Ack /<C-r><C-w>/ %<CR>
 endif
 " }}}
 
@@ -654,19 +645,32 @@ function! RenameFile()
 endfunction
 command! RenameFile call RenameFile()
 
+" BEClose {{{1
+function! s:BufferClose()
+    exec "wincmd c"
+endfunction
+
 function! ListLeaders() " {{{
      silent! redir @a
      silent! nmap <LEADER>
      silent! redir END
-     silent! new
+     silent! vnew
+     setlocal buftype=nofile
+     setlocal noswapfile
+     setlocal nowrap
+     setlocal cursorline
      silent! put! a
      silent! g/^s*$/d
      silent! %s/^.*,//
      silent! normal ggVg
      silent! sort
+     silent! normal <c-c>
+     nnoremap <buffer> <silent> q :call <SID>BufferClose()<cr>
      silent! let lines = getline(1,"$")
+     setlocal nomodifiable
 endfunction "}}}
 command! XListLeaders :call ListLeaders()
+
 function! FindTODOFIXME(args) "{{{
     let l:grepargs = a:args
     noautocmd vimgrep /TODO/ "".a:args
