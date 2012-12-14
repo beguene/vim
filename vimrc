@@ -21,12 +21,6 @@ map <3-MiddleMouse> <Nop>
 imap <3-MiddleMouse> <Nop>
 map <4-MiddleMouse> <Nop>
 imap <4-MiddleMouse> <Nop>
-" Unbind the cursor keys in insert, normal and visual modes.
-for prefix in ['i']
-  for key in ['<Up>', '<Down>', '<Left>', '<Right>']
-    exe prefix . "noremap " . key . " <Nop>"
-  endfor
-endfor "}}}
 
 " Sets how many lines of history VIM has to remember
 set history=700
@@ -36,6 +30,7 @@ set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.
 set confirm
 set foldmethod=marker
 set ttyfast
+"}}}
 
 " ******* Format ******* {{{
 " Don't use Ex mode, use Q for formatting
@@ -52,7 +47,42 @@ set listchars=tab:>-,trail:·,eol:$
 set showcmd
 " " use an 79-character line limit
 set textwidth=79 " }}}"
-"
+
+" ******* Plugins ******* {{{
+" list only the plugin groups you will use
+if !exists('g:active_bundle_groups')
+    let g:active_bundle_groups=['general', 'programming', 'php', 'javascript', 'html', 'misc']
+endif
+" To disable a plugin, add it's bundle name to the following list
+let g:pathogen_disabled = []
+" for some reason the csscolor plugin is very slow when run on the terminal
+" but not in GVim, so disable it if no GUI is running
+if !has('gui_running')
+  call add(g:pathogen_disabled, 'csscolor')
+  call add(g:pathogen_disabled, 'yankring')
+endif
+
+" Tags requires ctags
+if !executable("ctags")
+  call add(g:pathogen_disabled, 'tagbar')
+  call add(g:pathogen_disabled, 'taglist-plus')
+  call add(g:pathogen_disabled, 'taglist')
+  call add(g:pathogen_disabled, 'doctor-js')
+endif
+
+if v:version < '702'
+  call add(g:pathogen_disabled, 'l9')
+endif
+if v:version < '700'
+  call add(g:pathogen_disabled, 'supertab')
+endif
+if !executable('ack')
+  call add(g:pathogen_disabled, 'ack')
+endif
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
+call pathogen#infect() " }}}"
+
 "******* Special ********* {{{
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -140,14 +170,6 @@ autocmd CmdwinLeave * :set scrolloff=0
 nnoremap <a-Space> /
 nnoremap / /\v
 vnoremap / /\v
-" ******* Ack ******* "{{{
-if executable('ack')
-  " *** ACK ***
-  nnoremap <leader>a :Ack
-  " " Use <Leader>A to ack for the word under the cursor
-  nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
-endif
-" }}}
 "}}}
 
 " ******* Navigation ******* {{{
@@ -161,15 +183,13 @@ nn j gj
 nn k gk
 nn gj j
 nn gk k
-nnoremap <C-K> :bp<CR> "go to previous buffer
-nnoremap <C-J> :bn<CR> "go to next buffer
+nnoremap <C-K> :bp<CR>
+nnoremap <C-J> :bn<CR>
 " When pressing <leader>cd switch to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>
 " Bash-like command for navigation in Insert Mode
 ino <silent> <c-a> <c-o>b
 ino <silent> <c-e> <esc>ea
-nnoremap <tab> %
-vnoremap <tab> %
 " Quickfix / Location List
 nnoremap <up>  :cprev<cr>zvzz
 nnoremap <down> :cnext<cr>zvzz
@@ -177,7 +197,8 @@ nnoremap <left>    :lprev<cr>zvzz
 nnoremap <right>  :lnext<cr>zvzz
 nnoremap <leader>qn :cnext<CR>
 nnoremap <leader>qp :cprev<CR>
-nnoremap <leader>qq :cclose<CR> "}}}"
+nnoremap <leader>qc :cclose<CR>
+"}}}"
 
 "******* Language Specific ********* {{{
 " PHP Generated Code Highlights (HTML & SQL)
@@ -251,41 +272,6 @@ else
   let $VIMHOME = $HOME."/.vim"
 endif
 "}}}"
-
-" ******* Plugins ******* {{{
-" list only the plugin groups you will use
-if !exists('g:active_bundle_groups')
-    let g:active_bundle_groups=['general', 'programming', 'php', 'javascript', 'html', 'misc']
-endif
-" To disable a plugin, add it's bundle name to the following list
-let g:pathogen_disabled = []
-" for some reason the csscolor plugin is very slow when run on the terminal
-" but not in GVim, so disable it if no GUI is running
-if !has('gui_running')
-  call add(g:pathogen_disabled, 'csscolor')
-  call add(g:pathogen_disabled, 'yankring')
-endif
-
-" Tags requires ctags
-if !executable("ctags")
-  call add(g:pathogen_disabled, 'tagbar')
-  call add(g:pathogen_disabled, 'taglist-plus')
-  call add(g:pathogen_disabled, 'taglist')
-  call add(g:pathogen_disabled, 'doctor-js')
-endif
-
-if v:version < '702'
-  call add(g:pathogen_disabled, 'l9')
-endif
-if v:version < '700'
-  call add(g:pathogen_disabled, 'supertab')
-endif
-if !executable('ack')
-  call add(g:pathogen_disabled, 'ack')
-endif
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
-call pathogen#infect() " }}}"
 
 " ******* Theme and Layout ******* {{{
 set shortmess+=I " Disable splash screen
@@ -378,6 +364,7 @@ nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
 nnoremap <leader>k :CtrlPBuffer<CR>
+let g:ctrlp_by_filename = 1
 " *** NERDTree ***
 nnoremap <leader>n :NERDTree %<CR>
 let NERDTreeQuitOnOpen = 1
@@ -708,7 +695,6 @@ set pastetoggle=<F3>
 " F6 run
 nmap <F5> :w<CR>:make<CR>:copen<CR>
 inoremap <C-L> <C-V>u2022<Space>
-nnoremap <Up> :XRemoveTrailingWhitespace<cr>
 nnoremap <leader>bd :Bclose<cr>
 nnoremap <leader>di :ToggleDistractionFree<cr>
 
@@ -736,8 +722,17 @@ vnoremap <leader>s :!sort<cr>
 
 " }}}
 
-nnoremap SC :wa<CR>:mksession! <c-r>=$SESSIONS_HOME<cr><c-d>
-nnoremap SO :wa<CR>:so <c-r>=$SESSIONS_HOME<cr><c-d>
+" ******* Ack ******* "{{{
+if executable('ack')
+  " *** ACK ***
+  nnoremap <leader>a :Ack
+  " " Use <Leader>A to ack for the word under the cursor
+  nnoremap <leader>A *<C-O>:AckFromSearch!<CR>
+endif
+" }}}
+
+nnoremap SC :wa<CR>:mksession! <c-r>=g:sessions_path."/"<cr><c-d>
+nnoremap SO :wa<CR>:so <c-r>=g:sessions_path."/"<cr><c-d>
 set ttimeoutlen=50 " Make Esc work faster
 
 " ******* Experimental *******  {{{
@@ -746,3 +741,8 @@ set ttimeoutlen=50 " Make Esc work faster
 nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
 
 source $HOME/.vim/experimental.vim
+nnoremap <leader>qc :cclose<CR>
+nnoremap <leader>qo :copen<CR>
+"}}}
+nnoremap <tab> %
+vnoremap <tab> %
