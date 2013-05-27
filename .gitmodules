@@ -103,3 +103,15 @@
 [submodule "bundle-archive/vim-javascript"]
 	path = bundle-archive/vim-javascript
 	url = https://github.com/pangloss/vim-javascript.git
+[submodule "bundle-archive/vim-twig"]
+	path = bundle-archive/vim-twig
+	url = https://github.com/beyondwords/vim-twig.git
+[submodule "bundle-archive/jshint"]
+	path = bundle-archive/jshint
+	url = https://github.com/wookiehangover/jshint.vim.git
+[submodule "bundle-archive/vim-jshint"]
+	path = bundle-archive/vim-jshint
+	url = git://github.com/sleistner/vim-jshint.git
+[submodule "bundle-archive/vim-less"]
+	path = bundle-archive/vim-less
+	url = https://github.com/groenewege/vim-less.git

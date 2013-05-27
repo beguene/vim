@@ -69,6 +69,7 @@ if !executable("ctags")
   call add(g:pathogen_disabled, 'taglist')
   call add(g:pathogen_disabled, 'doctor-js')
 endif
+"call add(g:pathogen_disabled, 'syntastic')
 
 if v:version < '702'
   call add(g:pathogen_disabled, 'l9')
@@ -202,13 +203,13 @@ nnoremap <leader>qc :cclose<CR>
 
 "******* Language Specific ********* {{{
 " PHP Generated Code Highlights (HTML & SQL)
-let php_sql_query=1
-let php_htmlInStrings=1
-"For highlighting parent error ] or ): >
-let php_parent_error_close = 1
-"For skipping an php end tag, if there exists an open ( or [ without a closing
-""one: >
-let php_parent_error_open = 1
+"let php_sql_query=1
+"let php_htmlInStrings=1
+""For highlighting parent error ] or ): >
+"let php_parent_error_close = 1
+""For skipping an php end tag, if there exists an open ( or [ without a closing
+"""one: >
+"let php_parent_error_open = 1
 let python_highlight_all=1
 let javascript_enable_domhtmlcss=1
 "JAVA
@@ -343,12 +344,12 @@ else " Build custom statusline if not Powerline"
       return ''
   endfunction "}}}
   set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-  silent set statusline+=%{fugitive#statusline()}
+  "silent set statusline+=%{fugitive#statusline()}
   set statusline+=\ %{HasPaste()}
   set statusline+=%= "align the rest to right
   set statusline+=[%l,%v][%p%%]
   set statusline+=%#warningmsg#
-  set statusline+=%{SyntasticStatuslineFlag()}
+  "set statusline+=%{SyntasticStatuslineFlag()}
   set statusline+=%*
 endif
   "}}}"
@@ -360,6 +361,7 @@ let g:SuperTabDefaultCompletionType = "context"
 "}}}"
 
 " ******* Files / Dir  management ******* {{{
+map <leader>t :tabnew<CR>
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
@@ -393,7 +395,8 @@ let g:ctrlp_clear_cache_on_exit = 0
 "let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
 let g:ctrlp_open_multiple_files = '1rv'
 let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_mruf_max = 250
+let g:ctrlp_mruf_max = 500
+let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
 let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir']
 nnoremap <Space> :CtrlP<CR>
 vnoremap <Space> <esc>:CtrlP<CR>
@@ -451,15 +454,15 @@ xno v <esc> " }}}
 
 " ******* Syntastic *******  {{{
 let g:syntastic_enable_signs = 1
-let g:syntastic_check_on_open = 1
+"let g:syntastic_check_on_open = 0
 let g:syntastic_disabled_filetypes = ['html', 'rst']
-let g:syntastic_stl_format = '[%E{%e Errors}%B{, }%W{%w Warnings}]'
-let g:syntastic_jsl_conf = '$HOME/.vim/jsl.conf'
+"let g:syntastic_stl_format = '[%E{%e Errors}%B{, }%W{%w Warnings}]'
+"let g:syntastic_jsl_conf = '$HOME/.vim/jsl.conf'
 
-let g:syntastic_error_symbol = '✗'
-let g:syntastic_style_error_symbol = '✠'
-let g:syntastic_warning_symbol = '∆'
-let g:syntastic_style_warning_symbol = '≈'
+"let g:syntastic_error_symbol = '✗'
+"let g:syntastic_style_error_symbol = '✠'
+"let g:syntastic_warning_symbol = '∆'
+"let g:syntastic_style_warning_symbol = '≈'
 
 " }}}
 
@@ -505,7 +508,8 @@ if has("autocmd")
     autocmd FileType sh,zsh,csh,tcsh        inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
     autocmd FileType perl,python,ruby       inoremap <silent> <buffer> <C-X>! #!/usr/bin/<C-R>=&ft<CR>
     " ###### TWIG
-    au BufRead,BufNewFile *.html.twig set ft=html.twig syntax=htmltwig
+    "au BufRead,BufNewFile *.html.twig set ft=html.twig syntax=htmltwig
+    au BufRead,BufNewFile *.html.twig setlocal expandtab sw=2 ts=2 sts=2 tw=0
     " ###### CSS
     autocmd BufNewFile,BufRead *.scss set ft=scss.css
     autocmd BufNewFile,BufRead *.sass set ft=sass.css
@@ -519,7 +523,7 @@ if has("autocmd")
     autocmd FileType html       set omnifunc=htmlcomplete#CompleteTags
     autocmd FileType xml        set omnifunc=xmlcomplete#CompleteTags
     autocmd FileType python     set omnifunc=pythoncomplete#Complete
-    autocmd FileType php        set omnifunc=phpcomplete#CompletePHP
+    "autocmd FileType php        set omnifunc=phpcomplete#CompletePHP
     autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
     autocmd FileType sql        setlocal completefunc=sqlcomplete#Complete"
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
@@ -564,7 +568,7 @@ if has("autocmd")
     autocmd FileType php            setlocal sw=4 ts=4 sts=4 textwidth=79
     autocmd FileType python         setlocal sw=4 ts=4 sts=4 textwidth=79 expandtab
     autocmd FileType css            setlocal sw=2 ts=2 sts=2 textwidth=79
-    autocmd FileType javascript     setlocal sw=4 ts=4 sts=4 textwidth=79
+    autocmd FileType javascript     setlocal sw=2 ts=2 sts=2 textwidth=79
     autocmd FileType yaml,ruby      setlocal ai et sta sw=2 sts=2
     au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
   augroup END "}}}2
@@ -713,7 +717,7 @@ let g:use_zen_complete_tag = 1
 let g:user_zen_expandabbr_key = '<c-z>'
 let g:user_zen_leader_key     = '<c-z>'
 " Kill window
-nnoremap K :q<cr>
+nnoremap K :cclose<cr>
 "  CSS properties sort
 nmap <leader>S /{/+1<CR>vi{:sort<CR>
 " Sort lines
@@ -741,8 +745,15 @@ set ttimeoutlen=50 " Make Esc work faster
 nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
 
 source $HOME/.vim/experimental.vim
-nnoremap <leader>qc :cclose<CR>
-nnoremap <leader>qo :copen<CR>
+nnoremap <leader>cc :cclose<CR>
+nnoremap <leader>co :copen<CR>
 "}}}
 nnoremap <tab> %
 vnoremap <tab> %
+nnoremap p [p
+nnoremap P [P
+let g:syntastic_javascript_checkers=['jshint']
+let g:syntastic_auto_loc_list=1
+let g:syntastic_loc_list_height=5
+let g:colorizer_nomap = 1
+let g:ackprg = 'ag --nogroup --nocolor --column'
