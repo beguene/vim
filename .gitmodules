@@ -115,3 +115,6 @@
 [submodule "bundle-archive/vim-less"]
 	path = bundle-archive/vim-less
 	url = https://github.com/groenewege/vim-less.git
+[submodule "bundle-archive/vim-togglelist"]
+	path = bundle-archive/vim-togglelist
+	url = https://github.com/milkypostman/vim-togglelist.git
