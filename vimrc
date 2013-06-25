@@ -223,6 +223,8 @@ set showcmd		" display incomplete commands
 " Bash like keys for the command line
 cnoremap <C-A>      <Home>
 cnoremap <C-E>      <End>
+cnoremap <C-j> <t_kd>
+cnoremap <C-k> <t_ku>
 cnoremap <C-K>      <C-U>
 cnoremap <C-P> <Up>
 cnoremap <C-N> <Down> "}}}"
@@ -251,7 +253,7 @@ if os == "mac"
   set dir=~/tmp/vimbackup
   set backupdir=~/tmp/vimbackup
   "Open current file in browser
-  nnoremap <silent> <leader>o :!open -a Google\ Chrome '%' &<cr>
+  "nnoremap <silent> <leader>o :!open -a Google\ Chrome '%' &<cr>
 elseif os == "windows"
   if $PATH =~? 'cygwin' && ! exists("g:no_cygwin_shell")
     set shell=bash
@@ -366,9 +368,10 @@ nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
 nnoremap <leader>k :CtrlPBuffer<CR>
+nnoremap <silent> <leader>o :CtrlPBufTag<CR>
 let g:ctrlp_by_filename = 1
 " *** NERDTree ***
-nnoremap <leader>n :NERDTree %<CR>
+nnoremap <leader>n :NERDTree<CR>
 let NERDTreeQuitOnOpen = 1
 let NERDTreeChDirMode=2
 let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
@@ -455,14 +458,15 @@ xno v <esc> " }}}
 " ******* Syntastic *******  {{{
 let g:syntastic_enable_signs = 1
 "let g:syntastic_check_on_open = 0
-let g:syntastic_disabled_filetypes = ['html', 'rst']
+let g:syntastic_auto_loc_list=2
+let g:syntastic_disabled_filetypes = ['html', 'rst', 'rhtml', 'css']
 "let g:syntastic_stl_format = '[%E{%e Errors}%B{, }%W{%w Warnings}]'
 "let g:syntastic_jsl_conf = '$HOME/.vim/jsl.conf'
 
-"let g:syntastic_error_symbol = '✗'
-"let g:syntastic_style_error_symbol = '✠'
-"let g:syntastic_warning_symbol = '∆'
-"let g:syntastic_style_warning_symbol = '≈'
+let g:syntastic_error_symbol = '✗'
+let g:syntastic_style_error_symbol = '✠'
+let g:syntastic_warning_symbol = '∆'
+let g:syntastic_style_warning_symbol = '≈'
 
 " }}}
 
@@ -735,8 +739,6 @@ if executable('ack')
 endif
 " }}}
 
-nnoremap SC :wa<CR>:mksession! <c-r>=g:sessions_path."/"<cr><c-d>
-nnoremap SO :wa<CR>:so <c-r>=g:sessions_path."/"<cr><c-d>
 set ttimeoutlen=50 " Make Esc work faster
 
 " ******* Experimental *******  {{{
@@ -745,11 +747,10 @@ set ttimeoutlen=50 " Make Esc work faster
 nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
 
 source $HOME/.vim/experimental.vim
-nnoremap <leader>cc :cclose<CR>
-nnoremap <leader>co :copen<CR>
+"nnoremap SC :wa<CR>:mksession! <c-r>=g:sessions_path."/"<cr><c-d>
+"nnoremap SO :wa<CR>:so <c-r>=g:sessions_path."/"<cr><c-d>
 "}}}
-nnoremap <tab> %
-vnoremap <tab> %
+"
 nnoremap p [p
 nnoremap P [P
 let g:syntastic_javascript_checkers=['jshint']
@@ -757,3 +758,7 @@ let g:syntastic_auto_loc_list=1
 let g:syntastic_loc_list_height=5
 let g:colorizer_nomap = 1
 let g:ackprg = 'ag --nogroup --nocolor --column'
+" Toggle List/Quickfix
+let g:toggle_list_no_mappings = 1
+"nmap <script> <silent> <leader>l :call ToggleLocationList()<CR>
+nmap <script> <silent> <space> :call ToggleQuickfixList()<CR>

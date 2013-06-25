@@ -1,5 +1,5 @@
 "set clipboard=unnamed
-"let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php'], 'passive_filetypes': ['xml', 'xhtml'] }
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
 "let g:ctrlp_map = '<c-p>'
 "set suffixes+=.dvi  " Lower priority in wildcards
 ""set tags+=../tags,../../tags,../../../tags,../../../../tags]
@@ -64,3 +64,11 @@ let g:surround_indent = 1")
 "Switching to the previously edited buffer
 nnoremap ù :b#<CR>
 nnoremap ; /
+" Keep visual selection when indenting
+vnoremap < <gv
+vnoremap > >gv
+
+"Force Saving Files that Require Root Permission
+cmap w!! %!sudo tee > /dev/null %
+
+set ssop-=options
