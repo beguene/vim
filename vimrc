@@ -368,7 +368,7 @@ nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 " :cd. change working directory to that of the current file
 cmap cd. lcd %:p:h
 nnoremap <leader>k :CtrlPBuffer<CR>
-nnoremap <silent> <leader>o :CtrlPBufTag<CR>
+nnoremap <silent> <leader>r :CtrlPBufTag<CR>
 let g:ctrlp_by_filename = 1
 " *** NERDTree ***
 nnoremap <leader>n :NERDTree<CR>
@@ -401,16 +401,16 @@ let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_mruf_max = 500
 let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
 let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir']
-nnoremap <Space> :CtrlP<CR>
-vnoremap <Space> <esc>:CtrlP<CR>
+"nnoremap <Space> :CtrlP<CR>
+"vnoremap <Space> <esc>:CtrlP<CR>
 nnoremap <C-@> <C-Space>
-if !has("gui_running")
-    nnoremap <C-@> :CtrlPBuffer<CR>
-    vnoremap <C-@> <esc>:CtrlPBuffer<CR>
-else
-    nnoremap <C-Space> :CtrlPBuffer<CR>
-    vnoremap <C-Space> <esc>:CtrlPBuffer<CR>
-endif
+"if !has("gui_running")
+    "nnoremap <C-@> :CtrlPBuffer<CR>
+    "vnoremap <C-@> <esc>:CtrlPBuffer<CR>
+"else
+    "nnoremap <C-Space> :CtrlPBuffer<CR>
+    "vnoremap <C-Space> <esc>:CtrlPBuffer<CR>
+"endif
 " *** MRU ***
 noremap <leader>m :CtrlPMRU<CR>
 let g:ctrlp_mruf_default_order = 1
@@ -689,7 +689,7 @@ command! XListLeaders :call ListLeaders()
 " Quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
-nnoremap <leader>r :reg<cr>
+"nnoremap <leader>r :reg<cr>
 nnoremap <leader>c :changes<cr>
 map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 " Expand current buffer full window
