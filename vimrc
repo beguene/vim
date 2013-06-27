@@ -41,8 +41,9 @@ Bundle 'mozilla/doctorjs'
 Bundle 'leshill/vim-json'
 
 "   Other Languages
-Bundle 'plasticboy/vim-markdown'
+Bundle 'JazzCore/ctrlp-cmatcher'
 Bundle 'groenewege/vim-less'
+Bundle 'plasticboy/vim-markdown'
 Bundle 'tsaleh/vim-matchit'
 Bundle 'vim-scripts/YankRing.vim'
 
@@ -444,6 +445,7 @@ let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_mruf_max = 500
 let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
 let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir']
+let g:ctrlp_match_func = {'match' : 'matcher#cmatch' }
 "nnoremap <Space> :CtrlP<CR>
 "vnoremap <Space> <esc>:CtrlP<CR>
 nnoremap <C-@> <C-Space>
