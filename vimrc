@@ -1,9 +1,52 @@
 " Beguene's settings
 " Author: Beguene Permale
-" Version: 0.5
+" Version: 0.9
 
 set nocompatible
+filetype off                   " required! for vundle
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+ " let Vundle manage Vundle
+ " required!
+Bundle 'gmarik/vundle'
+Bundle 'kien/ctrlp.vim'
+Bundle 'scrooloose/nerdtree'
+Bundle 'scrooloose/nerdcommenter'
+Bundle 'tpope/vim-surround'
+Bundle 'tpope/vim-fugitive'
+Bundle 'milkypostman/vim-togglelist'
+Bundle 'tpope/vim-abolish'
+Bundle 'Raimondi/delimitMate'
+Bundle 'scrooloose/syntastic'
+Bundle 'ervandew/supertab'
+Bundle 'majutsushi/tagbar'
+Bundle 'int3/vim-taglist-plus'
+Bundle 'mattn/zencoding-vim'
+Bundle 'altercation/vim-colors-solarized'
+Bundle 'MarcWeber/vim-addon-mw-utils'
+Bundle 'tomtom/tlib_vim'
+Bundle 'garbas/vim-snipmate'
+Bundle 'lukaszb/vim-web-indent'
+Bundle 'lilydjwg/colorizer'
+Bundle 'kchmck/vim-coffee-script'
+Bundle 'beguene/sessionman.vim'
+Bundle 'pangloss/vim-javascript'
+Bundle 'leshill/vim-json'
+Bundle 'mileszs/ack.vim'
 
+"   JavaScript
+Bundle 'pangloss/vim-javascript'
+Bundle 'kchmck/vim-coffee-script'
+Bundle 'mozilla/doctorjs'
+Bundle 'leshill/vim-json'
+
+"   Other Languages
+Bundle 'plasticboy/vim-markdown'
+Bundle 'groenewege/vim-less'
+Bundle 'tsaleh/vim-matchit'
+Bundle 'vim-scripts/YankRing.vim'
+
+filetype plugin indent on
 "The modelines bit prevents some security exploits having to do with modelines in files.
 set modelines=0
 " allow backspacing over everything in insert mode
