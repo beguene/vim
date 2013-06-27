@@ -4,6 +4,17 @@
 
 set nocompatible
 filetype off                   " required! for vundle
+" Setting up Vundle - the vim plugin bundler " thanks to erikzaadi.com
+let iCanHazVundle=1
+let vundle_readme=expand('~/.vim/bundle/vundle/README.md')
+if !filereadable(vundle_readme)
+  echo "Installing Vundle.."
+  echo ""
+  silent !mkdir -p ~/.vim/bundle
+  silent !git clone https://github.com/gmarik/vundle ~/.vim/bundle/vundle
+  let iCanHazVundle=0
+endif
+
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
  " let Vundle manage Vundle
@@ -18,9 +29,9 @@ Bundle 'milkypostman/vim-togglelist'
 Bundle 'tpope/vim-abolish'
 Bundle 'Raimondi/delimitMate'
 Bundle 'scrooloose/syntastic'
-Bundle 'ervandew/supertab'
+"Bundle 'ervandew/supertab'
 Bundle 'majutsushi/tagbar'
-Bundle 'int3/vim-taglist-plus'
+"Bundle 'int3/vim-taglist-plus'
 Bundle 'mattn/zencoding-vim'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'MarcWeber/vim-addon-mw-utils'
@@ -46,8 +57,20 @@ Bundle 'groenewege/vim-less'
 Bundle 'plasticboy/vim-markdown'
 Bundle 'tsaleh/vim-matchit'
 Bundle 'vim-scripts/YankRing.vim'
+"Bundle 'xolox/vim-notes'
+Bundle '907th/vim-auto-save'
+Bundle 'fisadev/vim-ctrlp-cmdpalette'
+Bundle 'Valloric/YouCompleteMe'
+
+if iCanHazVundle == 0
+  echo "Installing Bundles, please ignore key map error messages"
+  echo ""
+  :BundleInstall
+endif
 
 filetype plugin indent on
+" Setting up Vundle - the vim plugin bundler end
+
 "The modelines bit prevents some security exploits having to do with modelines in files.
 set modelines=0
 " allow backspacing over everything in insert mode
@@ -109,8 +132,6 @@ endif
 " Tags requires ctags
 if !executable("ctags")
   call add(g:pathogen_disabled, 'tagbar')
-  call add(g:pathogen_disabled, 'taglist-plus')
-  call add(g:pathogen_disabled, 'taglist')
   call add(g:pathogen_disabled, 'doctor-js')
 endif
 "call add(g:pathogen_disabled, 'syntastic')
@@ -215,6 +236,7 @@ autocmd CmdwinLeave * :set scrolloff=0
 nnoremap <a-Space> /
 nnoremap / /\v
 vnoremap / /\v
+nnoremap <silent> <leader>f :CtrlPLine<CR>
 "}}}
 
 " ******* Navigation ******* {{{
@@ -413,6 +435,8 @@ nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 cmap cd. lcd %:p:h
 nnoremap <leader>k :CtrlPBuffer<CR>
 nnoremap <silent> <leader>r :CtrlPBufTag<CR>
+nnoremap <silent> <leader>c :CtrlPCmdPalette<CR>
+
 let g:ctrlp_by_filename = 1
 " *** NERDTree ***
 nnoremap <leader>n :NERDTree<CR>
@@ -422,13 +446,10 @@ let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn'
 " *** TAGLIST/TAGBAR ***
 "set tags=$HOME/jdk_tags
 set tags+=~/tags;
-nmap <leader>b :TagbarToggle<CR>
 set cpt=k,.,w,b,u,t,i
-noremap <leader>l :TlistToggle<CR>
-let Tlist_Exit_OnlyWindow = 1
-let Tlist_GainFocus_On_ToggleOpen = 1
-let Tlist_Use_Right_Window   = 1
-let Tlist_Show_One_File = 1
+noremap <leader>l :TagBarToggle<CR>
+let g:tagbar_autofocus = 1
+
 " *** CTRL P ***
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_working_path_mode = 2
@@ -498,7 +519,11 @@ noremap P P`[
 " Yank text to the OS X clipboard
 noremap <leader>y "*y
 " Pressing v again brings you out of visual mode
-xno v <esc> " }}}
+xno v <esc>
+" Keep visual selection when indenting
+vnoremap < <gv
+vnoremap > >gv
+" }}}
 
 " ******* Syntastic *******  {{{
 let g:syntastic_enable_signs = 1
@@ -728,6 +753,31 @@ function! ListLeaders() " {{{
      setlocal nomodifiable
 endfunction "}}}
 command! XListLeaders :call ListLeaders()
+
+func! s:DeleteBuffer()
+  exec "bd" fnamemodify(getline('.')[2:], ':p')
+  exec "norm \<F5>"
+endfunc
+
+command! XCloseHiddenBuffers :call CloseHiddenBuffers()
+function! CloseHiddenBuffers()
+  " figure out which buffers are visible in any tab
+  let visible = {}
+  for t in range(1, tabpagenr('$'))
+    for b in tabpagebuflist(t)
+      let visible[b] = 1
+    endfor
+  endfor
+  " close any buffer that are loaded and not visible
+  let l:tally = 0
+  for b in range(1, bufnr('$'))
+    if bufloaded(b) && !has_key(visible, b)
+      let l:tally += 1
+      exe 'bw ' . b
+    endif
+  endfor
+  echon "Deleted " . l:tally . " buffers"
+endfun
 "}}}
 
 " ******* Mappings ******* {{{
@@ -735,7 +785,7 @@ command! XListLeaders :call ListLeaders()
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 "nnoremap <leader>r :reg<cr>
-nnoremap <leader>c :changes<cr>
+nnoremap <leader>h :changes<cr>
 map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 " Expand current buffer full window
 noremap <leader>f :only <CR>
@@ -807,3 +857,23 @@ let g:ackprg = 'ag --nogroup --nocolor --column'
 let g:toggle_list_no_mappings = 1
 "nmap <script> <silent> <leader>l :call ToggleLocationList()<CR>
 nmap <script> <silent> <space> :call ToggleQuickfixList()<CR>
+
+" Delete buffer on CtrlPBuffer
+let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
+
+func! MyCtrlPMappings()
+  nnoremap <buffer> <silent> <c-@> :call <sid>DeleteBuffer()<cr>
+endfunc
+" save as sudo
+ca w!! w !sudo tee "%"
+
+" to be able to call CtrlP with default search text
+function! CtrlPWithSearchText(search_text, ctrlp_command_end)
+  execute ':CtrlP' . a:ctrlp_command_end
+  call feedkeys(a:search_text)
+endfunction
+" CtrlP with default text
+nmap ,wr :call CtrlPWithSearchText(expand('<cword>'), 'BufTag')<CR>
+nmap ,wp :call CtrlPWithSearchText(expand('<cword>'), '')<CR>
+nmap ,wm :call CtrlPWithSearchText(expand('<cword>'), 'MRUFiles')<CR>
+nmap ,wc :call CtrlPWithSearchText(expand('<cword>'), 'CmdPalette')<CR>

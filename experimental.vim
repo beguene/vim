@@ -64,13 +64,11 @@ let g:surround_indent = 1")
 "Switching to the previously edited buffer
 nnoremap ù :b#<CR>
 "nnoremap ; /
-" Keep visual selection when indenting
-vnoremap < <gv
-vnoremap > >gv
 
 "Force Saving Files that Require Root Permission
 cmap w!! %!sudo tee > /dev/null %
 
+"Session mgt
 set ssop-=options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " RENAME CURRENT FILE (thanks Gary Bernhardt)
@@ -90,35 +88,7 @@ map ;mv :call RenameFile()<cr>
 nnoremap go o<Esc>k
 nnoremap gO O<Esc>j
 let g:ackprg = 'ag --nogroup --nocolor --column'
+set iskeyword +=.
 
-" Delete buffer on CtrlPBuffer
-let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
-
-func! MyCtrlPMappings()
-  nnoremap <buffer> <silent> <c-@> :call <sid>DeleteBuffer()<cr>
-endfunc
-
-func! s:DeleteBuffer()
-  exec "bd" fnamemodify(getline('.')[2:], ':p')
-  exec "norm \<F5>"
-endfunc
-
-command! -nargs=* Only call CloseHiddenBuffers()
-function! CloseHiddenBuffers()
-  " figure out which buffers are visible in any tab
-  let visible = {}
-  for t in range(1, tabpagenr('$'))
-    for b in tabpagebuflist(t)
-      let visible[b] = 1
-    endfor
-  endfor
-  " close any buffer that are loaded and not visible
-  let l:tally = 0
-  for b in range(1, bufnr('$'))
-    if bufloaded(b) && !has_key(visible, b)
-      let l:tally += 1
-      exe 'bw ' . b
-    endif
-  endfor
-  echon "Deleted " . l:tally . " buffers"
-endfun
+" TODO
+" Always use location list for syntax/compile errors
