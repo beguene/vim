@@ -942,3 +942,7 @@ let g:ycm_key_list_select_completion = ['<C-@>']
 let g:ycm_key_list_previous_completion = ['<C-S-@>']
 "TODO
 "QUICK SEARCH REPLACE searched item with *
+set relativenumber
+
+nnoremap <cr> <c-]>
+nnoremap <bs> <c-T>
