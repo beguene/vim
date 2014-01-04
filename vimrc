@@ -5,6 +5,11 @@
 set nocompatible
 filetype off                   " required! for vundle
 
+"if !empty($MY_RUBY_HOME)
+  "let g:ruby_path = join(split(glob($MY_RUBY_HOME.'/lib/ruby/*.*')."\n".glob($MY_RUBY_HOME.'/lib/ruby/site_ruby/*'),"\n"),',')
+"endif
+let g:ruby_path = system('rvm current')
+
 " ******* Bundle ******* {{{
 " Setting up Vundle - the vim plugin bundler " thanks to erikzaadi.com
 let iCanHazVundle=1
@@ -68,6 +73,7 @@ Bundle 'Valloric/YouCompleteMe'
 Bundle 'henrik/vim-reveal-in-finder'
 " Easily use quickfix to search and replace bulk files
 Bundle 'henrik/vim-qargs'
+Bundle 'malkomalko/vim-librarian.vim'
 " :Ggrep findme
 " :Qargs | argdo %s/findme/replacement/gc | update
 
@@ -105,7 +111,6 @@ set hidden
 set fileformats=unix,mac,dos
 set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
 set confirm
-set foldmethod=syntax
 set foldlevelstart=1
 set ttyfast
 set ttimeoutlen=50 " Make Esc work faster
@@ -301,7 +306,12 @@ nnoremap <leader>qn :cnext<CR>
 nnoremap <leader>qp :cprev<CR>
 nnoremap <leader>qc :cclose<CR>
 " Kill quickfix window
-nnoremap K :cclose<cr>
+" Toggle List/Quickfix
+let g:toggle_list_no_mappings = 1
+"nmap <script> <silent> <leader>l :call ToggleLocationList()<CR>
+"nmap <script> <silent> <space> :call ToggleQuickfixList()<CR>
+nnoremap K :call ToggleQuickfixList()<CR>
+"nnoremap L :call ToggleLocationList()<CR>
 "}}}"
 
 "******* Language Specific ********* {{{
@@ -399,7 +409,7 @@ endif
 hi clear SpellBad
 "hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
 " Use the below highlight group when displaying bad whitespace is desired.
-highlight BadWhitespace ctermbg=red guibg=red
+"highlight BadWhitespace ctermbg=red guibg=red
 if has("gui_running")
   set background=dark
   if exists("&guifont")
@@ -470,6 +480,7 @@ nnoremap <silent> <leader>r :CtrlPTag<CR>
 nnoremap <silent> <leader>c :CtrlPCmdPalette<CR>
 " Delete buffer on CtrlPBuffer
 let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
+"let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:100,results:25'
 
 func! MyCtrlPMappings()
   nnoremap <buffer> <silent> <c-@> :call <sid>DeleteBuffer()<cr>
@@ -613,27 +624,11 @@ if has("autocmd")
   " Java {{{
   augroup ft_java
     au!
+    au FileType java setlocal ai et sta sw=4 sts=4 cin
     au FileType java setlocal foldmethod=marker
     au FileType java setlocal foldmarker={,}
   augroup END
-
   " }}}
-
-  augroup FileTypeSpecifics " {{{
-    au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
-    " ###### PHP
-    "au BufRead *.php set ft=php.html
-    "au BufNewFile *.php set ft=php.html
-    " ###### JAVASCRIPT
-    autocmd FileType javascript setl fen  nocindent
-    au FileType javascript setlocal foldmethod=marker
-    au FileType javascript setlocal foldmarker={,}
-    " ###### PYTHON
-    " Display tabs at the beginning of a line in Python mode as bad.
-    autocmd BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
-    " " Make trailing whitespace be flagged as bad.
-    autocmd BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
-  augroup END "}}}
 
   augroup FTOptions " {{{2
     " In Makefiles, use real tabs, not tabs expanded to spaces
@@ -670,63 +665,94 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.json set ft=javascript
   augroup END "}}}2
 
-  augroup Compiler " {{{2
-    autocmd FileType java         silent! compiler javac  | setlocal makeprg=javac\ %
+  augroup ft_javascript " {{{2
+    au!
     autocmd FileType javascript   silent! compiler node | setlocal makeprg=node\ %
     autocmd FileType javascript   noremap <F6> <esc>:w!<CR>:!node %<CR>
-    autocmd FileType perl         silent! compiler perl
-    autocmd FileType sh           setlocal makeprg=sh\ %
-    autocmd FileType zsh          setlocal makeprg=zsh\ %
+    autocmd FileType javascript setl fen  nocindent
+    au FileType javascript setlocal foldmethod=marker
+    au FileType javascript setlocal foldmarker={,}
+    au FileType javascript setlocal sw=2 ts=2 sts=2 textwidth=79
+  augroup END "}}}
+
+  augroup ft_python " {{{2
+    au!
+    " Display tabs at the beginning of a line in Python mode as bad.
+    autocmd BufRead,BufNewFile *.py,*.pyw match BadWhitespace /^\t\+/
+    " " Make trailing whitespace be flagged as bad.
+    autocmd BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/"
     autocmd FileType python       silent! compiler python | setlocal makeprg=python\ %
     autocmd FileType python map <F5> :w!<CR>:!python %<CR>
-    "autocmd FileType java   map <F5> :w!<CR>:!javac %<CR>
+    autocmd FileType python         setlocal sw=4 ts=4 sts=4 textwidth=79 expandtab
+  augroup END "}}}
+
+  augroup ft_php " {{{2
+    au!
     " run file with PHP CLI (CTRL-M)
     autocmd FileType php noremap <F5> <esc>:w!<CR>:!php %<CR>
     " PHP parser check (CTRL-L)
     autocmd FileType php noremap <F4> <esc>:w!<CR>:!php -l %<CR>
+    autocmd FileType php            setlocal sw=4 ts=4 sts=4 textwidth=79
+  augroup END "}}}
+
+  augroup ft_coffeescript " {{{2
+    au!
+    au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
     au BufNewFile,BufReadPost *.coffee noremap <F4> <esc>:CoffeeLint<CR>
     au BufNewFile,BufReadPost *.coffee noremap <F5> <esc>:CoffeeMake<CR>
     au BufNewFile,BufReadPost *.coffee noremap <F6> <esc>:CoffeeRun<CR>
+    au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
+  augroup END "}}}
+
+  augroup ft_zsh " {{{2
+    au!
+    autocmd FileType zsh          setlocal makeprg=zsh\ %
   augroup END "}}}2
   " ------------------------------------------------------------
   " Ruby
   " ------------------------------------------------------------
   augroup ft_ruby
     autocmd!
-    autocmd FileType ruby setlocal foldmethod=syntax
+    "autocmd FileType ruby setlocal foldmethod=syntax
     autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
     autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
     autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
     autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+    autocmd FileType ruby      setlocal ai et sta sw=2 sts=2
   augroup END
 
-  augroup sh
+  augroup ft_sh " {{{2
     au!
+    autocmd FileType sh           setlocal makeprg=sh\ %
     "smart indent really only for C like languages
     au FileType sh set nosmartindent autoindent
   augroup END
 
+  augroup ft_html " {{{2
+    au!
+    au FileType html,xhtml,xml,eruby setlocal expandtab sw=2 ts=2 sts=2 tw=0
+  augroup END "}}}2
+
   augroup Format " {{{2
-    autocmd FileType c,cpp,cs,java  setlocal ai et sta sw=4 sts=4 cin
+    au!
+    autocmd FileType c,cpp  setlocal ai et sta sw=4 sts=4 cin
     " HTML,xhtml,xml (tab width 2 chr, no wrapping)
-    autocmd FileType html,xhtml,xml,eruby setlocal expandtab sw=2 ts=2 sts=2 tw=0
-    autocmd FileType php            setlocal sw=4 ts=4 sts=4 textwidth=79
-    autocmd FileType python         setlocal sw=4 ts=4 sts=4 textwidth=79 expandtab
     autocmd FileType css            setlocal sw=2 ts=2 sts=2 textwidth=79
-    autocmd FileType javascript     setlocal sw=2 ts=2 sts=2 textwidth=79
-    autocmd FileType yaml,ruby      setlocal ai et sta sw=2 sts=2
-    au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
+    autocmd FileType yaml      setlocal ai et sta sw=2 sts=2
   augroup END "}}}2
 
   augroup Help " {{{2
-  " Help File speedups, <enter> to follow tag, delete for back
-  au filetype help nnoremap <buffer><cr> <c-]>
-  au filetype help nnoremap <buffer><bs> <c-T>
-  au filetype help nnoremap q :q!<CR>
-  au filetype help set nonumber
-  au FileType help wincmd _
+    au!
+    " Help File speedups, <enter> to follow tag, delete for back
+    au filetype help nnoremap <buffer><cr> <c-]>
+    au filetype help nnoremap <buffer><bs> <c-T>
+    au filetype help nnoremap q :q!<CR>
+    au filetype help set nonumber
+    au FileType help wincmd _
   augroup END "}}}2
+
   autocmd FileType gitcommit setlocal spell
+
   augroup extraSpaces "{{{
     au!
     highlight ExtraWhitespace ctermbg=red guibg=red
@@ -778,7 +804,7 @@ function! <SID>ToggleDistractionFree() "{{{"
   else
     set nu
     set laststatus=2
-    colorscheme solarized
+    "colorscheme solarized
     let g:isDistractionFree = 'false'
   endif
 endfunction "}}}"
@@ -866,7 +892,7 @@ nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 " Expand current buffer full window
-noremap <leader>f :only <CR>
+"noremap <leader>f :only <CR>
 nnoremap <return> *
 "Session mgt
 set ssop-=options
@@ -914,13 +940,9 @@ nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
 
 "
 let g:syntastic_javascript_checkers=['jshint']
-let g:syntastic_auto_loc_list=1
+let g:syntastic_auto_loc_list=0
 let g:syntastic_loc_list_height=5
 let g:colorizer_nomap = 1
-" Toggle List/Quickfix
-let g:toggle_list_no_mappings = 1
-"nmap <script> <silent> <leader>l :call ToggleLocationList()<CR>
-"nmap <script> <silent> <space> :call ToggleQuickfixList()<CR>
 
 
 " ******* Experimental *******  {{{
@@ -940,9 +962,24 @@ inoremap <C-@> <C-Space>
 "let g:UltiSnipsJumpForwardTrigger="<c-c>"
 let g:ycm_key_list_select_completion = ['<C-@>']
 let g:ycm_key_list_previous_completion = ['<C-S-@>']
-"TODO
-"QUICK SEARCH REPLACE searched item with *
-set relativenumber
+"set relativenumber
 
 nnoremap <cr> <c-]>
 nnoremap <bs> <c-T>
+nnoremap <bs> :cnext<cr>:lnext<cr>
+set smartcase
+"Quick ack search"
+nnoremap <leader>f :Ack
+" vim-libarian
+nnoremap <leader>oa :VLBookmark<space>
+nnoremap <leader>od :VLDelBookmark<space>
+nnoremap <leader>oe :execute "split" g:librarian_filename<cr>
+nnoremap <leader>of :VLQFOpenBookmarksFor<space>
+nnoremap <leader>ol :VLQFOpenBookmarks<cr>
+nnoremap <leader>oo :VLOpenBookmarks<space>
+"TODO
+"QUICK SEARCH REPLACE searched item with *
+"fast navigation up and down : map ctrl-j to 5j
+"add mapping to select outer function name
+"Replace all
+"Add quick console log taking function name as param
