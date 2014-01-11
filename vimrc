@@ -76,7 +76,7 @@ Bundle 'henrik/vim-reveal-in-finder'
 " Easily use quickfix to search and replace bulk files
 Bundle 'henrik/vim-qargs'
 " Bundle 'malkomalko/vim-librarian.vim'
-"Bundle 'bling/vim-airline'
+Bundle 'bling/vim-airline'
 Bundle 'tacahiroy/ctrlp-funky'
 Bundle 'terryma/vim-expand-region'
 " Bundle 'bling/vim-airline'
@@ -431,25 +431,25 @@ highlight VertSplit ctermbg=13 ctermfg=13
 
 " ******* Status Line ******* "{{{
 set laststatus=2
-if exists("Pl#Theme#InsertSegment")
-  call Pl#Theme#InsertSegment('ws_marker', 'after', 'lineinfo')
-else " Build custom statusline if not Powerline"
-  " Returns true if paste mode is enabled
-  function! HasPaste() "{{{2
-      if &paste
-          return 'PASTE MODE  '
-      en
-      return ''
-  endfunction "}}}
-  set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-  "silent set statusline+=%{fugitive#statusline()}
-  set statusline+=\ %{HasPaste()}
-  set statusline+=%= "align the rest to right
-  set statusline+=[%l,%v][%p%%]
-  set statusline+=%#warningmsg#
-  "set statusline+=%{SyntasticStatuslineFlag()}
-  set statusline+=%*
-endif
+" if exists("Pl#Theme#InsertSegment")
+  " call Pl#Theme#InsertSegment('ws_marker', 'after', 'lineinfo')
+" else " Build custom statusline if not Powerline"
+  " " Returns true if paste mode is enabled
+  " function! HasPaste() "{{{2
+      " if &paste
+          " return 'PASTE MODE  '
+      " en
+      " return ''
+  " endfunction "}}}
+  " set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
+  " "silent set statusline+=%{fugitive#statusline()}
+  " set statusline+=\ %{HasPaste()}
+  " set statusline+=%= "align the rest to right
+  " set statusline+=[%l,%v][%p%%]
+  " set statusline+=%#warningmsg#
+  " "set statusline+=%{SyntasticStatuslineFlag()}
+  " set statusline+=%*
+" endif
 " }}}"
 
 " ******* Files / Dir  management ******* {{{
@@ -1182,9 +1182,9 @@ map <leader>gp :Git push<CR>
 map <leader>gs :Gstatus<CR>
 nnoremap <leader>j :CtrlPFunky<CR>
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
-" let g:airline#extensions#tabline#enabled = 1
-" let g:airline#extensions#tabline#left_sep=' '
-" let g:airline#extensions#tabline#left_alt_sep='¦'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep=' '
+let g:airline#extensions#tabline#left_alt_sep='¦'
 let g:airline_section_b = ''
 map = <Plug>(expand_region_expand)
 map + <Plug>(expand_region_shrink)
