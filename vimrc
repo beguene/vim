@@ -4,10 +4,9 @@
 
 set nocompatible
 filetype off                   " required! for vundle
+let mapleader = ","
+let g:mapleader = ","
 
-"if !empty($MY_RUBY_HOME)
-  "let g:ruby_path = join(split(glob($MY_RUBY_HOME.'/lib/ruby/*.*')."\n".glob($MY_RUBY_HOME.'/lib/ruby/site_ruby/*'),"\n"),',')
-"endif
 let g:ruby_path = system('rvm current')
 
 " ******* Bundle ******* {{{
@@ -32,6 +31,9 @@ Bundle 'gmarik/vundle'
 Bundle 'kien/ctrlp.vim'
 Bundle 'scrooloose/nerdtree'
 Bundle 'Shougo/unite.vim'
+Bundle 'Shougo/unite-session'
+Bundle 'Shougo/unite-outline'
+Bundle 'Shougo/vimproc.vim'
 
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'tpope/vim-surround'
@@ -43,7 +45,7 @@ Bundle 'scrooloose/syntastic'
 Bundle 'majutsushi/tagbar'
 Bundle 'mattn/emmet-vim'
 Bundle 'SirVer/ultisnips'
-Bundle 'beguene/sessionman.vim'
+" Bundle 'beguene/sessionman.vim'
 Bundle 'mileszs/ack.vim'
 
 "UI
@@ -65,15 +67,19 @@ Bundle 'tomtom/tlib_vim'
 Bundle 'MarcWeber/vim-addon-mw-utils'
 
 Bundle 'tsaleh/vim-matchit'
-Bundle 'vim-scripts/YankRing.vim'
+" Bundle 'vim-scripts/YankRing.vim'
 "Bundle 'maxbrunsfeld/vim-yankstack'
 Bundle '907th/vim-auto-save'
-Bundle 'fisadev/vim-ctrlp-cmdpalette'
+" Bundle 'fisadev/vim-ctrlp-cmdpalette'
 Bundle 'Valloric/YouCompleteMe'
 Bundle 'henrik/vim-reveal-in-finder'
 " Easily use quickfix to search and replace bulk files
 Bundle 'henrik/vim-qargs'
-Bundle 'malkomalko/vim-librarian.vim'
+" Bundle 'malkomalko/vim-librarian.vim'
+"Bundle 'bling/vim-airline'
+Bundle 'tacahiroy/ctrlp-funky'
+Bundle 'terryma/vim-expand-region'
+" Bundle 'bling/vim-airline'
 " :Ggrep findme
 " :Qargs | argdo %s/findme/replacement/gc | update
 
@@ -110,6 +116,9 @@ set history=700
 set hidden
 set fileformats=unix,mac,dos
 set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
+set wildignore+=tags
+set wildignore+=*/tmp/*
+set wildignore+=*/vendor/*
 set confirm
 set foldlevelstart=1
 set ttyfast
@@ -133,38 +142,8 @@ set showcmd
 set textwidth=79 " }}}"
 
 " ******* Plugins ******* {{{
-" list only the plugin groups you will use
-"if !exists('g:active_bundle_groups')
-    "let g:active_bundle_groups=['general', 'programming', 'php', 'javascript', 'html', 'misc']
-"endif
-"" To disable a plugin, add it's bundle name to the following list
-"let g:pathogen_disabled = []
-"" for some reason the csscolor plugin is very slow when run on the terminal
-"" but not in GVim, so disable it if no GUI is running
-"if !has('gui_running')
-  "call add(g:pathogen_disabled, 'csscolor')
-  "call add(g:pathogen_disabled, 'yankring')
-"endif
 
-"" Tags requires ctags
-"if !executable("ctags")
-  "call add(g:pathogen_disabled, 'tagbar')
-  "call add(g:pathogen_disabled, 'doctor-js')
-"endif
-""call add(g:pathogen_disabled, 'syntastic')
-
-"if v:version < '702'
-  "call add(g:pathogen_disabled, 'l9')
-"endif
-"if v:version < '700'
-  "call add(g:pathogen_disabled, 'supertab')
-"endif
-"if !executable('ack')
-  "call add(g:pathogen_disabled, 'ack')
-"endif
-"call pathogen#runtime_append_all_bundles()
-"call pathogen#helptags()
-"call pathogen#infect() " }}}"
+"" }}}"
 
 "******* Special ********* {{{
 " Only do this part when compiled with support for autocommands.
@@ -220,7 +199,6 @@ set shiftwidth=4
 set tabstop=4
 set softtabstop=4
 set smarttab
-"set smartindent
 set autoindent
 set expandtab "}}}"
 
@@ -228,11 +206,21 @@ set expandtab "}}}"
 set wildmenu
 set wildmode=list:longest,full
 set complete=.,w,b,u,U,t,i,d
-"let g:SuperTabDefaultCompletionType = "<c-n>"
-"let g:SuperTabLongestHighlight = 1
-"let g:SuperTabCrMapping = 1
-"let g:SuperTabDefaultCompletionType = "context"
-"let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+let g:ycm_complete_in_comments_and_strings=1
+let g:ycm_key_list_select_completion=['<C-n>', '<Down>', '<Tab>']
+let g:ycm_key_list_previous_completion=['<C-p>', '<Up>', '<S-Tab>']
+let g:ycm_filetype_blacklist = {
+      \ 'notes' : 1,
+      \ 'markdown' : 1,
+      \ 'text' : 1,
+      \ 'unite' : 1
+      \}
+
+"}}}"
+
+" ******* UltiSnips ******* {{{
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 function! g:UltiSnips_Complete()
   call UltiSnips_JumpForwards()
   if g:ulti_jump_forwards_res == 0
@@ -247,11 +235,9 @@ function! g:UltiSnips_Complete()
   endif
   return ""
 endfunction
+" let g:UltiSnipsExpandTrigger="<cr>"
 au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-
-"}}}"
+"}}}
 
 " ******* Search ******* "{{{
 "gdefault applies substitutions globally on lines. For example, instead of
@@ -265,7 +251,6 @@ map n nzz
 " Autoscroll to middle of the screen when searching
 autocmd CmdwinEnter * :set scrolloff=9999
 autocmd CmdwinLeave * :set scrolloff=0
-nnoremap <a-Space> /
 nnoremap / /\v
 vnoremap / /\v
 " ******* Ack ******* "{{{
@@ -312,6 +297,8 @@ let g:toggle_list_no_mappings = 1
 "nmap <script> <silent> <space> :call ToggleQuickfixList()<CR>
 nnoremap K :call ToggleQuickfixList()<CR>
 "nnoremap L :call ToggleLocationList()<CR>
+"Switching to the previously edited buffer
+nnoremap ù :b#<CR>
 "}}}"
 
 "******* Language Specific ********* {{{
@@ -343,8 +330,6 @@ cnoremap <C-P> <Up>
 cnoremap <C-N> <Down> "}}}"
 
 " ******* Init & Constants ******* {{{
-let mapleader = ","
-let g:mapleader = ","
 
 fun! MySys()
   if has('win32') || has('win64') || has('win32unix')
@@ -407,9 +392,7 @@ if &diff
   syntax off
 endif
 hi clear SpellBad
-"hi SpellBad gui=underline,bold cterm=underline,bold guibg=darkgrey ctermbg=darkgrey
-" Use the below highlight group when displaying bad whitespace is desired.
-"highlight BadWhitespace ctermbg=red guibg=red
+
 if has("gui_running")
   set background=dark
   if exists("&guifont")
@@ -430,7 +413,7 @@ if has("gui_running")
   "colorscheme mustang
   "colors peaksea
   "colorscheme clouds_midnight
-  colo wombat
+  " colo wombat
   "colorscheme lucius
 else
   set background=dark
@@ -476,10 +459,18 @@ nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 cmap cd. lcd %:p:h
 nnoremap <leader>k :CtrlPBuffer<CR>
 nnoremap <silent> <leader>b :CtrlPBufTag<CR>
+nnoremap <silent> <leader>j :CtrlPFunky<CR>
 nnoremap <silent> <leader>r :CtrlPTag<CR>
-nnoremap <silent> <leader>c :CtrlPCmdPalette<CR>
+nnoremap <silent> <leader>c [unite] c
+" nnoremap <silent> <leader>c :CtrlPCmdPalette<CR>
 " Delete buffer on CtrlPBuffer
 let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
+let g:ctrlp_buftag_types = {
+    \ 'javascript' : {
+      \ 'bin': 'jsctags',
+      \ 'args': '-f -',
+      \ }
+    \ }
 "let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:100,results:25'
 
 func! MyCtrlPMappings()
@@ -503,8 +494,8 @@ nnoremap <leader>n :NERDTree<CR>
 let NERDTreeQuitOnOpen = 1
 let NERDTreeChDirMode=2
 let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
+let NERDSpaceDelims=1
 " *** TAGLIST/TAGBAR ***
-"set tags=$HOME/jdk_tags
 set tags+=.git/tags;
 set cpt=k,.,w,b,u,t,i
 noremap <leader>l :TagbarToggle<CR>
@@ -521,19 +512,19 @@ let g:ctrlp_custom_ignore = {
 let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
 let g:ctrlp_clear_cache_on_exit = 0
 "let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
+if executable('ag')
+  let g:ctrlp_user_command='ag %s -l --nocolor -g ""'
+endif
 let g:ctrlp_open_multiple_files = '1rv'
 let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_mruf_max = 500
 let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
-let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir']
+" let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir', 'funky']
 let g:ctrlp_dotfiles = 0
 let g:ctrlp_switch_buffer = 0
 let g:ctrlp_by_filename = 1
 "nnoremap <Space> :CtrlP<CR>
 "vnoremap <Space> <esc>:CtrlP<CR>
-"nnoremap <C-@> <C-Space>
-"nnoremap <C-@> :CtrlP<CR>
-let g:user_emmet_leader_key = '<C-@>'
 "if !has("gui_running")
     "nnoremap <C-@> :CtrlPBuffer<CR>
     "vnoremap <C-@> <esc>:CtrlPBuffer<CR>
@@ -554,8 +545,10 @@ function! Git_Repo_Cdup() " Get the relative path to repo root
     let git_fail = 'fatal: Not a git repository'
     if strpart(git_top, 0, strlen(git_fail)) == git_fail
         " Above line says we are not in git repo. Ugly. Better version?
+        let g:is_git_repo = 0
         return ''
     else
+        let g:is_git_repo = 1
         " Return the cdup path to the root. If already in root,
         " path will be empty, so add './'
         return './' . git_top
@@ -567,15 +560,13 @@ function! CD_Git_Root()
     let curdir = getcwd()
     echo 'CWD now set to: '.curdir
 endfunction
-nnoremap <LEADER>gr :call CD_Git_Root()<cr> " change to the git project dir
+ " change to the git project dir
+nnoremap <leader>gr :call CD_Git_Root()<cr>
 nnoremap <silent> <leader>gs :Gstatus<CR>
 " }}}
 
 " ******* Selection, Yank & Paste ******* {{{
-" *** YANKRING ***
-let g:yankring_history_dir = '$VIMHOME'
-nnoremap <silent> <leader>y :YRShow<cr>
-inoremap <silent> <leader>y <ESC>:YRShow<cr>
+
 "don't move the cursor after pasting
 "(by jumping to back start of previously changed text)
 "noremap p p`[
@@ -587,13 +578,14 @@ xno v <esc>
 " Keep visual selection when indenting
 vnoremap < <gv
 vnoremap > >gv
-nnoremap p [p
-nnoremap P [P
+" nnoremap p [p
+" nnoremap P [P
 " select (charwise) the contents of the current line, excluding indentation.
 " Great for pasting Python lines into REPLs.
 nnoremap vv ^vg_
 " Easier linewise reselection
 nnoremap <leader>V V`]
+
 " }}}
 
 " ******* Syntastic & Compiler *******  {{{
@@ -608,7 +600,10 @@ let g:syntastic_error_symbol = '✗'
 let g:syntastic_style_error_symbol = '✠'
 let g:syntastic_warning_symbol = '∆'
 let g:syntastic_style_warning_symbol = '≈'
-
+let g:syntastic_javascript_checkers=['jshint']
+let g:syntastic_auto_loc_list=0
+let g:syntastic_loc_list_height=5
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
 " }}}
 
 " ******* Autocommands *******  {{{
@@ -753,15 +748,14 @@ if has("autocmd")
 
   autocmd FileType gitcommit setlocal spell
 
-  augroup extraSpaces "{{{
-    au!
-    highlight ExtraWhitespace ctermbg=red guibg=red
-    au ColorScheme * highlight ExtraWhitespace guibg=red
-    au BufEnter * match ExtraWhitespace /\s\+$/
-    au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-    au InsertLeave * match ExtraWhiteSpace /\s\+$/
-  augroup END "}}}
-  set splitright
+  " augroup extraSpaces "{{{
+    " au!
+    " highlight ExtraWhitespace ctermbg=red guibg=red
+    " au ColorScheme * highlight ExtraWhitespace guibg=red
+    " au BufEnter * match ExtraWhitespace /\s\+$/
+    " au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    " au InsertLeave * match ExtraWhiteSpace /\s\+$/
+  " augroup END "}}}
 endif " has("autocmd")}}}"
 
 " ******* Custom Functions *******  {{{
@@ -893,10 +887,14 @@ nmap <silent> <leader>sv :so $MYVIMRC<CR>
 map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 " Expand current buffer full window
 "noremap <leader>f :only <CR>
-nnoremap <return> *
 "Session mgt
 set ssop-=options
-noremap <F2> :CtrlPSession<cr>
+"===============================================================================
+" Function Key Mappings
+"===============================================================================
+"noremap <F2> :CtrlPSession<cr>
+" <F4>: Save session
+nnoremap <F2> :<C-u>UniteSessionSave<space>
 set pastetoggle=<F3>
 " F2 mgt sessions
 " F4 lint
@@ -919,10 +917,15 @@ endif
 " save as sudo
 ca w!! w !sudo tee "%"
 
-" Re-map Zen Coding
-let g:use_zen_complete_tag = 1
-let g:user_zen_expandabbr_key = '<c-z>'
-let g:user_zen_leader_key     = '<c-z>'
+function! s:zen_html_tab()
+  let line = getline('.')
+  if match(line, '<.*>') < 0
+    return "\<c-y>,"
+  endif
+  return "\<c-y>n"
+endfunction
+" autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
+" autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
 
 "  CSS properties sort
 nmap <leader>S /{/+1<CR>vi{:sort<CR>
@@ -939,14 +942,12 @@ vnoremap <leader>s :!sort<cr>
 nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
 
 "
-let g:syntastic_javascript_checkers=['jshint']
-let g:syntastic_auto_loc_list=0
-let g:syntastic_loc_list_height=5
 let g:colorizer_nomap = 1
-
 
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
+"}}}
+
 " ******* Ack ******* "{{{
 if executable('ack')
   " *** ACK ***
@@ -956,12 +957,10 @@ if executable('ack')
 endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
 "}}}
-inoremap <C-Space> <C-x><C-o>
-inoremap <C-@> <C-Space>
-"let g:UltiSnipsExpandTrigger="<c-c>"
-"let g:UltiSnipsJumpForwardTrigger="<c-c>"
-let g:ycm_key_list_select_completion = ['<C-@>']
-let g:ycm_key_list_previous_completion = ['<C-S-@>']
+
+" inoremap <C-Space> <C-x><C-o>
+" inoremap <C-@> <C-Space>
+
 "set relativenumber
 
 nnoremap <cr> <c-]>
@@ -970,16 +969,226 @@ nnoremap <bs> :cnext<cr>:lnext<cr>
 set smartcase
 "Quick ack search"
 nnoremap <leader>f :Ack
-" vim-libarian
-nnoremap <leader>oa :VLBookmark<space>
-nnoremap <leader>od :VLDelBookmark<space>
-nnoremap <leader>oe :execute "split" g:librarian_filename<cr>
-nnoremap <leader>of :VLQFOpenBookmarksFor<space>
-nnoremap <leader>ol :VLQFOpenBookmarks<cr>
-nnoremap <leader>oo :VLOpenBookmarks<space>
-"TODO
-"QUICK SEARCH REPLACE searched item with *
-"fast navigation up and down : map ctrl-j to 5j
-"add mapping to select outer function name
-"Replace all
+" Unite
+"" toggle paste map <F6> :set invpaste<CR>:set paste?<CR>
+function! CloseWindowOrKillBuffer() "{{{
+  let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
+
+  " never bdelete a nerd tree
+  if matchstr(expand("%"), 'NERD') == 'NERD'
+    wincmd c
+    return
+  endif
+
+  if number_of_windows_to_this_buffer > 1
+    wincmd c
+  else
+    bdelete
+  endif
+endfunction "}}}
+"}}}
+
+" window killer
+nnoremap <silent> <leader>bd :call CloseWindowOrKillBuffer()<cr>
+"=============================================================================== {{{
+" Unite
+"===============================================================================
+
+" Use the fuzzy matcher for everything
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+" Use the rank sorter for everything
+call unite#set_profile('files', 'smartcase', 1)
+" call unite#custom#source('line,outline','matchers','matchers')
+call unite#filters#sorter_default#use(['sorter_rank'])
+
+" Set up some custom ignores
+" call unite#custom_source('file_rec,file_rec/async,file_mru,file,buffer,grep',
+      " \ 'ignore_pattern', join([
+      " \ '\.git/',
+      " \ 'git5/.*/review/',
+      " \ 'google/obj/',
+      " \ 'tmp/',
+      " \ 'log/',
+      " \ '.sass-cache',
+      " \ ], '\|'))
+let g:unite_data_directory='~/.vim/.cache/unite'
+let g:unite_enable_start_insert=1
+let g:unite_source_history_yank_enable=1
+let g:unite_source_rec_max_cache_files=5000
+let g:unite_prompt='» '
+" Open in bottom right
+" Shorten the default update date of 500ms
+let g:unite_update_time = 200
+let g:unite_source_file_mru_limit = 1000
+let g:unite_cursor_line_highlight = 'TabLineSel'
+let g:unite_source_file_mru_filename_format = ':~:.'
+let g:unite_source_file_mru_time_format = ''
+" let g:unite_split_rule = "right"
+
+" For ack.
+" if executable('ack-grep')
+  " let g:unite_source_grep_command = 'ack-grep'
+  " " Match whole word only. This might/might not be a good idea
+  " let g:unite_source_grep_default_opts = '--no-heading --no-color -a -w'
+  " let g:unite_source_grep_recursive_opt = ''
+" elseif executable('ack')
+  " let g:unite_source_grep_command = 'ack'
+  " let g:unite_source_grep_default_opts = '--no-heading --no-color -a -w'
+  " let g:unite_source_grep_recursive_opt = ''
+" endif
+if executable('ag')
+  let g:unite_source_grep_command='ag'
+  let g:unite_source_grep_default_opts='--nocolor --nogroup -S -C4'
+  let g:unite_source_rec_async_command= 'ag --nocolor --nogroup --hidden -g ""'
+  let g:unite_source_grep_recursive_opt=''
+elseif executable('ack')
+  let g:unite_source_grep_command='ack'
+  let g:unite_source_grep_default_opts='--no-heading --no-color -a -C4'
+  let g:unite_source_grep_recursive_opt=''
+endif
+
+function! s:unite_settings()
+  nmap <buffer> Q <plug>(unite_exit)
+  nmap <buffer> <ESC> <Plug>(unite_exit)
+  imap <buffer> <ESC> <Plug>(unite_exit)
+  " imap <buffer> <c-j> <Plug>(unite_select_next_line)
+  imap <buffer> <c-j> <Plug>(unite_insert_leave)
+  nmap <buffer> <c-j> <Plug>(unite_loop_cursor_down)
+  nmap <buffer> <c-k> <Plug>(unite_loop_cursor_up)
+  imap <buffer> <c-a> <Plug>(unite_choose_action)
+  " imap <buffer> <Tab> <Plug>(unite_exit_insert)
+  imap <buffer> jj <Plug>(unite_insert_leave)
+  imap <buffer> <C-w> <Plug>(unite_delete_backward_word)
+  imap <buffer> <C-u> <Plug>(unite_delete_backward_path)
+  imap <buffer> '     <Plug>(unite_quick_match_default_action)
+  nmap <buffer> '     <Plug>(unite_quick_match_default_action)
+  nmap <buffer> <C-r> <Plug>(unite_redraw)
+  imap <buffer> <C-r> <Plug>(unite_redraw)
+  inoremap <silent><buffer><expr> <C-s> unite#do_action('split')
+  nnoremap <silent><buffer><expr> <C-s> unite#do_action('split')
+  inoremap <silent><buffer><expr> <C-v> unite#do_action('vsplit')
+  nnoremap <silent><buffer><expr> <C-v> unite#do_action('vsplit')
+  nnoremap <silent><buffer><expr> <C-d> unite#do_action('delete')
+  nnoremap <silent><buffer><expr> <C-t> unite#do_action('tabopen')
+
+  let unite = unite#get_current_unite()
+  if unite.buffer_name =~# '^search'
+      nnoremap <silent><buffer><expr> r     unite#do_action('replace')
+  else
+      nnoremap <silent><buffer><expr> r     unite#do_action('rename')
+  endif
+
+  nnoremap <silent><buffer><expr> cd     unite#do_action('lcd')
+
+  " Unite -buffer-name=sessions session
+
+endfunction
+autocmd FileType unite call s:unite_settings()
+
+" Save session automatically.
+let g:unite_source_session_enable_auto_save = 1
+
+nmap <space> [unite]
+nnoremap [unite] <nop>
+
+" General fuzzy search
+nnoremap <silent> [unite]f :<C-u>Unite
+            \ -buffer-name=files buffer file_mru file_rec/async<CR>
+
+" Quick registers
+nnoremap <silent> [unite]r :<C-u>Unite -buffer-name=register register<CR>
+
+" Quick buffer and mru
+nnoremap <silent> [unite]u :<C-u>Unite -buffer-name=buffers buffer file_mru<CR>
+
+" Quick yank history
+nnoremap <silent> [unite]y :<C-u>Unite -buffer-name=yanks history/yank<CR>
+
+" Quick outline
+nnoremap <silent> [unite]o :<C-u>Unite -buffer-name=outline -vertical outline<CR>
+
+" Quick sessions (projects)
+nnoremap <silent> [unite]p :<C-u>Unite -buffer-name=sessions session<CR>
+
+" Quick sources
+nnoremap <silent> [unite]a :<C-u>Unite -buffer-name=sources source<CR>
+
+" Quickly switch lcd
+nnoremap <silent> [unite]d
+            \ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd directory_mru<CR>
+
+" Quick file search
+nnoremap <silent> [unite]<space> :<C-u>Unite -buffer-name=files file_rec/async file/new<CR>
+
+" Quick grep from cwd
+nnoremap <silent> [unite]g :<C-u>Unite -buffer-name=grep grep:.<CR>
+
+" Quick line using the word under cursor
+nnoremap <silent> [unite]l :<C-u>Unite -buffer-name=search_file line<CR>
+
+" Quick MRU search
+nnoremap <silent> [unite]m :<C-u>Unite -buffer-name=mru file_mru<CR>
+
+" Quick commands
+nnoremap <silent> [unite]c :<C-u>Unite -buffer-name=commands command<CR>
+
+" Quick bookmarks
+nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=bookmarks bookmark<CR>
+
+"(S)earch word under cur(s)or in current directory
+" nnoremap <leader>a :Unite grep:.::<C-r><C-w><CR>
+" Ctrl-sd: (S)earch word in current (d)irectory (prompt for word)
+" nnoremap <leader>A :Unite grep:.<CR>
+" Ctrl-sf: Quickly (s)earch in (f)ile
+nmap <c-s><c-f> [unite]l
+"}}}
+" Ctrl-sr: Easier (s)earch and (r)eplace
+nnoremap <c-s><c-r> :%s/<c-r><c-w>//gc<left><left><left>
+" Ctrl-sw: Quickly surround word
+nmap <c-s><c-w> ysiw
+" custom configuration for surround.vim
+let g:surround_{char2nr('-')} = "<% \r %>"
+let g:surround_{char2nr('=')} = "<%= \r %>"
+let g:surround_{char2nr('8')} = "/* \r */"
+let g:surround_{char2nr('s')} = " \r"
+let g:surround_{char2nr('^')} = "/^\r$/"
+let g:surround_indent = 1")
+
+let delimitMate_jump_expansion = 1
+let delimitMate_expand_space = 1
+let delimitMate_expand_cr = 1
+" nnoremap <silent> /  :<C-u>Unite -buffer-name=search
+" \ line:forward -start-insert -no-quit<CR>
+nnoremap <C-@> <C-Space>
+"nnoremap <C-@> :CtrlP<CR>
+" let g:user_emmet_leader_key = '<c-y>'
+imap <c-z> <c-y>,
+" Create newlines without entering insert mode
+nnoremap go o<Esc>k
+nnoremap gO O<Esc>j
+
+" Always use location list for syntax/compile errors
 "Add quick console log taking function name as param
+"QUICK SEARCH REPLACE searched item with *
+"Replace all
+"TODO
+"add mapping to select outer function name
+"fast navigation up and down : map ctrl-j to 5j
+map <leader>gb :Gblame<CR>
+map <leader>gc :Gcommit<CR>
+map <leader>gd :Gdiff<CR>
+map <leader>gl :Glog<CR>
+map <leader>gp :Git push<CR>
+map <leader>gs :Gstatus<CR>
+nnoremap <leader>j :CtrlPFunky<CR>
+let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
+" let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#left_sep=' '
+" let g:airline#extensions#tabline#left_alt_sep='¦'
+let g:airline_section_b = ''
+map = <Plug>(expand_region_expand)
+map + <Plug>(expand_region_shrink)
+nnoremap <silent> <leader>DD :exe ":profile start profile.log"<cr>:exe ":profile func *"<cr>:exe ":profile file *"<cr>
+nnoremap <silent> <leader>DP :exe ":profile pause"<cr>
+nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
+nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>

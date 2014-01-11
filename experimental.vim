@@ -1,8 +1,7 @@
-let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
 "set suffixes+=.dvi  " Lower priority in wildcards
 "let g:syntastic_auto_loc_list=0
-autocmd FocusLost * :colorscheme solarized
-autocmd FocusGained * :colorscheme default
+" autocmd FocusLost * :colorscheme solarized
+" autocmd FocusGained * :colorscheme default
 "highlight Cursor guifg=white guibg=black
 "highlight iCursor guifg=red guibg=steelblue
 
@@ -26,21 +25,5 @@ augroup ft_css
 augroup END
 
 " }}}
-" custom configuration for surround.vim
-let g:surround_{char2nr('-')} = "<% \r %>"
-let g:surround_{char2nr('=')} = "<%= \r %>"
-let g:surround_{char2nr('8')} = "/* \r */"
-let g:surround_{char2nr('s')} = " \r"
-let g:surround_{char2nr('^')} = "/^\r$/"
-let g:surround_indent = 1")
-"Switching to the previously edited buffer
-nnoremap ù :b#<CR>
 
-" Create newlines without entering insert mode
-"
-nnoremap go o<Esc>k
-nnoremap gO O<Esc>j
-"set iskeyword +=.
 
-" TODO
-" Always use location list for syntax/compile errors
