@@ -1,6 +1,6 @@
 " Beguene's settings
 " Author: Beguene Permale
-" Version: 0.9
+" Version: 1.0
 
 set nocompatible
 filetype off                   " required! for vundle
@@ -45,6 +45,7 @@ Bundle 'scrooloose/syntastic'
 Bundle 'majutsushi/tagbar'
 Bundle 'mattn/emmet-vim'
 Bundle 'SirVer/ultisnips'
+Bundle 'honza/vim-snippets'
 " Bundle 'beguene/sessionman.vim'
 Bundle 'mileszs/ack.vim'
 
@@ -220,25 +221,28 @@ let g:ycm_filetype_blacklist = {
 "}}}"
 
 " ******* UltiSnips ******* {{{
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-function! g:UltiSnips_Complete()
-  call UltiSnips_JumpForwards()
-  if g:ulti_jump_forwards_res == 0
-    call UltiSnips_ExpandSnippet()
-    if g:ulti_expand_res == 0
-      if pumvisible()
-        return "\<C-n>"
-      else
-        return "\<TAB>"
-      endif
-    endif
-  endif
-  return ""
-endfunction
+" let g:UltiSnipsJumpForwardTrigger="<tab>"
+" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+" function! g:UltiSnips_Complete()
+  " call UltiSnips_JumpForwards()
+  " if g:ulti_jump_forwards_res == 0
+    " call UltiSnips_ExpandSnippet()
+    " if g:ulti_expand_res == 0
+      " if pumvisible()
+        " return "\<C-n>"
+      " else
+        " return "\<TAB>"
+      " endif
+    " endif
+  " endif
+  " return ""
+" endfunction
 " let g:UltiSnipsExpandTrigger="<cr>"
-au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+" au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
 "}}}
+let g:UltiSnipsExpandTrigger="<c-b>"
+" let g:UltiSnipsJumpForwardTrigger="<c-b>"
+" let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " ******* Search ******* "{{{
 "gdefault applies substitutions globally on lines. For example, instead of
@@ -276,8 +280,8 @@ nn j gj
 nn k gk
 nn gj j
 nn gk k
-nnoremap <C-K> :bp<CR>
-nnoremap <C-J> :bn<CR>
+nnoremap <C-K> :tabnext<CR>
+nnoremap <C-J> :tabprevious<CR>
 " When pressing <leader>cd switch to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>
 " Bash-like command for navigation in Insert Mode
@@ -738,14 +742,14 @@ if has("autocmd")
 
   autocmd FileType gitcommit setlocal spell
 
-  " augroup extraSpaces "{{{
-    " au!
-    " highlight ExtraWhitespace ctermbg=red guibg=red
-    " au ColorScheme * highlight ExtraWhitespace guibg=red
-    " au BufEnter * match ExtraWhitespace /\s\+$/
-    " au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-    " au InsertLeave * match ExtraWhiteSpace /\s\+$/
-  " augroup END "}}}
+  augroup extraSpaces "{{{
+    au!
+    highlight ExtraWhitespace ctermbg=red guibg=red
+    au ColorScheme * highlight ExtraWhitespace guibg=red
+    au BufEnter * match ExtraWhitespace /\s\+$/
+    au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+    au InsertLeave * match ExtraWhiteSpace /\s\+$/
+  augroup END "}}}
 endif " has("autocmd")}}}"
 
 " ******* Custom Functions *******  {{{
@@ -874,6 +878,7 @@ map ;mv :call RenameFile()<cr>
 " Quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
+nmap <silent> <leader>ez :e ~/.zshrc<CR>
 map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 " Expand current buffer full window
 "noremap <leader>f :only <CR>
@@ -1154,7 +1159,7 @@ imap <c-z> <c-y>,
 let delimitMate_expand_cr = 1
 let delimitMate_expand_space = 1
 let delimitMate_jump_expansion = 1
-let g:user_emmet_leader_key = '<c-b>'
+" let g:user_emmet_leader_key = '<c-b>'
 nnoremap <C-@> <C-Space>
 nnoremap gO O<Esc>j
 nnoremap go o<Esc>k
@@ -1187,3 +1192,7 @@ nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
 nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
 set nofoldenable    " disable folding
+
+nnoremap <leader>bf [{ "Go to beginning of function code block
+nnoremap <leader>ef ]} "Go to end of function code block
+let g:syntastic_javascript_jshint_conf="~/.jshintrc"
