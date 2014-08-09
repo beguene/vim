@@ -51,6 +51,8 @@ Bundle 'mileszs/ack.vim'
 "UI
 "Bundle 'lilydjwg/colorizer'
 Bundle 'altercation/vim-colors-solarized'
+Bundle 'nanotech/jellybeans.vim'
+Bundle 'tomasr/molokai'
 Bundle 'jszakmeister/vim-togglecursor'
 
 " Languages
@@ -76,10 +78,9 @@ Bundle 'henrik/vim-reveal-in-finder'
 " Easily use quickfix to search and replace bulk files
 Bundle 'henrik/vim-qargs'
 " Bundle 'malkomalko/vim-librarian.vim'
-Bundle 'bling/vim-airline'
+" Bundle 'bling/vim-airline'
 Bundle 'tacahiroy/ctrlp-funky'
 Bundle 'terryma/vim-expand-region'
-" Bundle 'bling/vim-airline'
 " :Ggrep findme
 " :Qargs | argdo %s/findme/replacement/gc | update
 
@@ -120,7 +121,7 @@ set wildignore+=tags
 set wildignore+=*/tmp/*
 set wildignore+=*/vendor/*
 set confirm
-set foldlevelstart=1
+" set foldlevelstart=1
 set ttyfast
 set ttimeoutlen=50 " Make Esc work faster
 "}}}
@@ -410,11 +411,14 @@ if has("gui_running")
   set guioptions=abirLb
   set guioptions-=T
   set guifont=Menlo:h12
+  set guioptions-=r
+  set guioptions-=L
   "colorscheme mustang
   "colors peaksea
   "colorscheme clouds_midnight
   " colo wombat
   "colorscheme lucius
+  colorscheme solarized
 else
   set background=dark
   set guifont=Menlo:h12
@@ -431,26 +435,11 @@ highlight VertSplit ctermbg=13 ctermfg=13
 
 " ******* Status Line ******* "{{{
 set laststatus=2
-" if exists("Pl#Theme#InsertSegment")
-  " call Pl#Theme#InsertSegment('ws_marker', 'after', 'lineinfo')
-" else " Build custom statusline if not Powerline"
-  " " Returns true if paste mode is enabled
-  " function! HasPaste() "{{{2
-      " if &paste
-          " return 'PASTE MODE  '
-      " en
-      " return ''
-  " endfunction "}}}
-  " set statusline=%F%m%r%h%w\ (%{&ff})-[%{v:lang}]{%Y}
-  " "silent set statusline+=%{fugitive#statusline()}
-  " set statusline+=\ %{HasPaste()}
-  " set statusline+=%= "align the rest to right
-  " set statusline+=[%l,%v][%p%%]
-  " set statusline+=%#warningmsg#
-  " "set statusline+=%{SyntasticStatuslineFlag()}
-  " set statusline+=%*
-" endif
-" }}}"
+" let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep=' '
+let g:airline#extensions#tabline#left_alt_sep='¦'
+let g:airline_section_b = ''
+let g:airline#extensions#syntastic#enabled = 0
 
 " ******* Files / Dir  management ******* {{{
 map <leader>t :tabnew<CR>
@@ -573,6 +562,7 @@ nnoremap <silent> <leader>gs :Gstatus<CR>
 "noremap P P`[
 " Yank text to the OS X clipboard
 noremap <leader>y "*y
+set clipboard=unnamed
 " Pressing v again brings you out of visual mode
 xno v <esc>
 " Keep visual selection when indenting
@@ -603,7 +593,7 @@ let g:syntastic_style_warning_symbol = '≈'
 let g:syntastic_javascript_checkers=['jshint']
 let g:syntastic_auto_loc_list=0
 let g:syntastic_loc_list_height=5
-let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['javascript', 'php', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['php', 'javascript', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
 " }}}
 
 " ******* Autocommands *******  {{{
@@ -648,7 +638,7 @@ if has("autocmd")
     autocmd FileType xml        set omnifunc=xmlcomplete#CompleteTags
     autocmd FileType python     set omnifunc=pythoncomplete#Complete
     "autocmd FileType php        set omnifunc=phpcomplete#CompletePHP
-    autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
+    " autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
     autocmd FileType sql        setlocal completefunc=sqlcomplete#Complete"
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
@@ -665,8 +655,8 @@ if has("autocmd")
     autocmd FileType javascript   silent! compiler node | setlocal makeprg=node\ %
     autocmd FileType javascript   noremap <F6> <esc>:w!<CR>:!node %<CR>
     autocmd FileType javascript setl fen  nocindent
-    au FileType javascript setlocal foldmethod=marker
-    au FileType javascript setlocal foldmarker={,}
+    " au FileType javascript setlocal foldmethod=marker
+    " au FileType javascript setlocal foldmarker={,}
     au FileType javascript setlocal sw=2 ts=2 sts=2 textwidth=79
   augroup END "}}}
 
@@ -896,6 +886,7 @@ set ssop-=options
 " <F4>: Save session
 nnoremap <F2> :<C-u>UniteSessionSave<space>
 set pastetoggle=<F3>
+
 " F2 mgt sessions
 " F4 lint
 " F5 compile/make
@@ -970,7 +961,7 @@ set smartcase
 "Quick ack search"
 nnoremap <leader>f :Ack
 " Unite
-"" toggle paste map <F6> :set invpaste<CR>:set paste?<CR>
+
 function! CloseWindowOrKillBuffer() "{{{
   let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
 
@@ -1037,11 +1028,14 @@ let g:unite_source_file_mru_time_format = ''
   " let g:unite_source_grep_recursive_opt = ''
 " endif
 if executable('ag')
+  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
+  set grepformat=%f:%l:%c:%m
   let g:unite_source_grep_command='ag'
   let g:unite_source_grep_default_opts='--nocolor --nogroup -S -C4'
-  let g:unite_source_rec_async_command= 'ag --nocolor --nogroup --hidden -g ""'
   let g:unite_source_grep_recursive_opt=''
 elseif executable('ack')
+  set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
+  set grepformat=%f:%l:%c:%m
   let g:unite_source_grep_command='ack'
   let g:unite_source_grep_default_opts='--no-heading --no-color -a -C4'
   let g:unite_source_grep_recursive_opt=''
@@ -1137,13 +1131,11 @@ nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=bookmarks bookmark<CR>
 
 "(S)earch word under cur(s)or in current directory
 " nnoremap <leader>a :Unite grep:.::<C-r><C-w><CR>
-" Ctrl-sd: (S)earch word in current (d)irectory (prompt for word)
+" " Ctrl-sd: (S)earch word in current (d)irectory (prompt for word)
 " nnoremap <leader>A :Unite grep:.<CR>
-" Ctrl-sf: Quickly (s)earch in (f)ile
-nmap <c-s><c-f> [unite]l
 "}}}
 " Ctrl-sr: Easier (s)earch and (r)eplace
-nnoremap <c-s><c-r> :%s/<c-r><c-w>//gc<left><left><left>
+nnoremap <leader>sr :%s/<c-r><c-w>//gc<left><left><left>
 " Ctrl-sw: Quickly surround word
 nmap <c-s><c-w> ysiw
 " custom configuration for surround.vim
@@ -1154,18 +1146,18 @@ let g:surround_{char2nr('s')} = " \r"
 let g:surround_{char2nr('^')} = "/^\r$/"
 let g:surround_indent = 1")
 
-let delimitMate_jump_expansion = 1
-let delimitMate_expand_space = 1
-let delimitMate_expand_cr = 1
-" nnoremap <silent> /  :<C-u>Unite -buffer-name=search
-" \ line:forward -start-insert -no-quit<CR>
-nnoremap <C-@> <C-Space>
-"nnoremap <C-@> :CtrlP<CR>
-" let g:user_emmet_leader_key = '<c-y>'
-imap <c-z> <c-y>,
 " Create newlines without entering insert mode
-nnoremap go o<Esc>k
+" \ line:forward -start-insert -no-quit<CR>
+" nnoremap <silent> /  :<C-u>Unite -buffer-name=search
+"nnoremap <C-@> :CtrlP<CR>
+imap <c-z> <c-y>,
+let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
+let delimitMate_jump_expansion = 1
+let g:user_emmet_leader_key = '<c-b>'
+nnoremap <C-@> <C-Space>
 nnoremap gO O<Esc>j
+nnoremap go o<Esc>k
 
 " Always use location list for syntax/compile errors
 "Add quick console log taking function name as param
@@ -1174,21 +1166,24 @@ nnoremap gO O<Esc>j
 "TODO
 "add mapping to select outer function name
 "fast navigation up and down : map ctrl-j to 5j
+"
+"GIT {{{
 map <leader>gb :Gblame<CR>
 map <leader>gc :Gcommit<CR>
 map <leader>gd :Gdiff<CR>
 map <leader>gl :Glog<CR>
 map <leader>gp :Git push<CR>
 map <leader>gs :Gstatus<CR>
+"}}}
 nnoremap <leader>j :CtrlPFunky<CR>
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep=' '
-let g:airline#extensions#tabline#left_alt_sep='¦'
-let g:airline_section_b = ''
-map = <Plug>(expand_region_expand)
-map + <Plug>(expand_region_shrink)
+
+map - <Plug>(expand_region_expand)
+map _ <Plug>(expand_region_shrink)
+" PROFILING
 nnoremap <silent> <leader>DD :exe ":profile start profile.log"<cr>:exe ":profile func *"<cr>:exe ":profile file *"<cr>
 nnoremap <silent> <leader>DP :exe ":profile pause"<cr>
 nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
 nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
+nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
+set nofoldenable    " disable folding
