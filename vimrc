@@ -36,7 +36,7 @@ Bundle 'Shougo/unite-outline'
 Bundle 'Shougo/vimproc.vim'
 Bundle 'tsukkee/unite-tag'
 Bundle 'Shougo/vimfiler.vim'
-" Bundle 'Shougo/neocomplete.vim'
+Bundle 'Shougo/neocomplete.vim'
 
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'tpope/vim-surround'
@@ -58,6 +58,7 @@ Bundle 'altercation/vim-colors-solarized'
 Bundle 'tpope/vim-vividchalk'
 Bundle 'nanotech/jellybeans.vim'
 Bundle 'tomasr/molokai'
+Bundle 'itchyny/lightline.vim'
 Bundle 'jszakmeister/vim-togglecursor'
 
 " Languages
@@ -75,17 +76,19 @@ Bundle 'MarcWeber/vim-addon-mw-utils'
 
 Bundle 'tsaleh/vim-matchit'
 Bundle '907th/vim-auto-save'
-" Bundle 'Valloric/YouCompleteMe'
 Bundle 'henrik/vim-reveal-in-finder'
 " Easily use quickfix to search and replace bulk files
 Bundle 'henrik/vim-qargs'
-" Bundle 'malkomalko/vim-librarian.vim'
 Bundle 'terryma/vim-expand-region'
 Bundle 'chilicuil/vim-sml-coursera'
 Bundle 'tpope/vim-endwise'
 Bundle 'tpope/vim-rails'
 Bundle 'chrishunt/xterm-color-table.vim'
-Bundle 'itchyny/lightline.vim'
+Bundle 'kana/vim-textobj-user'
+Bundle 'nelstrom/vim-textobj-rubyblock'
+Bundle 'wikitopian/hardmode'
+Bundle 'davidhalter/jedi-vim'
+Bundle 'marijnh/tern_for_vim'
 
 
 " :Ggrep findme
@@ -434,11 +437,12 @@ else
   set background=dark
   set guifont=Menlo:h12
   let g:solarized_termtrans=1
-  let g:solarized_termcolors=256
+  let g:solarized_termcolors=16
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
-  colorscheme solarized
-  "colorscheme Tomorrow-Night-Bright
+  "colorscheme solarized
+  "colorscheme Tomorrow-Night-Blue
+  colorscheme Tomorrow-Night-Eighties
   " colorscheme vividchalk
 endif
 " Styling vertical split bar
@@ -463,7 +467,143 @@ set statusline+=%r      "read only flag
     " au InsertEnter * hi StatusLine term=reverse ctermbg=5 gui=undercurl guisp=Magenta
     " au InsertLeave * hi StatusLine term=reverse ctermfg=0 ctermbg=2 gui=bold,reverse
 " endif
+" STATUS LINES {{{
+" hi StatusLine ctermbg=black ctermfg=183
+" hi StatusLine ctermbg=grey ctermfg=darkblue
+
+
+let g:lightline = {
+            \ 'colorscheme': 'solarized',
+            \ 'active': {
+            \   'left': [ [ 'mode', 'paste' ], [ 'filename' ], ['ctrlpmark'] ],
+            \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+            \ },
+            \ 'component_function': {
+            \   'fugitive': 'MyFugitive',
+            \   'filename': 'MyFilename',
+            \   'fileformat': 'MyFileformat',
+            \   'filetype': 'MyFiletype',
+            \   'fileencoding': 'MyFileencoding',
+            \   'mode': 'MyMode',
+            \   'ctrlpmark': 'CtrlPMark',
+            \ },
+            \ 'component_expand': {
+            \   'syntastic': 'SyntasticStatuslineFlag',
+            \ },
+            \ 'component_type': {
+            \   'syntastic': 'error',
+            \ },
+            \ 'subseparator': { 'left': '|', 'right': '|' }
+            \ }
+
+function! MyModified()
+    return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! MyReadonly()
+    return &ft !~? 'help' && &readonly ? 'RO' : ''
+endfunction
+
+function! MyFilename()
+    let fname = expand('%:t')
+    return fname == 'ControlP' ? g:lightline.ctrlp_item :
+                \ fname == '__Tagbar__' ? g:lightline.fname :
+                \ fname =~ '__Gundo\|NERD_tree' ? '' :
+                \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
+                \ &ft == 'unite' ? unite#get_status_string() :
+                \ &ft == 'vimshell' ? vimshell#get_status_string() :
+                \ ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
+                \ ('' != fname ? fname : '[No Name]') .
+                \ ('' != MyModified() ? ' ' . MyModified() : '')
+endfunction
+
+function! MyFugitive()
+    try
+        if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && &ft !~? 'vimfiler' && exists('*fugitive#head')
+            let mark = ''  " edit here for cool mark
+            let _ = fugitive#head()
+            return strlen(_) ? mark._ : ''
+        endif
+    catch
+    endtry
+    return ''
+endfunction
+
+function! MyFileformat()
+    return winwidth(0) > 70 ? &fileformat : ''
+endfunction
+
+function! MyFiletype()
+    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
+endfunction
+
+function! MyFileencoding()
+    return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
+endfunction
+
+function! MyMode()
+    let fname = expand('%:t')
+    return fname == '__Tagbar__' ? 'Tagbar' :
+                \ fname == 'ControlP' ? 'CtrlP' :
+                \ fname == '__Gundo__' ? 'Gundo' :
+                \ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
+                \ fname =~ 'NERD_tree' ? 'NERDTree' :
+                \ &ft == 'unite' ? 'Unite' :
+                \ &ft == 'vimfiler' ? 'VimFiler' :
+                \ &ft == 'vimshell' ? 'VimShell' :
+                \ winwidth(0) > 60 ? lightline#mode() : ''
+endfunction
+
+function! CtrlPMark()
+    if expand('%:t') =~ 'ControlP'
+        call lightline#link('iR'[g:lightline.ctrlp_regex])
+        return lightline#concatenate([g:lightline.ctrlp_prev, g:lightline.ctrlp_item
+                    \ , g:lightline.ctrlp_next], 0)
+    else
+        return ''
+    endif
+endfunction
+
+let g:ctrlp_status_func = {
+            \ 'main': 'CtrlPStatusFunc_1',
+            \ 'prog': 'CtrlPStatusFunc_2',
+            \ }
+
+function! CtrlPStatusFunc_1(focus, byfname, regex, prev, item, next, marked)
+    let g:lightline.ctrlp_regex = a:regex
+    let g:lightline.ctrlp_prev = a:prev
+    let g:lightline.ctrlp_item = a:item
+    let g:lightline.ctrlp_next = a:next
+    return lightline#statusline(0)
+endfunction
+
+function! CtrlPStatusFunc_2(str)
+    return lightline#statusline(0)
+endfunction
+
+let g:tagbar_status_func = 'TagbarStatusFunc'
+
+function! TagbarStatusFunc(current, sort, fname, ...) abort
+    let g:lightline.fname = a:fname
+    return lightline#statusline(0)
+endfunction
+
+augroup AutoSyntastic
+    autocmd!
+    autocmd BufWritePost *.c,*.cpp call s:syntastic()
+augroup END
+function! s:syntastic()
+    SyntasticCheck
+    call lightline#update()
+endfunction
+
+let g:unite_force_overwrite_statusline = 0
+let g:vimfiler_force_overwrite_statusline = 0
+let g:vimshell_force_overwrite_statusline = 0
+let g:lightline.colorscheme = 'solarized'
+"}}}
 " }}}
+
 " ******* Files / Dir  management ******* {{{
 map <leader>t :tabnew<CR>
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
@@ -505,7 +645,7 @@ nmap ,wc :call CtrlPWithSearchText(expand('<cword>'), 'CmdPalette')<CR>
 
 let g:ctrlp_by_filename = 1
 " *** NERDTree ***
-" nnoremap <leader>n :NERDTree<CR>
+ nnoremap <leader>n :NERDTree<CR>
 " let NERDTreeQuitOnOpen = 1
 " let NERDTreeChDirMode=2
 " let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
@@ -622,6 +762,8 @@ let g:syntastic_style_warning_symbol = '≈'
 let g:syntastic_javascript_checkers=['jshint']
 let g:syntastic_auto_loc_list=0
 let g:syntastic_loc_list_height=5
+"let g:syntastic_ruby_mri_exec = 'ruby'
+
 let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['php', 'javascript', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
 " }}}
 
@@ -782,11 +924,38 @@ if has("autocmd")
 endif " has("autocmd")}}}"
 
 " ******* Custom Functions *******  {{{
+
+function! CloseWindowOrKillBuffer() "{{{
+  let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
+
+  " never bdelete a nerd tree
+  if matchstr(expand("%"), 'NERD') == 'NERD'
+    wincmd c
+    return
+  endif
+
+  if number_of_windows_to_this_buffer > 1
+    wincmd c
+  else
+    bdelete
+  endif
+endfunction "}}}
+
+" window killer
+nnoremap <silent> <leader>bd :call CloseWindowOrKillBuffer()<cr>
 command! XCleanHTML :%s#<[^>]\+>##g
 " Remove the Windows ^M -
 command! XRemoveControlM :%s/\+$//
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
+function XDeleteHiddenBuffers()
+  let tpbl=[]
+  call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
+  for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
+    silent execute 'bwipeout' buf
+  endfor
+endfunction
+command! XDeleteHiddenBuffers :call XDeleteHiddenBuffers()
 
 " Don't close window, when deleting a buffer
 command! Bclose call <SID>BufcloseCloseIt()
@@ -870,26 +1039,6 @@ func! s:DeleteBuffer()
   exec "norm \<F5>"
 endfunc
 
-command! XCloseHiddenBuffers :call CloseHiddenBuffers()
-function! CloseHiddenBuffers()
-  " figure out which buffers are visible in any tab
-  let visible = {}
-  for t in range(1, tabpagenr('$'))
-    for b in tabpagebuflist(t)
-      let visible[b] = 1
-    endfor
-  endfor
-  " close any buffer that are loaded and not visible
-  let l:tally = 0
-  for b in range(1, bufnr('$'))
-    if bufloaded(b) && !has_key(visible, b)
-      let l:tally += 1
-      exe 'bw ' . b
-    endif
-  endfor
-  echon "Deleted " . l:tally . " buffers"
-endfun
-
 " RENAME CURRENT FILE (thanks Gary Bernhardt)
 function! RenameFile()
     let old_name = expand('%')
@@ -963,7 +1112,6 @@ vnoremap <leader>s :!sort<cr>
 " }}}
 " }}}
 
-"
 let g:colorizer_nomap = 1
 
 " ******* Experimental *******  {{{
@@ -990,26 +1138,7 @@ nnoremap <bs> <c-T>
 nnoremap <bs> :cnext<cr>:lnext<cr>
 set smartcase
 
-function! CloseWindowOrKillBuffer() "{{{
-  let number_of_windows_to_this_buffer = len(filter(range(1, winnr('$')), "winbufnr(v:val) == bufnr('%')"))
-
-  " never bdelete a nerd tree
-  if matchstr(expand("%"), 'NERD') == 'NERD'
-    wincmd c
-    return
-  endif
-
-  if number_of_windows_to_this_buffer > 1
-    wincmd c
-  else
-    bdelete
-  endif
-endfunction "}}}
-"}}}
-
-" window killer
-nnoremap <silent> <leader>bd :call CloseWindowOrKillBuffer()<cr>
-" Unite {{{
+" === UNITE {{{
 "===============================================================================
 " Use the fuzzy matcher for everything
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
@@ -1019,7 +1148,8 @@ call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#custom#profile('default', 'context', {
       \   'winheight': 30,
       \   'prompt': '» ',
-      \   'marked_icon': '⚲',
+      \   'marked_icon' : '✓',
+      \   'enable_short_source_names': 0,
       \   'smartcase': 1,
       \ })
 
@@ -1062,17 +1192,6 @@ let g:unite_source_history_yank_enable = 1
 " Open in bottom right
 let g:unite_split_rule = "topleft"
 
-" For ack.
-" if executable('ack-grep')
-  " let g:unite_source_grep_command = 'ack-grep'
-  " " Match whole word only. This might/might not be a good idea
-  " let g:unite_source_grep_default_opts = '--no-heading --no-color -a -w'
-  " let g:unite_source_grep_recursive_opt = ''
-" elseif executable('ack')
-  " let g:unite_source_grep_command = 'ack'
-  " let g:unite_source_grep_default_opts = '--no-heading --no-color -a -w'
-  " let g:unite_source_grep_recursive_opt = ''
-" endif
 if executable('ag')
   set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
   set grepformat=%f:%l:%c:%m
@@ -1120,6 +1239,8 @@ function! s:unite_settings()
   endif
 
   nnoremap <silent><buffer><expr> cd     unite#do_action('lcd')
+  " Refresh
+  nmap <buffer> <C-r>      <Plug>(unite_redraw)
 
   " Unite -buffer-name=sessions session
 
@@ -1137,7 +1258,7 @@ nnoremap <silent> [unite]f :<C-u>Unite
             \ -buffer-name=files -immediately -resume -no-split -auto-preview buffer tab file_rec/async<CR>
 " Quick file search
 nnoremap <silent> [unite]<space> :<C-u>Unite
-            \ -buffer-name=files -immediately -resume -no-split -auto-preview buffer tab file_rec/async<CR>
+            \ -buffer-name=files -immediately -auto-resize -no-split file_rec/git<CR>
 
 " Quick registers
 nnoremap <silent> [unite]r :<C-u>Unite -buffer-name=register register<CR>
@@ -1180,6 +1301,8 @@ nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=bookmarks bookmark<CR>
 " Tags
 nnoremap <silent> [unite]t :<C-u>Unite -auto-preview -no-split -start-insert -auto-resize -resume -immediately tag<cr>
 nnoremap <enter> :<C-u>UniteWithCursorWord -auto-preview -start-insert -immediately -resume tag<cr>
+" grep
+nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
 
 "(S)earch word under cur(s)or in current directory
 " nnoremap <leader>a :Unite grep:.::<C-r><C-w><CR>
@@ -1227,7 +1350,6 @@ map <leader>gp :Git push<CR>
 map <leader>gs :Gstatus<CR>
 "}}}
 "
-nnoremap <leader>j :CtrlPFunky<CR>
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
 
 map - <Plug>(expand_region_expand)
@@ -1240,7 +1362,6 @@ nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
 nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 "}}}
 "
-nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
 set nofoldenable    " disable folding
 
 nnoremap <leader>bf [{ "Go to beginning of function code block
@@ -1252,140 +1373,137 @@ set re=1
 vnoremap J :m '>+1<CR>gv
 vnoremap K :m '<-2<CR>gv
 
-" STATUS LINES {{{
-" hi StatusLine ctermbg=black ctermfg=183
-" hi StatusLine ctermbg=grey ctermfg=darkblue
-
-
-let g:lightline = {
-            \ 'colorscheme': 'solarized',
-            \ 'active': {
-            \   'left': [ [ 'mode', 'paste' ], [ 'filename' ], ['ctrlpmark'] ],
-            \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
-            \ },
-            \ 'component_function': {
-            \   'fugitive': 'MyFugitive',
-            \   'filename': 'MyFilename',
-            \   'fileformat': 'MyFileformat',
-            \   'filetype': 'MyFiletype',
-            \   'fileencoding': 'MyFileencoding',
-            \   'mode': 'MyMode',
-            \   'ctrlpmark': 'CtrlPMark',
-            \ },
-            \ 'component_expand': {
-            \   'syntastic': 'SyntasticStatuslineFlag',
-            \ },
-            \ 'component_type': {
-            \   'syntastic': 'error',
-            \ },
-            \ 'subseparator': { 'left': '|', 'right': '|' }
-            \ }
-
-function! MyModified()
-    return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
-endfunction
-
-function! MyReadonly()
-    return &ft !~? 'help' && &readonly ? 'RO' : ''
-endfunction
-
-function! MyFilename()
-    let fname = expand('%:t')
-    return fname == 'ControlP' ? g:lightline.ctrlp_item :
-                \ fname == '__Tagbar__' ? g:lightline.fname :
-                \ fname =~ '__Gundo\|NERD_tree' ? '' :
-                \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-                \ &ft == 'unite' ? unite#get_status_string() :
-                \ &ft == 'vimshell' ? vimshell#get_status_string() :
-                \ ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
-                \ ('' != fname ? fname : '[No Name]') .
-                \ ('' != MyModified() ? ' ' . MyModified() : '')
-endfunction
-
-function! MyFugitive()
-    try
-        if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && &ft !~? 'vimfiler' && exists('*fugitive#head')
-            let mark = ''  " edit here for cool mark
-            let _ = fugitive#head()
-            return strlen(_) ? mark._ : ''
-        endif
-    catch
-    endtry
-    return ''
-endfunction
-
-function! MyFileformat()
-    return winwidth(0) > 70 ? &fileformat : ''
-endfunction
-
-function! MyFiletype()
-    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype : 'no ft') : ''
-endfunction
-
-function! MyFileencoding()
-    return winwidth(0) > 70 ? (strlen(&fenc) ? &fenc : &enc) : ''
-endfunction
-
-function! MyMode()
-    let fname = expand('%:t')
-    return fname == '__Tagbar__' ? 'Tagbar' :
-                \ fname == 'ControlP' ? 'CtrlP' :
-                \ fname == '__Gundo__' ? 'Gundo' :
-                \ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
-                \ fname =~ 'NERD_tree' ? 'NERDTree' :
-                \ &ft == 'unite' ? 'Unite' :
-                \ &ft == 'vimfiler' ? 'VimFiler' :
-                \ &ft == 'vimshell' ? 'VimShell' :
-                \ winwidth(0) > 60 ? lightline#mode() : ''
-endfunction
-
-function! CtrlPMark()
-    if expand('%:t') =~ 'ControlP'
-        call lightline#link('iR'[g:lightline.ctrlp_regex])
-        return lightline#concatenate([g:lightline.ctrlp_prev, g:lightline.ctrlp_item
-                    \ , g:lightline.ctrlp_next], 0)
-    else
-        return ''
-    endif
-endfunction
-
-let g:ctrlp_status_func = {
-            \ 'main': 'CtrlPStatusFunc_1',
-            \ 'prog': 'CtrlPStatusFunc_2',
-            \ }
-
-function! CtrlPStatusFunc_1(focus, byfname, regex, prev, item, next, marked)
-    let g:lightline.ctrlp_regex = a:regex
-    let g:lightline.ctrlp_prev = a:prev
-    let g:lightline.ctrlp_item = a:item
-    let g:lightline.ctrlp_next = a:next
-    return lightline#statusline(0)
-endfunction
-
-function! CtrlPStatusFunc_2(str)
-    return lightline#statusline(0)
-endfunction
-
-let g:tagbar_status_func = 'TagbarStatusFunc'
-
-function! TagbarStatusFunc(current, sort, fname, ...) abort
-    let g:lightline.fname = a:fname
-    return lightline#statusline(0)
-endfunction
-
-augroup AutoSyntastic
-    autocmd!
-    autocmd BufWritePost *.c,*.cpp call s:syntastic()
-augroup END
-function! s:syntastic()
-    SyntasticCheck
-    call lightline#update()
-endfunction
-
-let g:unite_force_overwrite_statusline = 0
-let g:vimfiler_force_overwrite_statusline = 0
-let g:vimshell_force_overwrite_statusline = 0
-let g:lightline.colorscheme = 'solarized'
-"}}}
 
 let g:unite_update_time = 100
+
+" NeoComplete {{{
+"Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
+" Disable AutoComplPop.
+let g:acp_enableAtStartup = 0
+" Use neocomplete.
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#disable_auto_complete=1
+" Set minimum syntax keyword length.
+ let g:neocomplete#auto_completion_start_length = 2
+inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+" Use smartcase.
+let g:neocomplete#enable_smart_case = 1
+" Set minimum syntax keyword length.
+let g:neocomplete#sources#syntax#min_keyword_length = 3
+let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+
+let g:neocomplete#max_list = 25
+
+" Define dictionary.
+let g:neocomplete#sources#dictionary#dictionaries = {
+    \ 'default' : '',
+    \ 'vimshell' : $HOME.'/.vimshell_hist',
+    \ 'scheme' : $HOME.'/.gosh_completions'
+        \ }
+
+" Define keyword.
+if !exists('g:neocomplete#keyword_patterns')
+    let g:neocomplete#keyword_patterns = {}
+endif
+let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+
+" Plugin key-mappings.
+inoremap <expr><C-g>     neocomplete#undo_completion()
+inoremap <expr><C-l>     neocomplete#complete_common_string()
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  return neocomplete#close_popup() . "\<CR>"
+  " For no inserting <CR> key.
+  "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+endfunction
+" <TAB>: completion.
+"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" <C-h>, <BS>: close popup and delete backword char.
+inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><C-y>  neocomplete#close_popup()
+inoremap <expr><C-e>  neocomplete#cancel_popup()
+" Close popup by <Space>.
+"inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+
+" For cursor moving in insert mode(Not recommended)
+"inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
+"inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
+"inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
+"inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
+" Or set this.
+"let g:neocomplete#enable_cursor_hold_i = 1
+" Or set this.
+"let g:neocomplete#enable_insert_char_pre = 1
+
+" AutoComplPop like behavior.
+"let g:neocomplete#enable_auto_select = 1
+
+" Shell like behavior(not recommended).
+"set completeopt+=longest
+"let g:neocomplete#enable_auto_select = 1
+"let g:neocomplete#disable_auto_complete = 1
+"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+
+" Enable omni completion.
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+"autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType javascript setlocal omnifunc=tern#Complete
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
+
+" Enable heavy omni completion.
+if !exists('g:neocomplete#sources#omni#input_patterns')
+  let g:neocomplete#sources#omni#input_patterns = {}
+endif
+"let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+"let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+"let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+
+" For perlomni.vim setting.
+" https://github.com/c9s/perlomni.vim
+let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+if !exists('g:neocomplete#force_omni_input_patterns')
+    let g:neocomplete#force_omni_input_patterns = {}
+endif
+autocmd FileType python setlocal omnifunc=jedi#completions
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:neocomplete#force_omni_input_patterns.python =
+            \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+let g:neocomplete#force_omni_input_patterns.ruby =
+      \ '[^. *\t]\.\w*\|\h\w*::'
+" alternative pattern: '\h\w*\|[^. \t]\.\w*'
+" }}}
+"
+" Unite menu {{{
+let g:unite_source_menu_menus = {}
+let g:unite_source_menu_menus.vim = {
+    \ 'description' : '            vim
+        \                                                   ⌘ [space]v',
+    \}
+let g:unite_source_menu_menus.vim.command_candidates = [
+    \['▷ RemoveTrailingWhitespace',
+        \'XRemoveTrailingWhitespace'],
+    \['▷ ToggleDistractionFree',
+        \'ToggleDistractionFree'],
+    \['▷ RemoveControlM',
+        \'XRemoveControlM'],
+    \['▷ List Leaders',
+        \'XListLeaders'],
+    \['▷ DeleteHiddenBuffers',
+        \'XDeleteHiddenBuffers'],
+    \]
+
+nnoremap <silent> [unite]m :<C-u>Unite menu:vim<CR>
+
+" }}}
+
+hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
+hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
+nnoremap <leader>n :NERDTree<CR>
