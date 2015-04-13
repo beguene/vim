@@ -440,9 +440,9 @@ else
   let g:solarized_termcolors=16
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
-  "colorscheme solarized
+  colorscheme solarized
   "colorscheme Tomorrow-Night-Blue
-  colorscheme Tomorrow-Night-Eighties
+  "colorscheme Tomorrow-Night-Eighties
   " colorscheme vividchalk
 endif
 " Styling vertical split bar
@@ -826,7 +826,6 @@ if has("autocmd")
   augroup ft_javascript " {{{2
     au!
     autocmd FileType javascript   silent! compiler node | setlocal makeprg=node\ %
-    autocmd FileType javascript   noremap <F6> <esc>:w!<CR>:!node %<CR>
     autocmd FileType javascript setl fen  nocindent
     " au FileType javascript setlocal foldmethod=marker
     " au FileType javascript setlocal foldmarker={,}
@@ -836,8 +835,8 @@ if has("autocmd")
   augroup ft_python " {{{2
     au!
     autocmd FileType python       silent! compiler python | setlocal makeprg=python\ %
-    autocmd FileType python map <F5> :w!<CR>:!python %<CR>
     autocmd FileType python         setlocal sw=4 ts=4 sts=4 textwidth=79 expandtab
+
   augroup END "}}}
 
   augroup ft_php " {{{2
@@ -873,6 +872,7 @@ if has("autocmd")
     autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
     autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
     autocmd FileType ruby      setlocal ai et sta sw=2 sts=2
+    autocmd FileType ruby      setlocal makeprg=ruby\ %
   augroup END
 
   augroup ft_sh " {{{2
@@ -1076,7 +1076,7 @@ set pastetoggle=<F3>
 " F4 lint
 " F5 compile/make
 " F6 run
-nmap <F5> :w<CR>:make<CR>:copen<CR>
+nmap <F6> :w!<cr>:make<CR><CR><CR>:copen<CR><c-w><c-w>
 inoremap <C-L> <C-V>u2022<Space>
 nnoremap <leader>bd :Bclose<cr>
 nnoremap <leader>di :ToggleDistractionFree<cr>
@@ -1256,7 +1256,7 @@ nnoremap [unite] <nop>
 
 " General fuzzy search
 nnoremap <silent> [unite]f :<C-u>Unite
-            \ -buffer-name=files -immediately -resume -no-split -auto-preview buffer tab file_rec/async<CR>
+            \ -buffer-name=files -immediately -resume -no-split buffer tab file_rec/async<CR>
 " Quick file search
 nnoremap <silent> [unite]<space> :<C-u>Unite
             \ -buffer-name=files -immediately -auto-resize -no-split file_rec/git<CR>
@@ -1307,7 +1307,7 @@ nnoremap <silent> [unite]g :<C-u>Unite -buffer-name=grep -auto-preview -no-split
 nnoremap <silent> [unite]a :<C-u>UniteWithCursorWord -buffer-name=grepa -auto-preview -no-split grep<CR>
 
 " Quick MRU search
-nnoremap <silent> [unite]m :<C-u>Unite -buffer-name=mru file_mru<CR>
+"nnoremap <silent> [unite]m :<C-u>Unite -buffer-name=mru file_mru<CR>
 
 " Quick commands
 nnoremap <silent> [unite]c :<C-u>Unite -buffer-name=commands command<CR>
@@ -1400,6 +1400,7 @@ let g:acp_enableAtStartup = 0
 " Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
 let g:neocomplete#disable_auto_complete=1
+let g:neocomplete#enable_auto_select=1
 " Set minimum syntax keyword length.
  let g:neocomplete#auto_completion_start_length = 2
  " Define keyword.
@@ -1409,6 +1410,8 @@ endif
 let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 "inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
 inoremap <expr><Tab> pumvisible() ? "\<Tab>" : neocomplete#start_manual_complete()
+"inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+
 " <TAB>: completion.
 inoremap <silent><expr><TAB>  neocomplete#mappings#complete_common_string() != '' ?
             \   neocomplete#mappings#complete_common_string() :
@@ -1436,12 +1439,6 @@ let g:neocomplete#sources#dictionary#dictionaries = {
     \ 'vimshell' : $HOME.'/.vimshell_hist',
     \ 'scheme' : $HOME.'/.gosh_completions'
         \ }
-
-" Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
@@ -1510,8 +1507,11 @@ endif
 autocmd FileType python setlocal omnifunc=jedi#completions
 let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
+let g:jedi#show_call_signatures = 2
+
 let g:neocomplete#force_omni_input_patterns.python =
             \ '\%([^.\t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+
 let g:neocomplete#force_omni_input_patterns.ruby =
       \ '[^. *\t]\.\w*\|\h\w*::'
 
@@ -1545,3 +1545,21 @@ hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
 hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 nnoremap <leader>n :NERDTreeToggle<CR>
 let g:jedi#documentation_command = "DO"
+
+function! s:ExecuteInShell(command)
+  let command = join(map(split(a:command), 'expand(v:val)'))
+  let winnr = bufwinnr('^' . command . '$')
+silent! execute  winnr < 0 ? 'vnew ' . fnameescape(command) : winnr . 'wincmd w'
+  setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
+  echo 'Execute ' . command . '...'
+  silent! execute 'silent %!'. command
+  "silent! execute 'resize ' . line('$')
+  silent! redraw
+  silent! execute 'au BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
+  echo 'Shell command ' . command . ' executed.'
+endfunction
+command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
+let g:neocomplete#fallback_mappings =
+    \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
+let g:syntastic_ruby_exec = '~/.rvm/rubies/ruby-2.1.0/bin/ruby'
+
