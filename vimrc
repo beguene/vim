@@ -213,15 +213,15 @@ set expandtab "}}}"
 set wildmenu
 set wildmode=list:longest,full
 set complete=.,w,b,u,U,t,i,d
-let g:ycm_complete_in_comments_and_strings=1
-let g:ycm_key_list_select_completion=['<C-n>', '<Down>', '<Tab>']
-let g:ycm_key_list_previous_completion=['<C-p>', '<Up>', '<S-Tab>']
-let g:ycm_filetype_blacklist = {
-      \ 'notes' : 1,
-      \ 'markdown' : 1,
-      \ 'text' : 1,
-      \ 'unite' : 1
-      \}
+"let g:ycm_complete_in_comments_and_strings=1
+"let g:ycm_key_list_select_completion=['<C-n>', '<Down>', '<Tab>']
+"let g:ycm_key_list_previous_completion=['<C-p>', '<Up>', '<S-Tab>']
+"let g:ycm_filetype_blacklist = {
+      "\ 'notes' : 1,
+      "\ 'markdown' : 1,
+      "\ 'text' : 1,
+      "\ 'unite' : 1
+      "\}
 
 "}}}"
 
@@ -298,8 +298,8 @@ map <leader>cd :cd %:p:h<cr>
 ino <silent> <c-a> <c-o>b
 ino <silent> <c-e> <esc>ea
 " Quickfix / Location List
-nnoremap <up>  :cprev<cr>zvzz
-nnoremap <down> :cnext<cr>zvzz
+nnoremap <up>  :cprev<cr>zvzz:bd#<cr> " make sure to delete the buffer visited during the browsing of quickfix using bd#"
+nnoremap <down> :cnext<cr>zvzz:bd#<cr>
 nnoremap <left>    :lprev<cr>zvzz
 nnoremap <right>  :lnext<cr>zvzz
 nnoremap <leader>qn :cnext<CR>
@@ -765,6 +765,7 @@ let g:syntastic_loc_list_height=5
 "let g:syntastic_ruby_mri_exec = 'ruby'
 
 let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['php', 'javascript', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
+"let g:syntastic_python_python_exec = 'python3'
 " }}}
 
 " ******* Autocommands *******  {{{
@@ -948,7 +949,7 @@ command! XCleanHTML :%s#<[^>]\+>##g
 command! XRemoveControlM :%s/\+$//
 command! XShowTrailingWhitespace set nolist!
 command! XRemoveTrailingWhitespace :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl
-function XDeleteHiddenBuffers()
+function! XDeleteHiddenBuffers()
   let tpbl=[]
   call map(range(1, tabpagenr('$')), 'extend(tpbl, tabpagebuflist(v:val))')
   for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(tpbl, v:val)==-1')
@@ -1272,7 +1273,23 @@ nnoremap <silent> [unite]l :<C-u>Unite -start-insert -quick-match -cursor-line-h
 nnoremap <silent> [unite]y :<C-u>Unite -buffer-name=yanks -default-action=yank -quick-match history/yank<CR>
 
 " Quick outline
-nnoremap <silent> [unite]o :<C-u>Unite -start-insert -auto-preview -winwidth=90 -vertical-preview -no-split outline<cr>
+let g:unite_source_outline_filetype_options = {
+      \ '*': {
+      \   'auto_update': 1,
+      \   'auto_update_event': 'write',
+      \ },
+      \ 'cpp': {
+      \   'auto_update': 0,
+      \ },
+      \ 'javascript': {
+      \   'ignore_types': ['comment'],
+      \ },
+      \ 'markdown': {
+      \   'auto_update_event': 'hold',
+      \ },
+      \}
+nnoremap <silent> [unite]o :<C-u>Unite -start-insert -auto-preview -winwidth=60 -vertical-preview -no-split outline<cr>
+"Unite -winwidth=10 -vertical -direction=topleft menu:unite
 
 " Quick sessions (projects)
 nnoremap <silent> [unite]p :<C-u>Unite -buffer-name=sessions -auto-resize session<CR>
@@ -1385,7 +1402,26 @@ let g:neocomplete#enable_at_startup = 1
 let g:neocomplete#disable_auto_complete=1
 " Set minimum syntax keyword length.
  let g:neocomplete#auto_completion_start_length = 2
-inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+ " Define keyword.
+if !exists('g:neocomplete#keyword_patterns')
+    let g:neocomplete#keyword_patterns = {}
+endif
+let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+"inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
+inoremap <expr><Tab> pumvisible() ? "\<Tab>" : neocomplete#start_manual_complete()
+" <TAB>: completion.
+inoremap <silent><expr><TAB>  neocomplete#mappings#complete_common_string() != '' ?
+            \   neocomplete#mappings#complete_common_string() :
+            \ pumvisible() ? "\<C-n>" :
+            \ <SID>check_back_space() ? "\<TAB>" :
+            \ neocomplete#start_manual_complete()
+function! s:check_back_space() "{{{
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+endfunction"}}}
+" <S-TAB>: completion back.
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
+
 " Use smartcase.
 let g:neocomplete#enable_smart_case = 1
 " Set minimum syntax keyword length.
@@ -1475,9 +1511,10 @@ autocmd FileType python setlocal omnifunc=jedi#completions
 let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
 let g:neocomplete#force_omni_input_patterns.python =
-            \ '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+            \ '\%([^.\t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
 let g:neocomplete#force_omni_input_patterns.ruby =
       \ '[^. *\t]\.\w*\|\h\w*::'
+
 " alternative pattern: '\h\w*\|[^. \t]\.\w*'
 " }}}
 "
@@ -1506,4 +1543,5 @@ nnoremap <silent> [unite]m :<C-u>Unite menu:vim<CR>
 
 hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
 hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
-nnoremap <leader>n :NERDTree<CR>
+nnoremap <leader>n :NERDTreeToggle<CR>
+let g:jedi#documentation_command = "DO"
