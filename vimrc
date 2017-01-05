@@ -30,11 +30,7 @@ Bundle 'gmarik/vundle'
 "File Mgt
 Bundle 'kien/ctrlp.vim'
 Bundle 'scrooloose/nerdtree'
-"Bundle 'Shougo/unite.vim'
-"Bundle 'Shougo/unite-session'
-"Bundle 'Shougo/unite-outline'
 "Bundle 'Shougo/vimproc.vim'
-"Bundle 'tsukkee/unite-tag'
 "Bundle 'Shougo/vimfiler.vim'
 Bundle 'Shougo/neocomplete.vim'
 
@@ -377,7 +373,7 @@ elseif os == "windows"
   set backupdir=C:\Windows\Temp
   call add(g:pathogen_disabled, 'doctorjs')
 else
-  set shell=/bin/zsh
+  set shell=/bin/bash
   nnoremap <silent> <leader>o :!open -a chomium-browser '%' &<cr>
 endif
 if os=='windows'
@@ -502,18 +498,18 @@ function! MyReadonly()
     return &ft !~? 'help' && &readonly ? 'RO' : ''
 endfunction
 
-function! MyFilename()
-    let fname = expand('%:t')
-    return fname == 'ControlP' ? g:lightline.ctrlp_item :
-                \ fname == '__Tagbar__' ? g:lightline.fname :
-                \ fname =~ '__Gundo\|NERD_tree' ? '' :
-                \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-                \ &ft == 'unite' ? unite#get_status_string() :
-                \ &ft == 'vimshell' ? vimshell#get_status_string() :
-                \ ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
-                \ ('' != fname ? fname : '[No Name]') .
-                \ ('' != MyModified() ? ' ' . MyModified() : '')
-endfunction
+"function! MyFilename()
+"    let fname = expand('%:t')
+"    return fname == 'ControlP' ? g:lightline.ctrlp_item :
+"                \ fname == '__Tagbar__' ? g:lightline.fname :
+"                \ fname =~ '__Gundo\|NERD_tree' ? '' :
+"                \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
+"                \ &ft == 'unite' ? unite#get_status_string() :
+"                \ &ft == 'vimshell' ? vimshell#get_status_string() :
+"                \ ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
+"                \ ('' != fname ? fname : '[No Name]') .
+"                \ ('' != MyModified() ? ' ' . MyModified() : '')
+"endfunction
 
 function! MyFugitive()
     try
@@ -546,7 +542,6 @@ function! MyMode()
                 \ fname == '__Gundo__' ? 'Gundo' :
                 \ fname == '__Gundo_Preview__' ? 'Gundo Preview' :
                 \ fname =~ 'NERD_tree' ? 'NERDTree' :
-                \ &ft == 'unite' ? 'Unite' :
                 \ &ft == 'vimfiler' ? 'VimFiler' :
                 \ &ft == 'vimshell' ? 'VimShell' :
                 \ winwidth(0) > 60 ? lightline#mode() : ''
@@ -595,9 +590,6 @@ function! s:syntastic()
     call lightline#update()
 endfunction
 
-let g:unite_force_overwrite_statusline = 0
-let g:vimfiler_force_overwrite_statusline = 0
-let g:vimshell_force_overwrite_statusline = 0
 let g:lightline.colorscheme = 'solarized'
 "}}}
 " }}}
@@ -611,7 +603,6 @@ nnoremap <leader>k :CtrlPBuffer<CR>
 nnoremap <silent> <leader>b :CtrlPBufTag<CR>
 nnoremap <silent> <leader>j :CtrlPFunky<CR>
 " nnoremap <silent> <leader>r :CtrlPTag<CR>
-nnoremap <silent> <leader>c [unite] c
 hi CursorLine cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 hi PmenuSel cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 " nnoremap <silent> <leader>c :CtrlPCmdPalette<CR>
@@ -637,7 +628,6 @@ endfunction
 " CtrlP with default text
 nmap ,wb :call CtrlPWithSearchText(expand('<cword>'), 'BufTag')<CR>
 " nmap ,wr :call CtrlPWithSearchText(expand('<cword>'), 'Tag')<CR>
-nmap ,wr :Unite tag:expand('<cword>')<CR>
 nmap ,wm :call CtrlPWithSearchText(expand('<cword>'), 'MRUFiles')<CR>
 nmap ,wc :call CtrlPWithSearchText(expand('<cword>'), 'CmdPalette')<CR>
 
@@ -905,11 +895,6 @@ if has("autocmd")
 
   autocmd FileType gitcommit setlocal spell
 
-  augroup Unite " {{{2
-    au!
-    " Help File speedups, <enter> to follow tag, delete for back
-
-  augroup END "}}}2
   augroup extraSpaces "{{{
     au!
     " highlight ExtraWhitespace ctermbg=red guibg=red
@@ -1066,8 +1051,6 @@ set ssop-=options
 "===============================================================================
 "noremap <F2> :CtrlPSession<cr>
 " <F4>: Save session
-nnoremap <F2> :<C-u>UniteSessionSave<space>
-let g:unite_source_session_enable_auto_save = 1
 set pastetoggle=<F3>
 
 " F2 mgt sessions
@@ -1137,193 +1120,6 @@ nnoremap <bs> <c-T>
 nnoremap <bs> :cnext<cr>:lnext<cr>
 set smartcase
 
-" === UNITE {{{
-"===============================================================================
-" Use the fuzzy matcher for everything
-call unite#filters#matcher_default#use(['matcher_fuzzy'])
-" Use the rank sorter for everything
-" call unite#set_profile('files', 'smartcase', 1)
-" call unite#custom#source('line,outline','matchers','matchers')
-call unite#custom#profile('default', 'context', {
-      \   'winheight': 30,
-      \   'prompt': '» ',
-      \   'marked_icon' : '✓',
-      \   'enable_short_source_names': 0,
-      \   'smartcase': 1,
-      \ })
-
-call unite#filters#sorter_default#use(['sorter_rank'])
-
-" Set up some custom ignores
-
-" Set up some custom ignores
-call unite#custom_source('file_rec,file_rec/async,file_mru,file,buffer,grep',
-      \ 'ignore_pattern', join([
-      \ '\.git/',
-      \ '*.git/',
-      \ 'git5/.*/review/',
-      \ 'google/obj/',
-      \ 'tmp/',
-      \ 'node_modules/',
-      \ 'vendor/',
-      \ 'Vendor/',
-      \ 'app_old/',
-      \ 'acf-laravel/',
-      \ 'plugins/',
-      \ 'bower_components/',
-      \ '.sass-cache',
-      \ 'web/wp',
-      \ ], '\|'))
-" highlight like my vim
-let g:unite_data_directory='~/.vim/.cache/unite'
-let g:unite_enable_start_insert=1
-let g:unite_source_history_yank_enable=1
-let g:unite_source_rec_max_cache_files=5000
-" Open in bottom right
-" Shorten the default update date of 500ms
-let g:unite_update_time = 200
-let g:unite_source_file_mru_limit = 1000
-let g:unite_source_file_mru_filename_format = ':~:.'
-let g:unite_source_file_mru_time_format = ''
-" Enable history yank source
-let g:unite_source_history_yank_enable = 1
-
-" Open in bottom right
-let g:unite_split_rule = "topleft"
-
-if executable('ag')
-  set grepprg=ag\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow
-  set grepformat=%f:%l:%c:%m
-  let g:unite_source_grep_command='ag'
-  let g:unite_source_grep_default_opts='--nocolor --nogroup -S'
-  let g:unite_source_grep_recursive_opt=''
-  let g:unite_source_rec_async_command =  'ag --follow --nocolor --nogroup --hidden -g ""'
-elseif executable('ack')
-  set grepprg=ack\ --nogroup\ --column\ --smart-case\ --nocolor\ --follow\ $*
-  set grepformat=%f:%l:%c:%m
-  let g:unite_source_grep_command='ack'
-  let g:unite_source_grep_default_opts='--no-heading --no-color -a'
-  let g:unite_source_grep_recursive_opt=''
-endif
-
-function! s:unite_settings()
-  nmap <buffer> Q <plug>(unite_exit)
-  nmap <buffer> <ESC> <Plug>(unite_exit)
-  imap <buffer> <ESC> <Plug>(unite_exit)
-  " imap <buffer> <c-j> <Plug>(unite_select_next_line)
-  imap <buffer> <c-j> <Plug>(unite_insert_leave)
-  nmap <buffer> <c-j> <Plug>(unite_loop_cursor_down)
-  nmap <buffer> <c-k> <Plug>(unite_loop_cursor_up)
-  imap <buffer> <c-a> <Plug>(unite_choose_action)
-  " imap <buffer> <Tab> <Plug>(unite_exit_insert)
-  imap <buffer> jj <Plug>(unite_insert_leave)
-  imap <buffer> <C-w> <Plug>(unite_delete_backward_word)
-  imap <buffer> <C-u> <Plug>(unite_delete_backward_path)
-  imap <buffer> '     <Plug>(unite_quick_match_default_action)
-  nmap <buffer> '     <Plug>(unite_quick_match_default_action)
-  nmap <buffer> <C-r> <Plug>(unite_redraw)
-  imap <buffer> <C-r> <Plug>(unite_redraw)
-  inoremap <silent><buffer><expr> <C-s> unite#do_action('split')
-  nnoremap <silent><buffer><expr> <C-s> unite#do_action('split')
-  inoremap <silent><buffer><expr> <C-v> unite#do_action('vsplit')
-  nnoremap <silent><buffer><expr> <C-v> unite#do_action('vsplit')
-  nnoremap <silent><buffer><expr> <C-d> unite#do_action('delete')
-  nnoremap <silent><buffer><expr> <C-t> unite#do_action('tabopen')
-
-  let unite = unite#get_current_unite()
-  if unite.buffer_name =~# '^search'
-      nnoremap <silent><buffer><expr> r     unite#do_action('replace')
-  else
-      nnoremap <silent><buffer><expr> r     unite#do_action('rename')
-  endif
-
-  nnoremap <silent><buffer><expr> cd     unite#do_action('lcd')
-  " Refresh
-  nmap <buffer> <C-r>      <Plug>(unite_redraw)
-
-  " Unite -buffer-name=sessions session
-
-endfunction
-autocmd FileType unite call s:unite_settings()
-
-" Save session automatically.
-let g:unite_source_session_enable_auto_save = 1
-
-nmap <space> [unite]
-nnoremap [unite] <nop>
-
-" General fuzzy search
-nnoremap <silent> [unite]f :<C-u>Unite
-            \ -buffer-name=files -immediately -resume -no-split buffer tab file_rec/async<CR>
-" Quick file search
-nnoremap <silent> [unite]<space> :<C-u>Unite
-            \ -buffer-name=files -immediately -auto-resize -no-split file_rec/git<CR>
-
-" Quick registers
-nnoremap <silent> [unite]r :<C-u>Unite -buffer-name=register register<CR>
-
-" Quick buffer and mru
-nnoremap <silent> [unite]u :<C-u>Unite -buffer-name=buffers buffer file_mru<CR>
-nnoremap <silent> [unite]k :<C-u>Unite -start-insert -quick-match -cursor-line-highlight=Cursorline -auto-resize buffer<cr>
-nnoremap <silent> [unite]l :<C-u>Unite -start-insert -quick-match -cursor-line-highlight=Cursorline -auto-resize tab<cr>
-
-" Quick yank history
-nnoremap <silent> [unite]y :<C-u>Unite -buffer-name=yanks -default-action=yank -quick-match history/yank<CR>
-
-" Quick outline
-let g:unite_source_outline_filetype_options = {
-      \ '*': {
-      \   'auto_update': 1,
-      \   'auto_update_event': 'write',
-      \ },
-      \ 'cpp': {
-      \   'auto_update': 0,
-      \ },
-      \ 'javascript': {
-      \   'ignore_types': ['comment'],
-      \ },
-      \ 'markdown': {
-      \   'auto_update_event': 'hold',
-      \ },
-      \}
-nnoremap <silent> [unite]o :<C-u>Unite -start-insert -auto-preview -winwidth=60 -vertical-preview -no-split outline<cr>
-"Unite -winwidth=10 -vertical -direction=topleft menu:unite
-
-" Quick sessions (projects)
-nnoremap <silent> [unite]p :<C-u>Unite -buffer-name=sessions -auto-resize session<CR>
-
-" Quick sources
-" nnoremap <silent> [unite]a :<C-u>Unite -buffer-name=sources source<CR>
-
-" Quickly switch lcd
-nnoremap <silent> [unite]d
-            \ :<C-u>Unite -buffer-name=change-cwd -default-action=lcd directory_mru<CR>
-
-
-" Quick grep from cwd
-nnoremap <silent> [unite]g :<C-u>Unite -buffer-name=grep -auto-preview -no-split grep:.<CR>
-nnoremap <silent> [unite]a :<C-u>UniteWithCursorWord -buffer-name=grepa -auto-preview -no-split grep<CR>
-
-" Quick MRU search
-"nnoremap <silent> [unite]m :<C-u>Unite -buffer-name=mru file_mru<CR>
-
-" Quick commands
-nnoremap <silent> [unite]c :<C-u>Unite -buffer-name=commands command<CR>
-
-" Quick bookmarks
-nnoremap <silent> [unite]b :<C-u>Unite -buffer-name=bookmarks bookmark<CR>
-
-" Tags
-nnoremap <silent> [unite]t :<C-u>Unite -auto-preview -no-split -start-insert -auto-resize -resume -immediately tag<cr>
-nnoremap <enter> :<C-u>UniteWithCursorWord -auto-preview -start-insert -immediately -resume tag<cr>
-" grep
-nnoremap <silent> [unite]/ :<C-u>Unite -no-quit -buffer-name=search grep:.<cr>
-
-"(S)earch word under cur(s)or in current directory
-" nnoremap <leader>a :Unite grep:.::<C-r><C-w><CR>
-" " Ctrl-sd: (S)earch word in current (d)irectory (prompt for word)
-" nnoremap <leader>A :Unite grep:.<CR>
-"}}}
 "
 " Ctrl-sw: Quickly surround word
 nmap <c-s><c-w> ysiw
@@ -1335,9 +1131,6 @@ let g:surround_{char2nr('s')} = " \r"
 let g:surround_{char2nr('^')} = "/^\r$/"
 let g:surround_indent = 1")
 
-" Create newlines without entering insert mode
-" \ line:forward -start-insert -no-quit<CR>
-" nnoremap <silent> /  :<C-u>Unite -buffer-name=search
 "nnoremap <C-@> :CtrlP<CR>
 imap <c-z> <c-y>,
 let delimitMate_expand_cr = 1
@@ -1388,8 +1181,6 @@ set re=1
 vnoremap J :m '>+1<CR>gv
 vnoremap K :m '<-2<CR>gv
 
-
-let g:unite_update_time = 100
 
 " NeoComplete {{{
 "Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
@@ -1516,29 +1307,6 @@ let g:neocomplete#force_omni_input_patterns.ruby =
 " alternative pattern: '\h\w*\|[^. \t]\.\w*'
 " }}}
 "
-" Unite menu {{{
-let g:unite_source_menu_menus = {}
-let g:unite_source_menu_menus.vim = {
-    \ 'description' : '            vim
-        \                                                   ⌘ [space]v',
-    \}
-let g:unite_source_menu_menus.vim.command_candidates = [
-    \['▷ RemoveTrailingWhitespace',
-        \'XRemoveTrailingWhitespace'],
-    \['▷ ToggleDistractionFree',
-        \'ToggleDistractionFree'],
-    \['▷ RemoveControlM',
-        \'XRemoveControlM'],
-    \['▷ List Leaders',
-        \'XListLeaders'],
-    \['▷ DeleteHiddenBuffers',
-        \'XDeleteHiddenBuffers'],
-    \]
-
-nnoremap <silent> [unite]m :<C-u>Unite menu:vim<CR>
-
-" }}}
-
 hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
 hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 nnoremap <leader>n :NERDTreeToggle<CR>
