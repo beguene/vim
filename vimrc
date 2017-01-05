@@ -1120,7 +1120,7 @@ source $HOME/.vim/experimental.vim
 "}}}
 
 " ******* Ack ******* "{{{
-if executable('ack')
+if executable('ack') || executable('ag')
   " *** ACK ***
   nnoremap <silent> <leader>A :Ack
   " " Use <Leader>A to ack for the word under the cursor
@@ -1562,4 +1562,4 @@ command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
 let g:neocomplete#fallback_mappings =
     \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 let g:syntastic_ruby_exec = '~/.rvm/rubies/ruby-2.1.0/bin/ruby'
-
+set path+=**
