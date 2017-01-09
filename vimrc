@@ -30,6 +30,7 @@ Bundle 'gmarik/vundle'
 "File Mgt
 Bundle 'kien/ctrlp.vim'
 Bundle 'scrooloose/nerdtree'
+Bundle 'mhinz/vim-grepper'
 "Bundle 'Shougo/vimproc.vim'
 "Bundle 'Shougo/vimfiler.vim'
 Bundle 'Shougo/neocomplete.vim'
@@ -40,20 +41,18 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'tpope/vim-abolish'
 Bundle 'milkypostman/vim-togglelist'
 Bundle 'Raimondi/delimitMate'
-Bundle 'scrooloose/syntastic'
+"Bundle 'scrooloose/syntastic'
 Bundle 'majutsushi/tagbar'
 Bundle 'mattn/emmet-vim'
-Bundle 'SirVer/ultisnips'
-Bundle 'honza/vim-snippets'
+"Bundle 'SirVer/ultisnips'
+"Bundle 'honza/vim-snippets'
 " Bundle 'beguene/sessionman.vim'
 Bundle 'mileszs/ack.vim'
+"Plugin 'ervandew/supertab'
 
 "UI
 "Bundle 'lilydjwg/colorizer'
 Bundle 'altercation/vim-colors-solarized'
-Bundle 'tpope/vim-vividchalk'
-Bundle 'nanotech/jellybeans.vim'
-Bundle 'tomasr/molokai'
 Bundle 'itchyny/lightline.vim'
 Bundle 'jszakmeister/vim-togglecursor'
 
@@ -69,9 +68,6 @@ Bundle 'lukaszb/vim-web-indent'
 Bundle 'tomtom/tlib_vim'
 Bundle 'MarcWeber/vim-addon-mw-utils'
 
-"Bundle 'tsaleh/vim-matchit'
-"Bundle '907th/vim-auto-save'
-"Bundle 'henrik/vim-reveal-in-finder'
 " Easily use quickfix to search and replace bulk files
 Bundle 'henrik/vim-qargs'
 Bundle 'terryma/vim-expand-region'
@@ -79,10 +75,16 @@ Bundle 'terryma/vim-expand-region'
 Bundle 'tpope/vim-endwise'
 Bundle 'tpope/vim-rails'
 Bundle 'chrishunt/xterm-color-table.vim'
-Bundle 'kana/vim-textobj-user'
-Bundle 'nelstrom/vim-textobj-rubyblock'
-Bundle 'davidhalter/jedi-vim'
+"Bundle 'kana/vim-textobj-user'
 Bundle 'marijnh/tern_for_vim'
+Plugin 'w0rp/ale'
+Plugin 'Shougo/denite.nvim'
+Plugin 'rizzatti/dash.vim'
+set rtp+=/usr/local/opt/fzf
+Plugin 'junegunn/fzf'
+Plugin 'junegunn/fzf.vim'
+Plugin 'junegunn/vim-slash'
+Plugin 'tpope/vim-repeat'
 
 
 " :Ggrep findme
@@ -191,6 +193,7 @@ if version >= 703 && has('persistent_undo')
     set undolevels=1000         "maximum number of changes that can be undone
     set undoreload=10000        "maximum number lines to save for undo on a buffer reload
 endif
+
 set noswapfile
 set nowb
 "}}}"
@@ -207,15 +210,6 @@ set expandtab "}}}"
 set wildmenu
 set wildmode=list:longest,full
 set complete=.,w,b,u,U,t,i,d
-"let g:ycm_complete_in_comments_and_strings=1
-"let g:ycm_key_list_select_completion=['<C-n>', '<Down>', '<Tab>']
-"let g:ycm_key_list_previous_completion=['<C-p>', '<Up>', '<S-Tab>']
-"let g:ycm_filetype_blacklist = {
-      "\ 'notes' : 1,
-      "\ 'markdown' : 1,
-      "\ 'text' : 1,
-      "\ 'unite' : 1
-      "\}
 
 "}}}"
 
@@ -238,7 +232,7 @@ set complete=.,w,b,u,U,t,i,d
 " endfunction
 " let g:UltiSnipsExpandTrigger="<cr>"
 " au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-let g:UltiSnipsExpandTrigger="<c-b>"
+"let g:UltiSnipsExpandTrigger="<c-k>"
 " let g:UltiSnipsJumpForwardTrigger="<c-b>"
 " let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 "}}}
@@ -284,8 +278,8 @@ nn j gj
 nn k gk
 nn gj j
 nn gk k
-nnoremap <C-K> :tabnext<CR>
-nnoremap <C-J> :tabprevious<CR>
+"nnoremap <C-K> :tabnext<CR>
+"nnoremap <C-J> :tabprevious<CR>
 " When pressing <leader>cd switch to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>
 " Bash-like command for navigation in Insert Mode
@@ -371,7 +365,6 @@ elseif os == "windows"
   " let &guioptions = substitute(&guioptions, "t", "", "g")
   set dir=C:\Windows\Temp
   set backupdir=C:\Windows\Temp
-  call add(g:pathogen_disabled, 'doctorjs')
 else
   set shell=/bin/bash
   nnoremap <silent> <leader>o :!open -a chomium-browser '%' &<cr>
@@ -498,19 +491,6 @@ function! MyReadonly()
     return &ft !~? 'help' && &readonly ? 'RO' : ''
 endfunction
 
-"function! MyFilename()
-"    let fname = expand('%:t')
-"    return fname == 'ControlP' ? g:lightline.ctrlp_item :
-"                \ fname == '__Tagbar__' ? g:lightline.fname :
-"                \ fname =~ '__Gundo\|NERD_tree' ? '' :
-"                \ &ft == 'vimfiler' ? vimfiler#get_status_string() :
-"                \ &ft == 'unite' ? unite#get_status_string() :
-"                \ &ft == 'vimshell' ? vimshell#get_status_string() :
-"                \ ('' != MyReadonly() ? MyReadonly() . ' ' : '') .
-"                \ ('' != fname ? fname : '[No Name]') .
-"                \ ('' != MyModified() ? ' ' . MyModified() : '')
-"endfunction
-
 function! MyFugitive()
     try
         if expand('%:t') !~? 'Tagbar\|Gundo\|NERD' && &ft !~? 'vimfiler' && exists('*fugitive#head')
@@ -581,15 +561,6 @@ function! TagbarStatusFunc(current, sort, fname, ...) abort
     return lightline#statusline(0)
 endfunction
 
-augroup AutoSyntastic
-    autocmd!
-    autocmd BufWritePost *.c,*.cpp call s:syntastic()
-augroup END
-function! s:syntastic()
-    SyntasticCheck
-    call lightline#update()
-endfunction
-
 let g:lightline.colorscheme = 'solarized'
 "}}}
 " }}}
@@ -601,11 +572,9 @@ nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 cmap cd. lcd %:p:h
 nnoremap <leader>k :CtrlPBuffer<CR>
 nnoremap <silent> <leader>b :CtrlPBufTag<CR>
-nnoremap <silent> <leader>j :CtrlPFunky<CR>
-" nnoremap <silent> <leader>r :CtrlPTag<CR>
 hi CursorLine cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 hi PmenuSel cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
-" nnoremap <silent> <leader>c :CtrlPCmdPalette<CR>
+highlight Cursor cterm=NONE ctermbg=green ctermfg=red
 " Delete buffer on CtrlPBuffer
 let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
 let g:ctrlp_buftag_types = {
@@ -614,8 +583,6 @@ let g:ctrlp_buftag_types = {
       \ 'args': '-f -',
       \ }
     \ }
-"let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:100,results:25'
-
 func! MyCtrlPMappings()
   nnoremap <buffer> <silent> <c-@> :call <sid>DeleteBuffer()<cr>
 endfunc
@@ -627,7 +594,7 @@ function! CtrlPWithSearchText(search_text, ctrlp_command_end)
 endfunction
 " CtrlP with default text
 nmap ,wb :call CtrlPWithSearchText(expand('<cword>'), 'BufTag')<CR>
-" nmap ,wr :call CtrlPWithSearchText(expand('<cword>'), 'Tag')<CR>
+
 nmap ,wm :call CtrlPWithSearchText(expand('<cword>'), 'MRUFiles')<CR>
 nmap ,wc :call CtrlPWithSearchText(expand('<cword>'), 'CmdPalette')<CR>
 
@@ -645,10 +612,8 @@ noremap <leader>l :TagbarToggle<CR>
 let g:tagbar_autofocus = 1
 
 nnoremap <leader>n :VimFilerExplorer<CR>
-" VimFiler
-let g:vimfiler_quick_look_command = 'qlmanage -p'
 " *** CTRL P ***
-let g:ctrlp_map = '<leader>p'
+"let g:ctrlp_map = '<leader>p'
 let g:ctrlp_working_path_mode = 2
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\.git$\|\.hg$\|\.svn$\|\.yardoc\|public\/images\|data\|node_modules|log\|tmp$',
@@ -680,6 +645,7 @@ let g:ctrlp_by_filename = 1
 "endif
 " *** MRU ***
 noremap <leader>m :CtrlPMRU<CR>
+noremap <leader>m :History<CR>
 let g:ctrlp_mruf_default_order = 1
 let g:ctrlp_mruf_exclude = '.git/*'
 "}}}"
@@ -1109,13 +1075,13 @@ if executable('ack') || executable('ag')
 endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
 "Quick ack search"
-nnoremap <leader>f :Ack
+set grepprg=grep\ -inH
+nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
+nnoremap <leader>f :Grepper -noswitch<cr>
+nmap gs  <plug>(GrepperOperator)
+xmap gs  <plug>(GrepperOperator)
 "}}}
 
-" inoremap <C-Space> <C-x><C-o>
-" inoremap <C-@> <C-Space>
-
-nnoremap <cr> <c-]>
 nnoremap <bs> <c-T>
 nnoremap <bs> :cnext<cr>:lnext<cr>
 set smartcase
@@ -1137,6 +1103,9 @@ let delimitMate_expand_cr = 1
 let delimitMate_expand_space = 1
 let delimitMate_jump_expansion = 1
 " let g:user_emmet_leader_key = '<c-b>'
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
+let g:user_emmet_leader_key='<c-z>'
 nnoremap <C-@> <C-Space>
 nnoremap gO O<Esc>j
 nnoremap go o<Esc>k
@@ -1186,68 +1155,75 @@ vnoremap K :m '<-2<CR>gv
 "Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
-" Use neocomplete.
+"" Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#disable_auto_complete=1
-let g:neocomplete#enable_auto_select=1
 " Set minimum syntax keyword length.
- let g:neocomplete#auto_completion_start_length = 2
- " Define keyword.
+let g:neocomplete#sources#syntax#min_keyword_length = 3
+
+"let g:neocomplete#disable_auto_complete=1
+"let g:neocomplete#enable_auto_select=1
+"" Set minimum syntax keyword length.
+" let g:neocomplete#auto_completion_start_length = 2
+" " Define keyword.
+" Define keyword.
 if !exists('g:neocomplete#keyword_patterns')
     let g:neocomplete#keyword_patterns = {}
 endif
 let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-"inoremap <expr><Tab> pumvisible() ? "\<C-n>" : neocomplete#start_manual_complete()
-inoremap <expr><Tab> pumvisible() ? "\<Tab>" : neocomplete#start_manual_complete()
-"inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
-
-" <TAB>: completion.
-inoremap <silent><expr><TAB>  neocomplete#mappings#complete_common_string() != '' ?
-            \   neocomplete#mappings#complete_common_string() :
-            \ pumvisible() ? "\<C-n>" :
-            \ <SID>check_back_space() ? "\<TAB>" :
-            \ neocomplete#start_manual_complete()
-function! s:check_back_space() "{{{
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~ '\s'
-endfunction"}}}
-" <S-TAB>: completion back.
-inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
-
-" Use smartcase.
-let g:neocomplete#enable_smart_case = 1
-" Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 3
-let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-let g:neocomplete#max_list = 25
-
-" Define dictionary.
-let g:neocomplete#sources#dictionary#dictionaries = {
-    \ 'default' : '',
-    \ 'vimshell' : $HOME.'/.vimshell_hist',
-    \ 'scheme' : $HOME.'/.gosh_completions'
-        \ }
-
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
-
 " Recommended key-mappings.
 " <CR>: close popup and save indent.
 inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 function! s:my_cr_function()
-  return neocomplete#close_popup() . "\<CR>"
+  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
   " For no inserting <CR> key.
-  "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+  "return pumvisible() ? "\<C-y>" : "\<CR>"
 endfunction
 " <TAB>: completion.
-"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
 " <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><C-y>  neocomplete#close_popup()
-inoremap <expr><C-e>  neocomplete#cancel_popup()
+
+"" <TAB>: completion.
+"inoremap <silent><expr><TAB>  neocomplete#mappings#complete_common_string() != '' ?
+"            \   neocomplete#mappings#complete_common_string() :
+"            \ pumvisible() ? "\<C-n>" :
+"            \ <SID>check_back_space() ? "\<TAB>" :
+"            \ neocomplete#start_manual_complete()
+"function! s:check_back_space() "{{{
+"    let col = col('.') - 1
+"    return !col || getline('.')[col - 1]  =~ '\s'
+"endfunction"}}}
+"" <S-TAB>: completion back.
+
+"" Use smartcase.
+"let g:neocomplete#enable_smart_case = 1
+"" Set minimum syntax keyword length.
+"let g:neocomplete#sources#syntax#min_keyword_length = 3
+"let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+
+"let g:neocomplete#max_list = 25
+
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+"function! s:my_cr_function()
+"  return neocomplete#close_popup() . "\<CR>"
+"  " For no inserting <CR> key.
+"  "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+"endfunction
+" <TAB>: completion.
+"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" <C-h>, <BS>: close popup and delete backword char.
+"inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+"inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+"inoremap <expr><C-y>  neocomplete#close_popup()
+"inoremap <expr><C-e>  neocomplete#cancel_popup()
 " Close popup by <Space>.
 "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
 
@@ -1262,13 +1238,7 @@ inoremap <expr><C-e>  neocomplete#cancel_popup()
 "let g:neocomplete#enable_insert_char_pre = 1
 
 " AutoComplPop like behavior.
-"let g:neocomplete#enable_auto_select = 1
-
-" Shell like behavior(not recommended).
-"set completeopt+=longest
-"let g:neocomplete#enable_auto_select = 1
-"let g:neocomplete#disable_auto_complete = 1
-"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+let g:neocomplete#enable_auto_select = 1
 
 " Enable omni completion.
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -1280,29 +1250,29 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
 
 " Enable heavy omni completion.
-if !exists('g:neocomplete#sources#omni#input_patterns')
-  let g:neocomplete#sources#omni#input_patterns = {}
-endif
+"if !exists('g:neocomplete#sources#omni#input_patterns')
+"  let g:neocomplete#sources#omni#input_patterns = {}
+"endif
 "let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 "let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
 "let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 
 " For perlomni.vim setting.
 " https://github.com/c9s/perlomni.vim
-let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
-endif
+"let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+"if !exists('g:neocomplete#force_omni_input_patterns')
+"    let g:neocomplete#force_omni_input_patterns = {}
+"endif
 autocmd FileType python setlocal omnifunc=jedi#completions
 let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#show_call_signatures = 2
 
-let g:neocomplete#force_omni_input_patterns.python =
-            \ '\%([^.\t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+"let g:neocomplete#force_omni_input_patterns.python =
+"            \ '\%([^.\t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
 
-let g:neocomplete#force_omni_input_patterns.ruby =
-      \ '[^. *\t]\.\w*\|\h\w*::'
+"let g:neocomplete#force_omni_input_patterns.ruby =
+"      \ '[^. *\t]\.\w*\|\h\w*::'
 
 " alternative pattern: '\h\w*\|[^. \t]\.\w*'
 " }}}
@@ -1325,7 +1295,111 @@ silent! execute  winnr < 0 ? 'vnew ' . fnameescape(command) : winnr . 'wincmd w'
   echo 'Shell command ' . command . ' executed.'
 endfunction
 command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
-let g:neocomplete#fallback_mappings =
+"let g:neocomplete#fallback_mappings =
     \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 let g:syntastic_ruby_exec = '~/.rvm/rubies/ruby-2.1.0/bin/ruby'
 set path+=**
+set complete-=i 
+let g:loaded_rrhelper = 1
+let g:loaded_vimballPlugin = 1
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_text_changed = 0
+" Change file_rec command.
+    call denite#custom#var('file_rec', 'command',
+    \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+
+" Change mappings.
+call denite#custom#map(
+	  \ 'insert',
+	  \ '<C-j>',
+	  \ '<denite:move_to_next_line>',
+	  \ 'noremap'
+	  \)
+call denite#custom#map(
+	  \ 'insert',
+	  \ '<C-k>',
+	  \ '<denite:move_to_previous_line>',
+	  \ 'noremap'
+	  \)
+
+nnoremap <leader>p :Denite file_rec<CR>
+nnoremap <leader>p :FZF<CR>
+nnoremap <leader>d :Dash <C-r>=expand("<cword>")<CR><CR>
+
+let g:fzf_layout = { 'down': '~40%' }
+" Report changes.
+ set report=0
+let NERDTreeHijackNetrw=1
+"hi Search cterm=NONE ctermfg=red ctermbg=NONE
+"hi IncSearch cterm=NONE ctermfg=white ctermbg=red
+noremap <plug>(slash-after) zz
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+"Plugin 'edkolev/tmuxline.vim'
+"let g:lightline = {
+"      \ 'colorscheme': 'wombat',
+"      \ 'separator': { 'left': '', 'right': '' },
+"      \ 'subseparator': { 'left': '', 'right': '' }
+"      \ }
+"let g:tmuxline_powerline_separators = 0
+"let g:tmuxline_preset = {
+"      \'a'    : '#S',
+"      \'win'  : '#I #W',
+"      \'cwin' : '#I #W',
+"      \'z'    : '#H',
+"      \'options' : {
+"      \ 'status-justify': 'left'}
+"      \ }
+"TODO
+"last buffer :b#
+"
+Plugin 'metakirby5/codi.vim'
+let g:SuperTabCompleteCase = "match"
+let g:SuperTabDefaultCompletionType = "context"
+"autocmd FileType *
+      "\ if &omnifunc != '' |
+      "\   call SuperTabChain(&omnifunc, "<c-p>") |
+      "\ endif
+let g:SuperTabNoCompleteAfter = ['^', ',', ';', "'", '"', '\s']
+let g:jedi#popup_on_dot = 0 
+"let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+" Replace the default dictionary completion with fzf-based fuzzy completion
+" Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+let g:fzf_files_options =
+  \ '--preview "(highlight -O ansi {} || cat {}) 2> /dev/null | head -'.&lines.'"'
+
+let g:fzf_layout = { 'down': '~60%' }
+let g:fzf_buffers_jump = 1
+" Track the engine.
+Plugin 'SirVer/ultisnips'
+
+" Snippets are separated from the engine. Add this if you want them:
+Plugin 'honza/vim-snippets'
+
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<c-j>"
+let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+" <Leader><Leader> -- Open last buffer.
+nnoremap <Leader><Leader> <C-^>
+nnoremap <Leader>q :quit<CR>
+" Multi-mode mappings (Normal, Visual, Operating-pending modes).
+noremap Y y$
+if has('linebreak')
+  set breakindent                     " indent wrapped lines to match start
+endif
+set switchbuf=usetab   " try to reuse windows/tabs when switching buffers
