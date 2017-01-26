@@ -26,6 +26,8 @@ call vundle#rc()
  " let Vundle manage Vundle
  " required!
 Bundle 'gmarik/vundle'
+packadd! matchit
+
 
 "File Mgt
 Bundle 'kien/ctrlp.vim'
@@ -77,9 +79,8 @@ Plugin 'w0rp/ale'
 
 Plugin 'rizzatti/dash.vim'
 set rtp+=/usr/local/opt/fzf
-Plugin 'junegunn/fzf'
+"Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
-Plugin 'junegunn/vim-slash'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-repeat'
 
@@ -816,6 +817,7 @@ if has("autocmd")
     au!
     au FileType html,xhtml,xml,eruby setlocal expandtab sw=2 ts=2 sts=2 tw=0
   augroup END "}}}2
+  autocmd BufRead,BufNewFile *.erb set filetype=eruby.html
 
   augroup Format " {{{2
     au!
@@ -995,16 +997,6 @@ if has('spell')
 endif
 " save as sudo
 ca w!! w !sudo tee "%"
-
-function! s:zen_html_tab()
-  let line = getline('.')
-  if match(line, '<.*>') < 0
-    return "\<c-y>,"
-  endif
-  return "\<c-y>n"
-endfunction
-" autocmd FileType xml,xsl,xslt,xsd,css,sass,scss,less,mustache imap <buffer><tab> <c-y>,
-" autocmd FileType html imap <buffer><expr><tab> <sid>zen_html_tab()
 
 "  CSS properties sort
 nmap <leader>S /{/+1<CR>vi{:sort<CR>
