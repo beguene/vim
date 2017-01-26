@@ -31,9 +31,6 @@
 [submodule "bundle-archive/matchit"]
 	path = bundle-archive/matchit
 	url = https://github.com/tsaleh/vim-matchit.git
-[submodule "bundle-archive/doctorjs"]
-	path = bundle-archive/doctorjs
-	url = https://github.com/mozilla/doctorjs.git
 [submodule "bundle-archive/syntastic"]
 	path = bundle-archive/syntastic
 	url = https://github.com/scrooloose/syntastic.git
@@ -52,9 +49,6 @@
 [submodule "bundle-archive/vim-symfony"]
 	path = bundle-archive/vim-symfony
 	url = https://github.com/docteurklein/vim-symfony.git
-[submodule "bundle-archive/pydoc"]
-	path = bundle-archive/pydoc
-	url = https://github.com/fs111/pydoc.vim.git
 [submodule "bundle-archive/ctrlp"]
 	path = bundle-archive/ctrlp
 	url = https://github.com/kien/ctrlp.vim.git

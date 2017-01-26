@@ -1,12 +1,5 @@
-"set suffixes+=.dvi  " Lower priority in wildcards
 "let g:syntastic_auto_loc_list=0
-" autocmd FocusLost * :colorscheme solarized
-" autocmd FocusGained * :colorscheme default
-"highlight Cursor guifg=white guibg=black
-"highlight iCursor guifg=red guibg=steelblue
 
-" Toggle line numbers
-"nnoremap <leader>n :setlocal number!<cr>
 " CSS and LessCSS {{{
 augroup ft_css
     au!
@@ -37,4 +30,3 @@ function! s:mkdir_as_necessary(dir, force) abort
     call mkdir(iconv(a:dir, &encoding, &termencoding), 'p')
   endif
 endfunction
-imap <c-x><c-l> <plug>(fzf-complete-line)

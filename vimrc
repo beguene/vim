@@ -113,7 +113,7 @@ imap <4-MiddleMouse> <Nop>
 "}}}
 
 " Sets how many lines of history VIM has to remember
-set history=700
+set history=1500
 set hidden
 set fileformats=unix,mac,dos
 set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
@@ -817,10 +817,6 @@ if has("autocmd")
     au FileType html,xhtml,xml,eruby setlocal expandtab sw=2 ts=2 sts=2 tw=0
   augroup END "}}}2
 
-  au FileType eruby let b:delimitMate_matchpairs = '(:),[:],{:},<:>'
-  au FileType eruby let b:delimitMate_quotes = "" ' ` | %"
-
-
   augroup Format " {{{2
     au!
     autocmd FileType c,cpp  setlocal ai et sta sw=4 sts=4 cin
@@ -834,7 +830,6 @@ if has("autocmd")
     " Help File speedups, <enter> to follow tag, delete for back
     au filetype help nnoremap <buffer><cr> <c-]>
     au filetype help nnoremap <buffer><bs> <c-T>
-    au filetype help nnoremap q :q!<CR>
     au filetype help set nonumber
     au FileType help wincmd _
   augroup END "}}}2
@@ -1302,9 +1297,9 @@ source $HOME/.vim/experimental.vim
 Plugin 'vimwiki/vimwiki'
 
 let g:vimwiki_list = [{'path': '~/notes/'}]
-let g:vimwiki_ext2syntax = {'.org': 'media'}
-let g:vimwiki_list = [{'path': '~/notes/',
-      \ 'syntax': 'markdown', 'ext': '.md'}]
+"let g:vimwiki_ext2syntax = {'.org': 'media'}
+"let g:vimwiki_list = [{'path': '~/notes/',
+      "\ 'syntax': 'markdown', 'ext': '.md'}]
 "}}}
 
 let g:UltiSnipsExpandTrigger="<C-j>"
@@ -1340,3 +1335,5 @@ let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 
 let g:neosnippet#snippets_directory = "~/.vim/customsnippets"
+"TODO
+"space in normal mode expand region, u undo/shrink
