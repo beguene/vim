@@ -1,6 +1,7 @@
 " Beguene's settings
 " Author: Beguene Permale
 " Version: 3.0
+"source $HOME/.vim/minimal.vim
 
 set nocompatible
 filetype off                   " required! for vundle
@@ -1327,3 +1328,4 @@ vmap <C-@> cw
 
 nnoremap gO O<Esc>j
 nnoremap go o<Esc>k
+imap <D-v> ^O:set paste<Enter>^R+^O:set nopaste<Enter>
