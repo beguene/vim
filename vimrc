@@ -30,56 +30,55 @@ packadd! matchit
 
 
 "File Mgt
-Bundle 'kien/ctrlp.vim'
-Bundle 'scrooloose/nerdtree'
-Bundle 'mhinz/vim-grepper'
-Bundle 'Shougo/neocomplete.vim'
+Plugin 'kien/ctrlp.vim'
+Plugin 'scrooloose/nerdtree'
+Plugin 'mhinz/vim-grepper'
+Plugin 'Shougo/neocomplete.vim'
 
-Bundle 'scrooloose/nerdcommenter'
-Bundle 'tpope/vim-surround'
-Bundle 'tpope/vim-fugitive'
-Bundle 'tpope/vim-abolish'
-Bundle 'milkypostman/vim-togglelist'
-Bundle 'Raimondi/delimitMate'
-"Bundle 'scrooloose/syntastic'
-Bundle 'majutsushi/tagbar'
-Bundle 'mattn/emmet-vim'
-" Bundle 'beguene/sessionman.vim'
-Bundle 'mileszs/ack.vim'
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'tpope/vim-surround'
+Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-abolish'
+Plugin 'milkypostman/vim-togglelist'
+Plugin 'Raimondi/delimitMate'
+"Plugin 'scrooloose/syntastic'
+Plugin 'majutsushi/tagbar'
+Plugin 'mattn/emmet-vim'
+" Plugin 'beguene/sessionman.vim'
+Plugin 'mileszs/ack.vim'
 "Plugin 'ervandew/supertab'
 Plugin 'Shougo/neosnippet'
 Plugin 'Shougo/neosnippet-snippets'
 
 "UI
 
-Bundle 'altercation/vim-colors-solarized'
-Bundle 'itchyny/lightline.vim'
-Bundle 'jszakmeister/vim-togglecursor'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'itchyny/lightline.vim'
+Plugin 'jszakmeister/vim-togglecursor'
 
 " Languages
-Bundle 'pangloss/vim-javascript'
-Bundle 'mozilla/doctorjs'
-Bundle 'leshill/vim-json'
-Bundle 'groenewege/vim-less'
-Bundle 'plasticboy/vim-markdown'
-Bundle 'lukaszb/vim-web-indent'
+Plugin 'pangloss/vim-javascript'
+Plugin 'mozilla/doctorjs'
+Plugin 'leshill/vim-json'
+Plugin 'groenewege/vim-less'
+Plugin 'plasticboy/vim-markdown'
+Plugin 'lukaszb/vim-web-indent'
 
 "Utils
-Bundle 'tomtom/tlib_vim'
-Bundle 'MarcWeber/vim-addon-mw-utils'
+Plugin 'tomtom/tlib_vim'
+Plugin 'MarcWeber/vim-addon-mw-utils'
 
 " Easily use quickfix to search and replace bulk files
-Bundle 'terryma/vim-expand-region'
-Bundle 'tpope/vim-endwise'
-Bundle 'tpope/vim-rails'
-Bundle 'chrishunt/xterm-color-table.vim'
-"Bundle 'kana/vim-textobj-user'
-Bundle 'marijnh/tern_for_vim'
+Plugin 'terryma/vim-expand-region'
+Plugin 'tpope/vim-endwise'
+Plugin 'tpope/vim-rails'
+Plugin 'chrishunt/xterm-color-table.vim'
+"Plugin 'kana/vim-textobj-user'
+Plugin 'marijnh/tern_for_vim'
 Plugin 'w0rp/ale'
 
 Plugin 'rizzatti/dash.vim'
 set rtp+=/usr/local/opt/fzf
-"Plugin 'junegunn/fzf'
 Plugin 'junegunn/fzf.vim'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-repeat'
@@ -87,17 +86,28 @@ Plugin 'tpope/vim-repeat'
 if iCanHazVundle == 0
   echo "Installing Bundles, please ignore key map error messages"
   echo ""
-  :BundleInstall
+  :PluginInstall
 endif
 " }}}"
 
 filetype plugin indent on
-" Setting up Vundle - the vim plugin bundler end
 
 "The modelines bit prevents some security exploits having to do with modelines in files.
 set modelines=0
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
+
+" Sets how many lines of history VIM has to remember
+set history=1500
+set hidden
+set fileformats=unix,mac,dos
+set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
+set wildignore+=tags
+set wildignore+=*/tmp/*
+set wildignore+=*/vendor/*
+set confirm
+set ttyfast
+set ttimeoutlen=50 " Make Esc work faster
 
 " Disable useless {{{
 set mouse=
@@ -112,20 +122,6 @@ imap <3-MiddleMouse> <Nop>
 map <4-MiddleMouse> <Nop>
 imap <4-MiddleMouse> <Nop>
 "}}}
-
-" Sets how many lines of history VIM has to remember
-set history=1500
-set hidden
-set fileformats=unix,mac,dos
-set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
-set wildignore+=tags
-set wildignore+=*/tmp/*
-set wildignore+=*/vendor/*
-set confirm
-" set foldlevelstart=1
-set ttyfast
-set ttimeoutlen=50 " Make Esc work faster
-
 
 " ******* Format ******* {{{
 " Don't use Ex mode, use Q for formatting
@@ -242,7 +238,7 @@ nnoremap <leader>sr :%s/<c-r><c-w>//gc<left><left><left>
 " }}}
 "}}}
 
-" Crypto {{{
+" ******* Crypto ****** {{{
 "silent! set cryptmethod=blowfish2
 "vim -c 'set cm=blowfish2' -c w -c q file
 " }}}
@@ -260,8 +256,9 @@ nn gj j
 nn gk k
 " When pressing <leader>cd switch to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>
+" }}}
 
-" Quickfix / Location List {{{
+" ******* Quickfix / Location List ******* {{{
 nnoremap <up>  :cprev<cr>zvzz:bd#<cr> " make sure to delete the buffer visited during the browsing of quickfix using bd#"
 nnoremap <down> :cnext<cr>zvzz:bd#<cr>
 nnoremap <left>    :lprev<cr>zvzz
@@ -311,7 +308,8 @@ cnoremap <C-j> <t_kd>
 cnoremap <C-k> <t_ku>
 cnoremap <C-K>      <C-U>
 cnoremap <C-P> <Up>
-cnoremap <C-N> <Down> "}}}"
+cnoremap <C-N> <Down> 
+"}}}"
 
 " ******* Init & Constants ******* {{{
 
@@ -415,6 +413,9 @@ else
 endif
 " Styling vertical split bar
 highlight VertSplit ctermbg=243 ctermfg=243
+
+hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
+hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 "}}}"
 
 " ******* Status Line ******* "{{{
@@ -625,6 +626,8 @@ noremap <leader>m :CtrlPMRU<CR>
 noremap <leader>m :History<CR>
 let g:ctrlp_mruf_default_order = 1
 let g:ctrlp_mruf_exclude = '.git/*'
+nnoremap <leader>n :NERDTreeToggle<CR>
+let NERDTreeHijackNetrw=1
 "}}}"
 
 " ******* Git / Fugitive ******* {{{
@@ -751,7 +754,6 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.txt set ft=txt syntax=txt
     autocmd FileType text,txt setlocal tw=78 linebreak nolist
     autocmd FileType txt      setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
-    autocmd BufNewFile,BufRead *.json set ft=javascript
   augroup END "}}}2
 
   augroup ft_javascript " {{{2
@@ -761,6 +763,8 @@ if has("autocmd")
     " au FileType javascript setlocal foldmethod=marker
     " au FileType javascript setlocal foldmarker={,}
     au FileType javascript setlocal sw=2 ts=2 sts=2 textwidth=79
+    autocmd BufNewFile,BufRead *.json set ft=javascript
+    autocmd BufRead,BufNewFile .{jscs,jshint,eslint}rc set filetype=json
   augroup END "}}}
 
   augroup ft_python " {{{2
@@ -779,15 +783,6 @@ if has("autocmd")
     autocmd FileType php            setlocal sw=4 ts=4 sts=4 textwidth=79
   augroup END "}}}
 
-  augroup ft_coffeescript " {{{2
-    au!
-    au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
-    au BufNewFile,BufReadPost *.coffee noremap <F4> <esc>:CoffeeLint<CR>
-    au BufNewFile,BufReadPost *.coffee noremap <F5> <esc>:CoffeeMake<CR>
-    au BufNewFile,BufReadPost *.coffee noremap <F6> <esc>:CoffeeRun<CR>
-    au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 expandtab
-  augroup END "}}}
-
   augroup ft_zsh " {{{2
     au!
     autocmd FileType zsh          setlocal makeprg=zsh\ %
@@ -795,7 +790,7 @@ if has("autocmd")
   " ------------------------------------------------------------
   " Ruby
   " ------------------------------------------------------------
-  augroup ft_ruby
+  augroup ft_ruby " {{{2
     autocmd!
     "autocmd FileType ruby setlocal foldmethod=syntax
     autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
@@ -804,7 +799,7 @@ if has("autocmd")
     autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
     autocmd FileType ruby      setlocal ai et sta sw=2 sts=2
     autocmd FileType ruby      setlocal makeprg=ruby\ %
-  augroup END
+  augroup END "}}}2
 
   augroup ft_sh " {{{2
     au!
@@ -1008,10 +1003,7 @@ vnoremap <leader>s :!sort<cr>
 " }}}
 " }}}
 
-let g:colorizer_nomap = 1
-
-
-" ******* Ack ******* "{{{
+" ******* Search ******* "{{{
 if executable('ack') || executable('ag')
   " *** ACK ***
   nnoremap <silent> <leader>A :Ack
@@ -1032,12 +1024,11 @@ nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
 nnoremap <leader>f :Grepper -noswitch<cr>
 nmap gs  <plug>(GrepperOperator)
 xmap gs  <plug>(GrepperOperator)
+nnoremap <leader>a :Ag <C-r>=expand("<cword>")<CR><CR>
+nnoremap <leader>A :Ag 
 
 "}}}
 
-set smartcase
-
-"
 " Ctrl-sw: Quickly surround word
 nmap <c-s><c-w> ysiw
 " custom configuration for surround.vim
@@ -1048,27 +1039,12 @@ let g:surround_{char2nr('s')} = " \r"
 let g:surround_{char2nr('^')} = "/^\r$/"
 let g:surround_indent = 1")
 
-"nnoremap <C-@> :CtrlP<CR>
-
 let delimitMate_expand_cr = 1
 let delimitMate_expand_space = 1
 let delimitMate_jump_expansion = 1
-" let g:user_emmet_leader_key = '<c-b>'
-"let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
-"let g:user_emmet_leader_key='<c-e>'
-nnoremap <C-@> <C-Space>
-nnoremap gO O<Esc>j
-nnoremap go o<Esc>k
 
-" Always use location list for syntax/compile errors
-"Add quick console log taking function name as param
-"QUICK SEARCH REPLACE searched item with *
-"Replace all
-"TODO
-"add mapping to select outer function name
-"fast navigation up and down : map ctrl-j to 5j
-"
+autocmd FileType html,css EmmetInstall
+
 "GIT {{{
 map <leader>gb :Gblame<CR>
 map <leader>gc :Gcommit<CR>
@@ -1077,7 +1053,7 @@ map <leader>gl :Glog<CR>
 map <leader>gp :Git push<CR>
 map <leader>gs :Gstatus<CR>
 "}}}
-"
+
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
 
 map - <Plug>(expand_region_expand)
@@ -1089,15 +1065,15 @@ nnoremap <silent> <leader>DP :exe ":profile pause"<cr>
 nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
 nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 "}}}
-"
+
 set nofoldenable    " disable folding
 
 let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
 set re=1
 
-set completeopt=menuone,preview
-" NeoComplete {{{
+" Complete {{{
 
+set completeopt=menuone,preview
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
 "" Use neocomplete.
@@ -1145,10 +1121,6 @@ let g:jedi#show_call_signatures = 2
 let g:jedi#documentation_command = "DO"
 "}}}
 
-nnoremap <leader>n :NERDTreeToggle<CR>
-
-hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
-hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 function! s:ExecuteInShell(command)
   let command = join(map(split(a:command), 'expand(v:val)'))
   let winnr = bufwinnr('^' . command . '$')
@@ -1171,14 +1143,13 @@ let g:ale_lint_on_save = 1
 let g:ale_lint_on_text_changed = 0
 
 nnoremap <leader>d :Dash <C-r>=expand("<cword>")<CR><CR>
+
+" FZF {{{ 
+nnoremap <leader>p :FZF<CR>
+nnoremap <space>p :FZF<CR>
+
 " quick edit file, useful in log files to quickly go to the file
 nnoremap <leader>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
-nnoremap <leader>a :Ag <C-r>=expand("<cword>")<CR><CR>
-nnoremap <leader>A :Ag 
-
-" {{{ FZF
-nnoremap <leader>p :FZF<CR>
-
 let g:fzf_colors =
 \ { 'fg':      ['fg', 'Normal'],
   \ 'bg':      ['bg', 'Normal'],
@@ -1205,9 +1176,9 @@ let g:fzf_files_options =
 
 let g:fzf_layout = { 'down': '~70%' }
 let g:fzf_buffers_jump = 1
+"imap <c-x><c-l> <plug>(fzf-complete-line)
 " }}}
-imap <c-x><c-l> <plug>(fzf-complete-line)
-let NERDTreeHijackNetrw=1
+"
 " Report changes.
  set report=0
 
@@ -1253,37 +1224,31 @@ let g:UltiSnipsJumpForwardTrigger="<c-n>"
 let g:UltiSnipsJumpBackwardTrigger="<c-p>"
 
 " }}}
-nnoremap <Leader><Leader> :wa<cr>
-nnoremap <Leader>q :quit<CR>
-" Multi-mode mappings (Normal, Visual, Operating-pending modes).
-noremap Y y$
+
 if has('linebreak')
   set breakindent                     " indent wrapped lines to match start
 endif
 set switchbuf=usetab   " try to reuse windows/tabs when switching buffers
+
 " {{{ Mappings
+noremap Y y$
+" Leader
+" <leader> e = edit
+" <leader> ev = edit vim
+" <leader> en = edit project note
 " Navigation
 " use space to navigate between windows (c-w) & tabs
 nnoremap <space> <c-w>
 nnoremap <space><space> <c-w><c-w>
-nnoremap <space>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
-nnoremap <space>p :FZF<CR>
 nnoremap <space>m :History<CR>
 nnoremap <space>k :tabnext<cr>
 nnoremap <space>j :tabprevious<cr>
 nnoremap <leader>s ysiw
+nnoremap <Leader><Leader> :wa<cr>
+nnoremap <Leader>q :quit<CR>
+" }}}
 
-"TODO
-"paste and indent
-" map leader \
-"nnoremap \r :tabnew<CR>
-" use space to complete autocomplete
-" search web from vim
 set suffixes+=.dvi  " Lower priority in wildcards
-
-" ******* Experimental *******  {{{
-source $HOME/.vim/experimental.vim
-"}}}
 
 " NOTES / WIKI {{{
 Plugin 'vimwiki/vimwiki'
@@ -1294,6 +1259,7 @@ let g:vimwiki_list = [{'path': '~/notes/'}]
       "\ 'syntax': 'markdown', 'ext': '.md'}]
 "}}}
 
+" Snippets {{{
 let g:UltiSnipsExpandTrigger="<C-j>"
 let g:UltiSnipsJumpForwardTrigger="<c-o>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
@@ -1315,6 +1281,7 @@ imap <C-k>     <Plug>(neosnippet_expand_or_jump)
 " \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+"}}}
 
 " For conceal markers.
 if has('conceal')
@@ -1327,5 +1294,36 @@ let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 
 let g:neosnippet#snippets_directory = "~/.vim/customsnippets"
+
+" ******* Experimental *******  {{{
+source $HOME/.vim/experimental.vim
+"}}}
+
 "TODO
 "space in normal mode expand region, u undo/shrink
+
+
+" Always use location list for syntax/compile errors
+"Add quick console log taking function name as param
+"QUICK SEARCH REPLACE searched item with *
+"Replace all
+"TODO
+"add mapping to select outer function name
+"fast navigation up and down : map ctrl-j to 5j
+"TODO
+"paste and indent
+" map leader \
+"nnoremap \r :tabnew<CR>
+" use space to complete autocomplete
+" search web from vim
+"
+" Available mappings {{{
+" C-space, \, Fkeys
+" Space leader
+" }}}
+"nnoremap <C-@> <C-Space>
+nmap <C-@> gt
+vmap <C-@> cw
+
+nnoremap gO O<Esc>j
+nnoremap go o<Esc>k
