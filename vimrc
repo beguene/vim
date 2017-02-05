@@ -7,120 +7,143 @@ filetype off                   " required! for vundle
 let g:ruby_path = system('rvm current')
 
 " ******* Bundle ******* {{{
-" Setting up Vundle - the vim plugin bundler " thanks to erikzaadi.com
-let iCanHazVundle=1
-let vundle_readme=expand('~/.vim/bundle/vundle/README.md')
-if !filereadable(vundle_readme)
-  echo "Installing Vundle.."
-  echo ""
-  silent !mkdir -p ~/.vim/bundle
-  silent !git clone https://github.com/gmarik/vundle ~/.vim/bundle/vundle
-  let iCanHazVundle=0
+"------ START PLUGINS -------
+if empty(glob("~/.vim/autoload/plug.vim"))
+	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	auto VimEnter * PlugInstall
 endif
+" Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
+call plug#begin('~/.vim/bundle')
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
- " let Vundle manage Vundle
- " required!
-Bundle 'gmarik/vundle'
-packadd! matchit
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'altercation/vim-colors-solarized'
+Plug 'itchyny/lightline.vim'
+
+" On-demand loading
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 
 
+" Initialize plugin system
 "File Mgt
-Plugin 'ctrlpvim/ctrlp.vim' "essential
-Plugin 'scrooloose/nerdtree' "essential
-Plugin 'mhinz/vim-grepper'
-Plugin 'Shougo/neocomplete.vim'
+Plug 'mhinz/vim-grepper'
+Plug 'Shougo/neocomplete.vim'
 
-Plugin 'scrooloose/nerdcommenter' "essential
-Plugin 'tpope/vim-surround'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-abolish'
-Plugin 'milkypostman/vim-togglelist'
-Plugin 'Raimondi/delimitMate'
+Plug 'scrooloose/nerdcommenter' "essential
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-abolish'
+Plug 'milkypostman/vim-togglelist'
+Plug 'Raimondi/delimitMate'
 
-Plugin 'majutsushi/tagbar'
-Plugin 'mattn/emmet-vim'
+Plug 'majutsushi/tagbar'
+Plug 'mattn/emmet-vim'
 
-Plugin 'mileszs/ack.vim'
+Plug 'mileszs/ack.vim'
 
-Plugin 'Shougo/neosnippet'
-Plugin 'Shougo/neosnippet-snippets'
+Plug 'Shougo/neosnippet'
+Plug 'Shougo/neosnippet-snippets'
 
 "UI
-Plugin 'altercation/vim-colors-solarized' "essential
-Plugin 'itchyny/lightline.vim' "essential
-Plugin 'jszakmeister/vim-togglecursor'
+Plug 'jszakmeister/vim-togglecursor'
 
 " Languages
-Plugin 'pangloss/vim-javascript'
-Plugin 'mozilla/doctorjs'
-Plugin 'leshill/vim-json'
-Plugin 'groenewege/vim-less'
-Plugin 'plasticboy/vim-markdown'
-Plugin 'lukaszb/vim-web-indent'
+Plug 'pangloss/vim-javascript'
+Plug 'mozilla/doctorjs'
+Plug 'leshill/vim-json'
+Plug 'groenewege/vim-less'
+Plug 'plasticboy/vim-markdown'
+Plug 'lukaszb/vim-web-indent'
 
 "Utils
-Plugin 'tomtom/tlib_vim'
-Plugin 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'MarcWeber/vim-addon-mw-utils'
 
 " Easily use quickfix to search and replace bulk files
-Plugin 'terryma/vim-expand-region'
-Plugin 'tpope/vim-endwise'
-Plugin 'tpope/vim-rails'
-Plugin 'chrishunt/xterm-color-table.vim'
+Plug 'terryma/vim-expand-region'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-rails'
+Plug 'chrishunt/xterm-color-table.vim'
 
-Plugin 'marijnh/tern_for_vim'
-Plugin 'w0rp/ale'
+Plug 'marijnh/tern_for_vim'
+Plug 'w0rp/ale'
 
-Plugin 'rizzatti/dash.vim'
+Plug 'rizzatti/dash.vim'
 set rtp+=/usr/local/opt/fzf
-Plugin 'junegunn/fzf.vim'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'tpope/vim-repeat'
-
-if iCanHazVundle == 0
-  echo "Installing Bundles, please ignore key map error messages"
-  echo ""
-  :PluginInstall
-endif
+Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-repeat'
+Plug 'honza/vim-snippets'
+Plug 'chrisgillis/vim-bootstrap3-snippets'
+Plug 'vimwiki/vimwiki'
+Plug 'tpope/vim-dispatch'
+call plug#end()
 " }}}"
 
 if has('autocmd')
   filetype plugin indent on
 endif
 
-"The modelines bit prevents some security exploits having to do with modelines in files.
-set modelines=0
+if !empty(glob("~/.vim/bundle/vim-colors-solarized/autoload/togglebg.vim"))
+  colorscheme solarized
+endif
 
-" Sets how many lines of history VIM has to remember
-set history=1500
-set fileformats=unix,mac,dos
+if isdirectory($HOME . "/.vim/bundle/nerdtree")
+  " *** NERDTree ***
+  nnoremap <leader>n :NERDTree<CR>
+  let NERDTreeHijackNetrw=1
+endif
 
-" Disable useless {{{
-set mouse=
-set nomousef
-" Disable middle-click paste
-map <MiddleMouse> <Nop>
-imap <MiddleMouse> <Nop>
-map <2-MiddleMouse> <Nop>
-imap <2-MiddleMouse> <Nop>
-map <3-MiddleMouse> <Nop>
-imap <3-MiddleMouse> <Nop>
-map <4-MiddleMouse> <Nop>
-imap <4-MiddleMouse> <Nop>
-"}}}
+if isdirectory($HOME . "/.vim/bundle/fzf.vim")
+  nnoremap <leader>p :FZF<CR>
+  " quick edit file, useful in log files to quickly go to the file
+  nnoremap <leader>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
+  let g:fzf_colors =
+        \ { 'fg':      ['fg', 'Normal'],
+        \ 'bg':      ['bg', 'Normal'],
+        \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+        \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+        \ 'info':    ['fg', 'PreProc'],
+        \ 'prompt':  ['fg', 'Conditional'],
+        \ 'pointer': ['fg', 'Exception'],
+        \ 'marker':  ['fg', 'Keyword'],
+        \ 'spinner': ['fg', 'Label'],
+        \ 'header':  ['fg', 'Comment'] }
+  let g:fzf_files_options =
+        \ '--preview "(highlight -O ansi {} || cat {}) 2> /dev/null | head -'.&lines.'"'
 
-" ******* Format ******* {{{
-" wrap lines rather than make use of the horizontal scrolling
-set wrap
-" " try not to wrap in the middle of a word
-set linebreak
-set formatoptions=tcrqn21
-"set formatoptions-=o "dont continue comments when pushing o/O
-" " use an 79-character line limit
-set textwidth=79 
-" }}}"
+  let g:fzf_layout = { 'down': '~70%' }
+  let g:fzf_buffers_jump = 1
+  nnoremap <leader>m :History<CR>
+elseif isdirectory($HOME . "/.vim/bundle/ctrlp")
+  let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
+  let g:ctrlp_working_path_mode = 2
+  let g:ctrlp_custom_ignore = {
+        \ 'dir':  '\.git$\|\.hg$\|\.svn$\|\.yardoc\|public\/images\|data\|node_modules|log\|tmp$',
+        \ 'file': '\.exe$\|\.so$\|\.dat$|\.pyc$\|\.pyo$\|\.rbc$|\.rbo$\|\.class$\|\.o$\|\~$\'
+        \ }
+  "let g:ctrlp_max_height = 15
+  let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
+  let g:ctrlp_clear_cache_on_exit = 0
+  "let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
+  if executable('ag')
+    let g:ctrlp_user_command='ag %s -l --nocolor -g ""'
+  endif
+  let g:ctrlp_open_multiple_files = '1rv'
+  let g:ctrlp_follow_symlinks = 1
+  let g:ctrlp_mruf_max = 500
+  let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
+  " let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir', 'funky']
+  let g:ctrlp_dotfiles = 0
+  let g:ctrlp_switch_buffer = 0
+  let g:ctrlp_by_filename = 1
+  let g:ctrlp_mruf_default_order = 1
+  let g:ctrlp_mruf_exclude = '.git/*'
+  nnoremap <leader>p :CtrlP<CR>
+  nnoremap <leader>k :CtrlPBuffer<CR>
+  nnoremap <leader>m :CtrlPMRUFiles<CR>
+else
+endif
 
 " ******* Search ******* "{{{
 " Autoscroll to middle of the screen when searching
@@ -431,10 +454,6 @@ nnoremap <leader>n :NERDTree<CR>
 " *** TAGLIST/TAGBAR ***
 noremap <leader>l :TagbarToggle<CR>
 let g:tagbar_autofocus = 1
-
-" *** MRU ***
-noremap <leader>m :CtrlPMRU<CR>
-nnoremap <leader>n :NERDTreeToggle<CR>
 "}}}"
 
 " ******* Git / Fugitive ******* {{{
@@ -942,13 +961,9 @@ command! SetTmuxWindowToBufferName :call SetTmuxWindowToBufferName()
 "nnoremap <up> :call FoldingEnter()<CR>
 " }}}
 
-Plugin 'metakirby5/codi.vim'
 " {{{ Snippets
-"Plugin 'SirVer/ultisnips'
 
 " Snippets are separated from the engine. Add this if you want them:
-Plugin 'honza/vim-snippets'
-Plugin 'chrisgillis/vim-bootstrap3-snippets'
 
 let g:UltiSnipsExpandTrigger="<c-j>"
 let g:UltiSnipsJumpForwardTrigger="<c-n>"
@@ -977,7 +992,6 @@ nnoremap <Leader>q :quit<CR>
 set suffixes+=.dvi  " Lower priority in wildcards
 
 " NOTES / WIKI {{{
-Plugin 'vimwiki/vimwiki'
 
 let g:vimwiki_list = [{'path': '~/notes/'}]
 "let g:vimwiki_ext2syntax = {'.org': 'media'}
@@ -1014,7 +1028,6 @@ if has('conceal')
   set conceallevel=2 concealcursor=niv
 endif
 
-Plugin 'tpope/vim-dispatch'
 let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 

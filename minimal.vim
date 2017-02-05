@@ -135,7 +135,10 @@ set nobackup		" do not keep a backup file, use versions instead
 "persistent undo
 if version >= 703 && has('persistent_undo')
     try
-      set undodir=~/tmp/undodir
+			if !isdirectory($HOME . "/.vim/undodir")
+				call mkdir($HOME . "/.vim/undodir", "p")
+			endif
+      set undodir=~/vim/undodir
       if os == "windows"
         set undodir=C:\Windows\Temp
       endif
@@ -151,9 +154,9 @@ set noswapfile
 "}}}"
 
 " ******* Tab & Indent ******* "{{{
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
+set shiftwidth=2
+set tabstop=2
+set softtabstop=2
 set smarttab
 set autoindent
 set expandtab "}}}"
@@ -286,5 +289,43 @@ endfunction
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<C-x>\<C-n>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
+set pastetoggle=<F3>
+
+set nocursorline
+nnoremap <leader>p :Explore<CR>
+nnoremap <leader>n :Explore<CR>
+
+" Disable useless {{{
+set mouse=
+set nomousef
+" Disable middle-click paste
+map <MiddleMouse> <Nop>
+imap <MiddleMouse> <Nop>
+map <2-MiddleMouse> <Nop>
+imap <2-MiddleMouse> <Nop>
+map <3-MiddleMouse> <Nop>
+imap <3-MiddleMouse> <Nop>
+map <4-MiddleMouse> <Nop>
+imap <4-MiddleMouse> <Nop>
+"}}}
+
+"The modelines bit prevents some security exploits having to do with modelines in files.
+set modelines=0
+
+" ******* Format ******* {{{
+" wrap lines rather than make use of the horizontal scrolling
+set wrap
+" " try not to wrap in the middle of a word
+set linebreak
+set formatoptions=tcrqn21
+"set formatoptions-=o "dont continue comments when pushing o/O
+" " use an 79-character line limit
+set textwidth=79 
+" }}}"
+" Sets how many lines of history VIM has to remember
+set history=1500
+set fileformats=unix,mac,dos
+
+
 
 " vim:set ft=vim et sw=2:
