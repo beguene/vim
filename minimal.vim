@@ -1,3 +1,8 @@
+" Author: Beguene Permale
+" Version: 1.0
+" Set of defaults options + few custom helpful functions
+" To be used on external env with just a curl
+" No plugin needed, no git, no dependency
 if exists('g:loaded_minimal') 
   finish
 else
@@ -216,9 +221,6 @@ set splitright
 set showmatch "Show matching bracket
 " Styling vertical split bar
 highlight VertSplit ctermbg=243 ctermfg=243
-
-hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
-hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 "}}}"
 " ******* Status Line ******* "{{{
 set laststatus=2
@@ -244,6 +246,7 @@ vnoremap > >gv
 " select (charwise) the contents of the current line, excluding indentation.
 " Great for pasting Python lines into REPLs.
 nnoremap vv ^vg_
+set pastetoggle=<F3>
 "}}}"
 
 " RENAME CURRENT FILE (thanks Gary Bernhardt) {{{
@@ -264,8 +267,24 @@ set re=1 "regexpengine"
 " Report changes.
 set report=0
 
-if has('linebreak')
-  set breakindent                     " indent wrapped lines to match start
-endif
+" {{{ Mappings
+noremap Y y$
+" Navigation
+" use space to navigate between windows (c-w) & tabs
+nnoremap <space> <c-w>
+nnoremap <space><space> <c-w><c-w>
+nnoremap <Leader><Leader> :wa<cr>
+" }}}
+
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+  " For no inserting <CR> key.
+  "return pumvisible() ? "\<C-y>" : "\<CR>"
+endfunction
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<C-x>\<C-n>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
 
 " vim:set ft=vim et sw=2:

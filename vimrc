@@ -1,13 +1,9 @@
 " Beguene's settings
 " Author: Beguene Permale
 " Version: 3.0
-"source $HOME/.vim/minimal.vim
+source $HOME/.vim/minimal.vim
 
-set nocompatible
 filetype off                   " required! for vundle
-let mapleader = ","
-let g:mapleader = ","
-
 let g:ruby_path = system('rvm current')
 
 " ******* Bundle ******* {{{
@@ -31,30 +27,29 @@ packadd! matchit
 
 
 "File Mgt
-Plugin 'kien/ctrlp.vim'
-Plugin 'scrooloose/nerdtree'
+Plugin 'ctrlpvim/ctrlp.vim' "essential
+Plugin 'scrooloose/nerdtree' "essential
 Plugin 'mhinz/vim-grepper'
 Plugin 'Shougo/neocomplete.vim'
 
-Plugin 'scrooloose/nerdcommenter'
+Plugin 'scrooloose/nerdcommenter' "essential
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-abolish'
 Plugin 'milkypostman/vim-togglelist'
 Plugin 'Raimondi/delimitMate'
-"Plugin 'scrooloose/syntastic'
+
 Plugin 'majutsushi/tagbar'
 Plugin 'mattn/emmet-vim'
-" Plugin 'beguene/sessionman.vim'
+
 Plugin 'mileszs/ack.vim'
-"Plugin 'ervandew/supertab'
+
 Plugin 'Shougo/neosnippet'
 Plugin 'Shougo/neosnippet-snippets'
 
 "UI
-
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'itchyny/lightline.vim'
+Plugin 'altercation/vim-colors-solarized' "essential
+Plugin 'itchyny/lightline.vim' "essential
 Plugin 'jszakmeister/vim-togglecursor'
 
 " Languages
@@ -74,7 +69,7 @@ Plugin 'terryma/vim-expand-region'
 Plugin 'tpope/vim-endwise'
 Plugin 'tpope/vim-rails'
 Plugin 'chrishunt/xterm-color-table.vim'
-"Plugin 'kana/vim-textobj-user'
+
 Plugin 'marijnh/tern_for_vim'
 Plugin 'w0rp/ale'
 
@@ -91,24 +86,16 @@ if iCanHazVundle == 0
 endif
 " }}}"
 
-filetype plugin indent on
+if has('autocmd')
+  filetype plugin indent on
+endif
 
 "The modelines bit prevents some security exploits having to do with modelines in files.
 set modelines=0
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
 
 " Sets how many lines of history VIM has to remember
 set history=1500
-set hidden
 set fileformats=unix,mac,dos
-set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,*cache*,*.tbz,*.run,*.tar,*.exe,*.tgz,*.bzip,*.gzip
-set wildignore+=tags
-set wildignore+=*/tmp/*
-set wildignore+=*/vendor/*
-set confirm
-set ttyfast
-set ttimeoutlen=50 " Make Esc work faster
 
 " Disable useless {{{
 set mouse=
@@ -125,105 +112,23 @@ imap <4-MiddleMouse> <Nop>
 "}}}
 
 " ******* Format ******* {{{
-" Don't use Ex mode, use Q for formatting
-map Q gq
-" Set to auto read when a file is changed from the outside
-set autoread
 " wrap lines rather than make use of the horizontal scrolling
 set wrap
 " " try not to wrap in the middle of a word
 set linebreak
 set formatoptions=tcrqn21
-set formatoptions-=o "dont continue comments when pushing o/O
-set listchars=tab:>-,trail:·,eol:$
-set showcmd
+"set formatoptions-=o "dont continue comments when pushing o/O
 " " use an 79-character line limit
-set textwidth=79 " }}}"
-
-"******* Special ********* {{{
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
-    augroup vimrcEx
-        au!
-        " When editing a file, always jump to the last known cursor position.
-        " Don't do it when the position is invalid or when inside an event handler
-        " (happens when dropping a file on gvim).
-        " Also don't do it when the mark is in the first line, that is the default
-        " position when opening a file.
-        autocmd BufReadPost *
-                    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-                    \   exe "normal! g`\"" |
-                    \ endif
-    augroup END
-endif " has("autocmd")
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-    command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
-                \ | wincmd p | diffthis
-endif
-"}}}"
-
-" ******* Backup & Undo ******* "{{{
-if has("vms")
-    set nobackup		" do not keep a backup file, use versions instead
-else
-    set backup		" keep a backup file
-endif
-
-"persistent undo
-if version >= 703 && has('persistent_undo')
-    try
-      set undodir=~/tmp/undodir
-      if os == "windows"
-        set undodir=C:\Windows\Temp
-      endif
-    catch
-    endtry
-    set undofile                "so is persistent undo ...
-    set undolevels=1000         "maximum number of changes that can be undone
-    set undoreload=10000        "maximum number lines to save for undo on a buffer reload
-endif
-
-set noswapfile
-set nowb
-"}}}"
-
-" ******* Tab & Indent ******* "{{{
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
-set smarttab
-set autoindent
-set expandtab "}}}"
-
-" ******* Completion ******* "{{{
-set wildmenu
-set wildmode=list:longest,full
-set complete=.,w,b,u,U,t,i,d
-
-"}}}"
+set textwidth=79 
+" }}}"
 
 " ******* Search ******* "{{{
-"gdefault applies substitutions globally on lines. For example, instead of
-":%s/foo/bar/g you just type :%s/foo/bar/.
-set gdefault
-set incsearch " do incremental searching
-set ignorecase
-set smartcase
-map N Nzz
-map n nzz
 " Autoscroll to middle of the screen when searching
 autocmd CmdwinEnter * :set scrolloff=9999
 autocmd CmdwinLeave * :set scrolloff=0
-nnoremap / /\v
-vnoremap / /\v
 " Pull word under cursor into LHS of a substitute (for quick search and
 " " replace)
 nnoremap <leader>z :%s/<C-r>=expand("<cword>")<CR>/
-hi Search cterm=NONE ctermfg=red ctermbg=grey
-hi IncSearch cterm=NONE ctermfg=white ctermbg=red
 noremap <plug>(slash-after) zz
 
 " ******* Ack ******* "{{{
@@ -234,8 +139,6 @@ if executable('ack')
   nnoremap <silent> <leader>a *<C-O>:AckFromSearch!<CR>
 endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
-" Ctrl-sr: Easier (s)earch and (r)eplace
-nnoremap <leader>sr :%s/<c-r><c-w>//gc<left><left><left>
 " }}}
 "}}}
 
@@ -246,17 +149,12 @@ nnoremap <leader>sr :%s/<c-r><c-w>//gc<left><left><left>
 
 " ******* Navigation & Window ******* {{{
 inoremap jj <Esc>
-"  H/L go to start/end of line.
-noremap H ^
-noremap L $
 " gj/gk treat wrapped lines as separate
 " " (i.e. you can move up/down in one wrapped line)
 nn j gj
 nn k gk
 nn gj j
 nn gk k
-" When pressing <leader>cd switch to the directory of the open buffer
-map <leader>cd :cd %:p:h<cr>
 " }}}
 
 " ******* Quickfix / Location List ******* {{{
@@ -297,23 +195,7 @@ let java_highlight_functions="style"
 " Don't flag C++ keywords as errors
 let java_allow_cpp_keywords=1 "}}}"
 
-"******* Command Mode Related ********* {{{
-set showcmd		" display incomplete commands
-" Bash-like command for navigation in Insert Mode
-ino <silent> <c-a> <c-o>b
-ino <silent> <c-e> <esc>ea
-" Bash like keys for the command line
-cnoremap <C-A>      <Home>
-cnoremap <C-E>      <End>
-cnoremap <C-j> <t_kd>
-cnoremap <C-k> <t_ku>
-cnoremap <C-K>      <C-U>
-cnoremap <C-P> <Up>
-cnoremap <C-N> <Down> 
-"}}}"
-
 " ******* Init & Constants ******* {{{
-
 fun! MySys()
   if has('win32') || has('win64') || has('win32unix')
     return 'windows'
@@ -349,6 +231,7 @@ else
   set shell=/bin/bash
   nnoremap <silent> <leader>o :!open -a chomium-browser '%' &<cr>
 endif
+
 if os=='windows'
   let $VIMHOME = $VIM."/vimfiles"
 else
@@ -357,11 +240,10 @@ endif
 "}}}"
 
 " ******* Theme and Layout ******* {{{
-set shortmess+=I " Disable splash screen
+
+hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
+hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 set scrolloff=6 " keep at least 6 lines above/below
-set splitright
-set showmatch "Show matching bracket
-set ruler		" show the cursor position all the time
 set t_Co=256
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -394,11 +276,6 @@ if has("gui_running")
   set guifont=Menlo:h12
   set guioptions-=r
   set guioptions-=L
-  "colorscheme mustang
-  "colors peaksea
-  "colorscheme clouds_midnight
-  " colo wombat
-  "colorscheme lucius
   colorscheme solarized
 else
   set background=dark
@@ -408,38 +285,10 @@ else
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
   colorscheme solarized
-  "colorscheme Tomorrow-Night-Blue
-  "colorscheme Tomorrow-Night-Eighties
-  " colorscheme vividchalk
 endif
-" Styling vertical split bar
-highlight VertSplit ctermbg=243 ctermfg=243
-
-hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
-hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 "}}}"
 
 " ******* Status Line ******* "{{{
-set laststatus=2
-" let g:airline#extensions#tabline#enabled = 1
-
-" put git status, column/row number, total lines, and percentage in status
-" set statusline=%F%m%r%h%w\ %{fugitive#statusline()}\ [%l,%c]\ [%L,%p%%]
-" Formats the statusline
-set statusline=%f                           " file name
-set statusline+=[%{strlen(&fenc)?&fenc:'none'}, "file encoding
-set statusline+=%{&ff}] "file format
-set statusline+=%y      "filetype
-set statusline+=%h      "help file flag
-set statusline+=%m      "modified flag
-set statusline+=%r      "read only flag
-" if version >= 700
-    " au InsertEnter * hi StatusLine term=reverse ctermbg=5 gui=undercurl guisp=Magenta
-    " au InsertLeave * hi StatusLine term=reverse ctermfg=0 ctermbg=2 gui=bold,reverse
-" endif
-" hi StatusLine ctermbg=black ctermfg=183
-" hi StatusLine ctermbg=grey ctermfg=darkblue
-
 
 let g:lightline = {
             \ 'colorscheme': 'solarized',
@@ -548,15 +397,11 @@ let g:lightline.colorscheme = 'solarized'
 " }}}
 
 " ******* Files / Dir  management ******* {{{
-map <leader>t :tabnew<CR>
-nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 " :cd. change working directory to that of the current file
-cmap cd. lcd %:p:h
 nnoremap <leader>k :CtrlPBuffer<CR>
 hi CursorLine cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 hi PmenuSel cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 highlight Cursor cterm=NONE ctermbg=green ctermfg=red
-set nocursorline
 " Delete buffer on CtrlPBuffer
 let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
 let g:ctrlp_buftag_types = {
@@ -582,53 +427,14 @@ nmap ,wc :call CtrlPWithSearchText(expand('<cword>'), 'CmdPalette')<CR>
 
 let g:ctrlp_by_filename = 1
 " *** NERDTree ***
- nnoremap <leader>n :NERDTree<CR>
-" let NERDTreeQuitOnOpen = 1
-" let NERDTreeChDirMode=2
-" let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
-" let NERDSpaceDelims=1
+nnoremap <leader>n :NERDTree<CR>
 " *** TAGLIST/TAGBAR ***
-set tags+=.git/tags;
-set cpt=k,.,w,b,u,t,i
 noremap <leader>l :TagbarToggle<CR>
 let g:tagbar_autofocus = 1
 
-" *** CTRL P ***
-"let g:ctrlp_map = '<leader>p'
-let g:ctrlp_working_path_mode = 2
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\.git$\|\.hg$\|\.svn$\|\.yardoc\|public\/images\|data\|node_modules|log\|tmp$',
-  \ 'file': '\.exe$\|\.so$\|\.dat$|\.pyc$\|\.pyo$\|\.rbc$|\.rbo$\|\.class$\|\.o$\|\~$\'
-  \ }
-"let g:ctrlp_max_height = 15
-let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
-let g:ctrlp_clear_cache_on_exit = 0
-"let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files']
-if executable('ag')
-  let g:ctrlp_user_command='ag %s -l --nocolor -g ""'
-endif
-let g:ctrlp_open_multiple_files = '1rv'
-let g:ctrlp_follow_symlinks = 1
-let g:ctrlp_mruf_max = 500
-let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*'
-" let g:ctrlp_extensions = ['tag', 'buffertag','bookmarkdir', 'funky']
-let g:ctrlp_dotfiles = 0
-let g:ctrlp_switch_buffer = 0
-let g:ctrlp_by_filename = 1
-"if !has("gui_running")
-    "nnoremap <C-@> :CtrlPBuffer<CR>
-    "vnoremap <C-@> <esc>:CtrlPBuffer<CR>
-"else
-    "nnoremap <C-Space> :CtrlPBuffer<CR>
-    "vnoremap <C-Space> <esc>:CtrlPBuffer<CR>
-"endif
 " *** MRU ***
 noremap <leader>m :CtrlPMRU<CR>
-noremap <leader>m :History<CR>
-let g:ctrlp_mruf_default_order = 1
-let g:ctrlp_mruf_exclude = '.git/*'
 nnoremap <leader>n :NERDTreeToggle<CR>
-let NERDTreeHijackNetrw=1
 "}}}"
 
 " ******* Git / Fugitive ******* {{{
@@ -669,49 +475,15 @@ noremap <leader>y "*y
 set clipboard=unnamed
 " Pressing v again brings you out of visual mode
 xno v <esc>
-" Keep visual selection when indenting
-vnoremap < <gv
-vnoremap > >gv
-" nnoremap p [p
-" nnoremap P [P
-" select (charwise) the contents of the current line, excluding indentation.
-" Great for pasting Python lines into REPLs.
-nnoremap vv ^vg_
 " Easier linewise reselection
 nnoremap <leader>V V`]
 
-" }}}
-
-" ******* Syntastic & Compiler *******  {{{
-let g:syntastic_enable_signs = 1
-"let g:syntastic_check_on_open = 0
-let g:syntastic_auto_loc_list=2
-let g:syntastic_disabled_filetypes = ['html', 'rst', 'rhtml', 'css']
-"let g:syntastic_stl_format = '[%E{%e Errors}%B{, }%W{%w Warnings}]'
-"let g:syntastic_jsl_conf = '$HOME/.vim/jsl.conf'
-
-let g:syntastic_error_symbol = '✗'
-let g:syntastic_style_error_symbol = '✠'
-let g:syntastic_warning_symbol = '∆'
-let g:syntastic_style_warning_symbol = '≈'
-let g:syntastic_javascript_checkers=['jshint']
-let g:syntastic_auto_loc_list=0
-let g:syntastic_loc_list_height=5
-"let g:syntastic_ruby_mri_exec = 'ruby'
-
-let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['php', 'javascript', 'ruby', 'java', 'perl', 'python'], 'passive_filetypes': ['xml', 'xhtml'] }
-"let g:syntastic_python_python_exec = 'python3'
 " }}}
 
 " ******* Autocommands *******  {{{
 if has("autocmd")
   if $HOME !~# '^/Users/'
     filetype off " Debian preloads this before the runtimepath is set
-  endif
-  if version>600
-    filetype plugin indent on
-  else
-    filetype on
   endif
   " Java {{{
   augroup ft_java
@@ -753,7 +525,7 @@ if has("autocmd")
     " TXT
     autocmd BufNewFile,BufRead *.txt,README,INSTALL,NEWS,TODO if &ft == ""|set ft=text|endif
     autocmd BufNewFile,BufRead *.txt set ft=txt syntax=txt
-    autocmd FileType text,txt setlocal tw=78 linebreak nolist
+    autocmd FileType text,txt setlocal tw=79 linebreak nolist
     autocmd FileType txt      setlocal formatoptions=ctnqro comments+=n:*,n:#,n:•
   augroup END "}}}2
 
@@ -901,17 +673,6 @@ function! <SID>BufcloseCloseIt() "{{{"
    endif
 endfunction "}}}"
 
-" RENAME CURRENT FILE (thanks Gary Bernhardt) {{{
-function! RenameFile()
-    let old_name = expand('%')
-    let new_name = input('New file name: ', expand('%'), 'file')
-    if new_name != '' && new_name != old_name
-        exec ':saveas ' . new_name
-        exec ':silent !rm ' . old_name
-        redraw!
-    endif
-endfunction
-command! RenameFile call RenameFile() "}}}
 
 " BufferClose {{{
 function! s:BufferClose()
@@ -944,17 +705,6 @@ func! s:DeleteBuffer()
   exec "norm \<F5>"
 endfunc
 
-" RENAME CURRENT FILE (thanks Gary Bernhardt)
-function! RenameFile()
-    let old_name = expand('%')
-    let new_name = input('New file name: ', expand('%'), 'file')
-    if new_name != '' && new_name != old_name
-        exec ':saveas ' . new_name
-        exec ':silent !rm ' . old_name
-        redraw!
-    endif
-endfunction
-map ;mv :call RenameFile()<cr>
 "}}}
 
 " ******* Mappings ******* {{{
@@ -964,14 +714,11 @@ nmap <silent> <leader>sv :so $MYVIMRC<CR>
 nmap <silent> <leader>ez :e ~/.zshrc<CR>
 map <leader>ej :e ~/Dropbox/docs/journal.txt<CR>
 " Expand current buffer full window
-"Session mgt
-set ssop-=options
 "===============================================================================
 " Function Key Mappings
 "===============================================================================
 "noremap <F2> :CtrlPSession<cr>
 " <F4>: Save session
-set pastetoggle=<F3>
 
 " F2 mgt sessions
 " F4 lint
@@ -1012,14 +759,6 @@ if executable('ack') || executable('ag')
   nnoremap <silent> <leader>a *<C-O>:AckFromSearch!<CR>
 endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
-
-set grepprg=grep\ -inH
-if executable('ag')
-  let &grepprg = 'ag --nogroup --nocolor --column'
-else
-  let &grepprg = 'grep -rn $* *'
-endif
-set grepformat=%f:%l:%c:%m,%f:%l:%m
 command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
 nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
 nnoremap <leader>f :Grepper -noswitch<cr>
@@ -1067,14 +806,10 @@ nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
 nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 "}}}
 
-set nofoldenable    " disable folding
-
 let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
-set re=1
 
 " Complete {{{
 
-set completeopt=menuone,preview
 " Disable AutoComplPop.
 let g:acp_enableAtStartup = 0
 "" Use neocomplete.
@@ -1136,8 +871,6 @@ silent! execute  winnr < 0 ? 'vnew ' . fnameescape(command) : winnr . 'wincmd w'
 endfunction
 command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
 let g:syntastic_ruby_exec = '~/.rvm/rubies/ruby-2.1.0/bin/ruby'
-set path+=**
-set complete-=i 
 let g:loaded_rrhelper = 1
 let g:loaded_vimballPlugin = 1
 let g:ale_lint_on_save = 1
@@ -1179,9 +912,6 @@ let g:fzf_layout = { 'down': '~70%' }
 let g:fzf_buffers_jump = 1
 "imap <c-x><c-l> <plug>(fzf-complete-line)
 " }}}
-"
-" Report changes.
- set report=0
 
 " {{{ TMUX
 "Plugin 'edkolev/tmuxline.vim'
@@ -1225,11 +955,6 @@ let g:UltiSnipsJumpForwardTrigger="<c-n>"
 let g:UltiSnipsJumpBackwardTrigger="<c-p>"
 
 " }}}
-
-if has('linebreak')
-  set breakindent                     " indent wrapped lines to match start
-endif
-set switchbuf=usetab   " try to reuse windows/tabs when switching buffers
 
 " {{{ Mappings
 noremap Y y$
@@ -1289,7 +1014,6 @@ if has('conceal')
   set conceallevel=2 concealcursor=niv
 endif
 
-set completeopt+=longest
 Plugin 'tpope/vim-dispatch'
 let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
@@ -1313,6 +1037,7 @@ source $HOME/.vim/experimental.vim
 "fast navigation up and down : map ctrl-j to 5j
 "TODO
 "paste and indent
+"Show list of last use files in session (like C-o but for files)
 " map leader \
 "nnoremap \r :tabnew<CR>
 " use space to complete autocomplete
@@ -1328,4 +1053,5 @@ vmap <C-@> cw
 
 nnoremap gO O<Esc>j
 nnoremap go o<Esc>k
-imap <D-v> ^O:set paste<Enter>^R+^O:set nopaste<Enter>
+"imap <D-v> ^O:set paste<Enter>^R+^O:set nopaste<Enter>
+
