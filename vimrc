@@ -77,6 +77,7 @@ Plug 'honza/vim-snippets'
 Plug 'chrisgillis/vim-bootstrap3-snippets'
 Plug 'vimwiki/vimwiki'
 Plug 'tpope/vim-dispatch'
+Plug 'junegunn/gv.vim'
 call plug#end()
 " }}}"
 
@@ -845,15 +846,15 @@ inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
 " Recommended key-mappings.
 " <CR>: close popup and save indent.
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function()
-  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-  " For no inserting <CR> key.
-  "return pumvisible() ? "\<C-y>" : "\<CR>"
-endfunction
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
+"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+"function! s:my_cr_function()
+  "return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+  "" For no inserting <CR> key.
+  ""return pumvisible() ? "\<C-y>" : "\<CR>"
+"endfunction
+"" <TAB>: completion.
+"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+"inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
 " <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
@@ -1049,6 +1050,8 @@ source $HOME/.vim/experimental.vim
 "add mapping to select outer function name
 "fast navigation up and down : map ctrl-j to 5j
 "TODO
+" take selection, delete and save in a new file (useful when refactoring common
+" code
 "paste and indent
 "Show list of last use files in session (like C-o but for files)
 " map leader \
@@ -1068,3 +1071,6 @@ nnoremap gO O<Esc>j
 nnoremap go o<Esc>k
 "imap <D-v> ^O:set paste<Enter>^R+^O:set nopaste<Enter>
 
+nnoremap ; gt
+nnoremap <C-;> gT
+nnoremap <space>t :tabnew<cr>

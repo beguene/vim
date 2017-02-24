@@ -3,6 +3,8 @@
 " Set of defaults options + few custom helpful functions
 " To be used on external env with just a curl
 " No plugin needed, no git, no dependency
+"
+
 if exists('g:loaded_minimal') 
   finish
 else
@@ -85,7 +87,7 @@ endif
 
 inoremap <C-U> <C-G>u<C-U>
 
-" ----------------
+" ---------------- Beyond Sensible Defaults -------
 let mapleader = ","
 let g:mapleader = ","
 
@@ -103,6 +105,15 @@ set wildignore+=*/vendor/*
 set confirm
 set ttyfast
 set showcmd
+set history=1500
+set fileformats=unix,mac,dos
+set tags+=.git/tags;
+set nofoldenable    " disable folding
+set re=1 "regexpengine"
+" Report changes.
+set report=0
+"The modelines bit prevents some security exploits having to do with modelines in files.
+set modelines=0
 
 "******* Special ********* {{{
 " Only do this part when compiled with support for autocommands.
@@ -129,16 +140,43 @@ if !exists(":DiffOrig")
 endif
 "}}}"
 
+" {{{ CUSTOM FUNCTIONS
+" Make directory automatically.
+" --------------------------------------
+" http://vim-users.jp/2011/02/hack202/
+
+autocmd BufWritePre * call s:mkdir_as_necessary(expand('<afile>:p:h'), v:cmdbang)
+function! s:mkdir_as_necessary(dir, force) abort
+  if !isdirectory(a:dir) && &l:buftype == '' &&
+        \ (a:force || input(printf('"%s" does not exist. Create? [y/N]',
+        \              a:dir)) =~? '^y\%[es]$')
+    call mkdir(iconv(a:dir, &encoding, &termencoding), 'p')
+  endif
+endfunction
+
+" RENAME CURRENT FILE (thanks Gary Bernhardt) {{{
+function! RenameFile()
+    let old_name = expand('%')
+    let new_name = input('New file name: ', expand('%'), 'file')
+    if new_name != '' && new_name != old_name
+        exec ':saveas ' . new_name
+        exec ':silent !rm ' . old_name
+        redraw!
+    endif
+endfunction
+command! RenameFile call RenameFile() "}}}
+" }}}
+
 " ******* Backup & Undo ******* "{{{
 set nobackup		" do not keep a backup file, use versions instead
 
 "persistent undo
 if version >= 703 && has('persistent_undo')
     try
-			if !isdirectory($HOME . "/.vim/undodir")
-				call mkdir($HOME . "/.vim/undodir", "p")
+			if !isdirectory($HOME . "/tmp/undodir")
+				call mkdir($HOME . "/tmp/undodir", "p")
 			endif
-      set undodir=~/vim/undodir
+      set undodir=~/tmp/undodir
       if os == "windows"
         set undodir=C:\Windows\Temp
       endif
@@ -150,7 +188,6 @@ if version >= 703 && has('persistent_undo')
 endif
 
 set noswapfile
-"set nowb
 "}}}"
 
 " ******* Tab & Indent ******* "{{{
@@ -213,18 +250,24 @@ cnoremap <C-A>      <Home>
 cnoremap <C-E>      <End>
 cnoremap <C-j> <t_kd>
 cnoremap <C-k> <t_ku>
-cnoremap <C-K>      <C-U>
+cnoremap <C-K> <C-U>
 cnoremap <C-P> <Up>
 cnoremap <C-N> <Down> 
+cnoremap <expr> <C-D> getcmdpos()>strlen(getcmdline())?"\<Lt>C-D>":"\<Lt>Del>"
+cnoremap <expr> <C-F> getcmdpos()>strlen(getcmdline())?&cedit:"\<Lt>Right>"
+cnoremap <M-b> <S-Left>
+cnoremap <M-f> <S-Right>
 "}}}"
 
 " ******* Theme and Layout ******* {{{
+set nocursorline
 set shortmess+=I " Disable splash screen
 set splitright
 set showmatch "Show matching bracket
 " Styling vertical split bar
 highlight VertSplit ctermbg=243 ctermfg=243
 "}}}"
+
 " ******* Status Line ******* "{{{
 set laststatus=2
 " Formats the statusline
@@ -237,10 +280,10 @@ set statusline+=%m      "modified flag
 set statusline+=%r      "read only flag
 
 "}}}"
+
 " ******* Files / Dir  management ******* {{{
 map <leader>t :tabnew<CR>
 "}}}"
-
 
 " ******* Selection, Yank & Paste ******* {{{
 " Keep visual selection when indenting
@@ -252,34 +295,30 @@ nnoremap vv ^vg_
 set pastetoggle=<F3>
 "}}}"
 
-" RENAME CURRENT FILE (thanks Gary Bernhardt) {{{
-function! RenameFile()
-    let old_name = expand('%')
-    let new_name = input('New file name: ', expand('%'), 'file')
-    if new_name != '' && new_name != old_name
-        exec ':saveas ' . new_name
-        exec ':silent !rm ' . old_name
-        redraw!
-    endif
-endfunction
-command! RenameFile call RenameFile() "}}}
+" ******* Format ******* {{{
+" wrap lines rather than make use of the horizontal scrolling
+set wrap
+" " try not to wrap in the middle of a word
+set linebreak
+set formatoptions=tcrqn21
+"set formatoptions-=o "dont continue comments when pushing o/O
+" " use an 79-character line limit
+set textwidth=79 
+" }}}"
 
-set tags+=.git/tags;
-set nofoldenable    " disable folding
-set re=1 "regexpengine"
-" Report changes.
-set report=0
-
-" {{{ Mappings
+" ******* Mappings ******* {{{
 noremap Y y$
 " Navigation
 " use space to navigate between windows (c-w) & tabs
 nnoremap <space> <c-w>
 nnoremap <space><space> <c-w><c-w>
 nnoremap <Leader><Leader> :wa<cr>
+nnoremap <leader>p :Explore<CR>
+nnoremap <leader>n :Explore<CR>
 " }}}
 
-" <CR>: close popup and save indent.
+" ******* TAB ******* {{{
+"<CR>: close popup and save indent.
 inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 function! s:my_cr_function()
   return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
@@ -289,11 +328,7 @@ endfunction
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<C-x>\<C-n>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
-set pastetoggle=<F3>
-
-set nocursorline
-nnoremap <leader>p :Explore<CR>
-nnoremap <leader>n :Explore<CR>
+" }}}
 
 " Disable useless {{{
 set mouse=
@@ -308,24 +343,5 @@ imap <3-MiddleMouse> <Nop>
 map <4-MiddleMouse> <Nop>
 imap <4-MiddleMouse> <Nop>
 "}}}
-
-"The modelines bit prevents some security exploits having to do with modelines in files.
-set modelines=0
-
-" ******* Format ******* {{{
-" wrap lines rather than make use of the horizontal scrolling
-set wrap
-" " try not to wrap in the middle of a word
-set linebreak
-set formatoptions=tcrqn21
-"set formatoptions-=o "dont continue comments when pushing o/O
-" " use an 79-character line limit
-set textwidth=79 
-" }}}"
-" Sets how many lines of history VIM has to remember
-set history=1500
-set fileformats=unix,mac,dos
-
-
 
 " vim:set ft=vim et sw=2:
