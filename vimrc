@@ -3,7 +3,7 @@
 " Version: 3.0
 source $HOME/.vim/minimal.vim
 
-filetype off                   " required! for vundle
+filetype off
 let g:ruby_path = system('rvm current')
 
 " ******* Bundle ******* {{{
@@ -16,13 +16,21 @@ endif
 " Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
 call plug#begin('~/.vim/bundle')
 
-Plug 'ctrlpvim/ctrlp.vim'
+"Colorscheme
+Plug 'jnurmine/Zenburn'
+Plug 'sonph/onehalf', {'rtp': 'vim/'}
+Plug 'jdkanani/vim-material-theme'
+Plug 'trevordmiller/nova-vim'
+Plug 'NLKNguyen/papercolor-theme'
 Plug 'altercation/vim-colors-solarized'
+Plug 'tpope/vim-vividchalk'
+Plug 'morhetz/gruvbox'
+
+Plug 'ctrlpvim/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
 
 " On-demand loading
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-
+Plug 'scrooloose/nerdtree'
 
 " Initialize plugin system
 "File Mgt
@@ -43,6 +51,7 @@ Plug 'mileszs/ack.vim'
 
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
+Plug 'honza/vim-snippets'
 
 "UI
 Plug 'jszakmeister/vim-togglecursor'
@@ -63,6 +72,7 @@ Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'terryma/vim-expand-region'
 Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-rails'
+Plug 'vim-ruby/vim-ruby'
 Plug 'chrishunt/xterm-color-table.vim'
 
 Plug 'marijnh/tern_for_vim'
@@ -76,8 +86,13 @@ Plug 'tpope/vim-repeat'
 Plug 'honza/vim-snippets'
 Plug 'chrisgillis/vim-bootstrap3-snippets'
 Plug 'vimwiki/vimwiki'
-Plug 'tpope/vim-dispatch'
+"Plug 'tpope/vim-dispatch'
+Plug 'skywind3000/asyncrun.vim'
 Plug 'junegunn/gv.vim'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/limelight.vim'
+"Plug 'tpope/vim-eunuch'
+Plug 'takac/vim-hardtime'
 call plug#end()
 " }}}"
 
@@ -85,9 +100,6 @@ if has('autocmd')
   filetype plugin indent on
 endif
 
-if !empty(glob("~/.vim/bundle/vim-colors-solarized/autoload/togglebg.vim"))
-  colorscheme solarized
-endif
 
 if isdirectory($HOME . "/.vim/bundle/nerdtree")
   " *** NERDTree ***
@@ -99,21 +111,21 @@ if isdirectory($HOME . "/.vim/bundle/fzf.vim")
   nnoremap <leader>p :FZF<CR>
   " quick edit file, useful in log files to quickly go to the file
   nnoremap <leader>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
-  let g:fzf_colors =
-        \ { 'fg':      ['fg', 'Normal'],
-        \ 'bg':      ['bg', 'Normal'],
-        \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-        \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-        \ 'info':    ['fg', 'PreProc'],
-        \ 'prompt':  ['fg', 'Conditional'],
-        \ 'pointer': ['fg', 'Exception'],
-        \ 'marker':  ['fg', 'Keyword'],
-        \ 'spinner': ['fg', 'Label'],
-        \ 'header':  ['fg', 'Comment'] }
+  "let g:fzf_colors =
+        "\ { 'fg':      ['fg', 'Normal'],
+        "\ 'bg':      ['bg', 'Normal'],
+        "\ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+        "\ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+        "\ 'info':    ['fg', 'PreProc'],
+        "\ 'prompt':  ['fg', 'Conditional'],
+        "\ 'pointer': ['fg', 'Exception'],
+        "\ 'marker':  ['fg', 'Keyword'],
+        "\ 'spinner': ['fg', 'Label'],
+        "\ 'header':  ['fg', 'Comment'] }
   let g:fzf_files_options =
         \ '--preview "(highlight -O ansi {} || cat {}) 2> /dev/null | head -'.&lines.'"'
 
-  let g:fzf_layout = { 'down': '~70%' }
+  let g:fzf_layout = { 'down': '~10%' }
   let g:fzf_buffers_jump = 1
   nnoremap <leader>m :History<CR>
 elseif isdirectory($HOME . "/.vim/bundle/ctrlp")
@@ -146,6 +158,12 @@ elseif isdirectory($HOME . "/.vim/bundle/ctrlp")
 else
 endif
 
+" gui colors if running iTerm
+"if $TERM_PROGRAM =~ "iTerm"
+  "set termguicolors
+"endif
+"set t_8f=[38;2;%lu;%lu;%lum
+"set t_8b=[48;2;%lu;%lu;%lum
 " ******* Search ******* "{{{
 " Autoscroll to middle of the screen when searching
 autocmd CmdwinEnter * :set scrolloff=9999
@@ -268,7 +286,7 @@ endif
 hi TabLineSel ctermfg=15 ctermbg=93 guibg=Magenta
 hi TabLine ctermfg=15 ctermbg=93 guibg=Magenta
 set scrolloff=6 " keep at least 6 lines above/below
-set t_Co=256
+"set t_Co=256
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
@@ -300,7 +318,6 @@ if has("gui_running")
   set guifont=Menlo:h12
   set guioptions-=r
   set guioptions-=L
-  colorscheme solarized
 else
   set background=dark
   set guifont=Menlo:h12
@@ -308,7 +325,6 @@ else
   let g:solarized_termcolors=16
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
-  colorscheme solarized
 endif
 "}}}"
 
@@ -416,16 +432,13 @@ function! TagbarStatusFunc(current, sort, fname, ...) abort
     return lightline#statusline(0)
 endfunction
 
-let g:lightline.colorscheme = 'solarized'
-
 " }}}
 
 " ******* Files / Dir  management ******* {{{
 " :cd. change working directory to that of the current file
-nnoremap <leader>k :CtrlPBuffer<CR>
+nnoremap <leader>k :Buffers<CR>
 hi CursorLine cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 hi PmenuSel cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
-highlight Cursor cterm=NONE ctermbg=green ctermfg=red
 " Delete buffer on CtrlPBuffer
 let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
 let g:ctrlp_buftag_types = {
@@ -481,7 +494,12 @@ function! CD_Git_Root()
 endfunction
  " change to the git project dir
 nnoremap <leader>gr :call CD_Git_Root()<cr>
-nnoremap <silent> <leader>gs :Gstatus<CR>
+map <leader>gb :Gblame<CR>
+map <leader>gc :Gcommit<CR>
+map <leader>gd :Gdiff<CR>
+map <leader>gl :Glog<CR>
+map <leader>gp :Git push<CR>
+map <leader>gs :Gstatus<CR>
 " }}}
 
 " ******* Selection, Yank & Paste ******* {{{
@@ -514,6 +532,23 @@ if has("autocmd")
   augroup END
   " }}}
 
+  " CSS and LessCSS {{{
+  augroup ft_css
+    au!
+    au BufNewFile,BufRead *.less setlocal filetype=less
+
+    au Filetype less,css setlocal foldmethod=marker
+    au Filetype less,css setlocal foldmarker={,}
+    au Filetype less,css setlocal omnifunc=csscomplete#CompleteCSS
+    au Filetype less,css setlocal iskeyword+=-
+
+    au BufNewFile,BufRead *.less,*.css nnoremap <buffer> <localleader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
+
+    " Make {<cr> insert a pair of brackets in such a way that the cursor is correctly
+    " positioned inside of them AND the following code doesn't get unfolded.
+    au BufNewFile,BufRead *.less,*.css inoremap <buffer> {<cr> {}<left><cr><space><space><space><space>.<cr><esc>kA<bs>
+  augroup END
+
   augroup FTOptions " {{{2
     " In Makefiles, use real tabs, not tabs expanded to spaces
     autocmd FileType make setlocal noexpandtab
@@ -527,13 +562,11 @@ if has("autocmd")
     autocmd BufNewFile,BufRead *.scss set ft=scss.css
     autocmd BufNewFile,BufRead *.sass set ft=sass.css
     autocmd BufNewFile,BufRead *.less set ft=less.css
-    autocmd BufRead,BufNewFile *.less set omnifunc=csscomplete#CompleteCSS
     " Other"
     au BufRead,BufNewFile Gemfile set filetype=ruby
     au BufRead,BufNewFile *.rabl setf ruby
     au BufRead,BufNewFile *.md set filetype=markdown
     "OmniFunc"
-    autocmd FileType css        set omnifunc=csscomplete#CompleteCSS
     autocmd FileType html       set omnifunc=htmlcomplete#CompleteTags
     autocmd FileType xml        set omnifunc=xmlcomplete#CompleteTags
     autocmd FileType python     set omnifunc=pythoncomplete#Complete
@@ -625,17 +658,8 @@ if has("autocmd")
   augroup END "}}}2
 
   autocmd FileType gitcommit setlocal spell
+  autocmd filetype svn,*commit* setlocal spell
 
-  augroup extraSpaces "{{{
-    au!
-    " highlight ExtraWhitespace ctermbg=red guibg=red
-    " au ColorScheme * highlight ExtraWhitespace guibg=red
-    " au BufEnter * match ExtraWhitespace /\s\+$/
-    " au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-    " au InsertLeave * match ExtraWhiteSpace /\s\+$/
-  augroup END "}}}
-  "hide red tilde
-  " autocmd FileType nerdtree  highlight NonText ctermfg=8
 endif " has("autocmd")}}}"
 
 " ******* Custom Functions *******  {{{
@@ -772,6 +796,9 @@ vnoremap <leader>s :!sort<cr>
 " }}}
 
 " ******* Search ******* "{{{
+
+"easy replace from visually selected text
+vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 if executable('ack') || executable('ag')
   " *** ACK ***
   nnoremap <silent> <leader>A :Ack
@@ -782,8 +809,8 @@ let g:ackprg = 'ag --nogroup --nocolor --column'
 command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
 nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
 nnoremap <leader>f :Grepper -noswitch<cr>
-nmap gs  <plug>(GrepperOperator)
-xmap gs  <plug>(GrepperOperator)
+"nmap gs  <plug>(GrepperOperator)
+"xmap gs  <plug>(GrepperOperator)
 nnoremap <leader>a :Ag <C-r>=expand("<cword>")<CR><CR>
 nnoremap <leader>A :Ag 
 
@@ -804,15 +831,6 @@ let delimitMate_expand_space = 1
 let delimitMate_jump_expansion = 1
 
 autocmd FileType html,css EmmetInstall
-
-"GIT {{{
-map <leader>gb :Gblame<CR>
-map <leader>gc :Gcommit<CR>
-map <leader>gd :Gdiff<CR>
-map <leader>gl :Glog<CR>
-map <leader>gp :Git push<CR>
-map <leader>gs :Gstatus<CR>
-"}}}
 
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
 
@@ -846,15 +864,15 @@ inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
 " Recommended key-mappings.
 " <CR>: close popup and save indent.
-"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-"function! s:my_cr_function()
-  "return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-  "" For no inserting <CR> key.
-  ""return pumvisible() ? "\<C-y>" : "\<CR>"
-"endfunction
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+  " For no inserting <CR> key.
+  "return pumvisible() ? "\<C-y>" : "\<CR>"
+endfunction
 "" <TAB>: completion.
-"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-"inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
 " <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
@@ -935,11 +953,6 @@ let g:fzf_buffers_jump = 1
 
 " {{{ TMUX
 "Plugin 'edkolev/tmuxline.vim'
-"let g:lightline = {
-"      \ 'colorscheme': 'wombat',
-"      \ 'separator': { 'left': '', 'right': '' },
-"      \ 'subseparator': { 'left': '', 'right': '' }
-"      \ }
 "let g:tmuxline_powerline_separators = 0
 "let g:tmuxline_preset = {
 "      \'a'    : '#S',
@@ -995,6 +1008,7 @@ set suffixes+=.dvi  " Lower priority in wildcards
 " NOTES / WIKI {{{
 
 let g:vimwiki_list = [{'path': '~/notes/'}]
+let g:vimwiki_table_mappings = 0
 "let g:vimwiki_ext2syntax = {'.org': 'media'}
 "let g:vimwiki_list = [{'path': '~/notes/',
       "\ 'syntax': 'markdown', 'ext': '.md'}]
@@ -1033,37 +1047,14 @@ let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 
 let g:neosnippet#snippets_directory = "~/.vim/customsnippets"
+let g:neosnippet#scope_aliases = {}
+let g:neosnippet#scope_aliases['ruby'] = 'ruby,ruby-rails, rails'
+
 
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
 "}}}
 
-"TODO
-"space in normal mode expand region, u undo/shrink
-
-
-" Always use location list for syntax/compile errors
-"Add quick console log taking function name as param
-"QUICK SEARCH REPLACE searched item with *
-"Replace all
-"TODO
-"add mapping to select outer function name
-"fast navigation up and down : map ctrl-j to 5j
-"TODO
-" take selection, delete and save in a new file (useful when refactoring common
-" code
-"paste and indent
-"Show list of last use files in session (like C-o but for files)
-" map leader \
-"nnoremap \r :tabnew<CR>
-" use space to complete autocomplete
-" search web from vim
-"
-" Available mappings {{{
-" C-space, \, Fkeys
-" Space leader
-" }}}
-"nnoremap <C-@> <C-Space>
 nmap <C-@> gt
 vmap <C-@> cw
 
@@ -1071,6 +1062,38 @@ nnoremap gO O<Esc>j
 nnoremap go o<Esc>k
 "imap <D-v> ^O:set paste<Enter>^R+^O:set nopaste<Enter>
 
-nnoremap ; gt
-nnoremap <C-;> gT
+nnoremap <space>a gT
 nnoremap <space>t :tabnew<cr>
+" Color name (:help cterm-colors) or ANSI code
+ let g:limelight_conceal_ctermfg = 'gray'
+ let g:limelight_conceal_ctermfg = 240
+let g:hardtime_default_on = 1
+" %% to insert the fodler of  
+cnoremap %% <C-R>=expand('%:h').'/'<CR>
+command! Rm :call delete(@%) | bdelete!
+" select last paste in visual mode
+nnoremap <expr> gb '`[' . strpart(getregtype(), 0, 1) . '`]'
+autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1 
+autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+" Better command history with q:
+command! CmdHist call fzf#vim#command_history({'down': '40'})
+" Better search history
+command! QHist call fzf#vim#search_history({'down': '40'})
+
+
+" Makes the background transparent. Leave these out if you're not using a transparent
+" terminal.
+"highlight Normal ctermbg=NONE guibg=NONE
+"highlight NonText ctermbg=NONE guibg=NONE
+command! BBLines call fzf#vim#buffer_lines({'down': '~6'})
+nnoremap \ :BBLines<cr>
+set isfname-==    " remove '=' from filename characters; for completion of FOO=/path/to/file"
+set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
+
+"
+if !empty(glob("~/.vim/bundle/vim-colors-solarized/autoload/togglebg.vim"))
+  colorscheme solarized
+  " Change the color scheme here.
+  "colorscheme gruvbox
+endif

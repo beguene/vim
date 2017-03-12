@@ -154,6 +154,7 @@ function! s:mkdir_as_necessary(dir, force) abort
   endif
 endfunction
 
+command! DeleteFile call delete(expand('%')) | bdelete!
 " RENAME CURRENT FILE (thanks Gary Bernhardt) {{{
 function! RenameFile()
     let old_name = expand('%')
@@ -318,16 +319,6 @@ nnoremap <leader>n :Explore<CR>
 " }}}
 
 " ******* TAB ******* {{{
-"<CR>: close popup and save indent.
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function()
-  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-  " For no inserting <CR> key.
-  "return pumvisible() ? "\<C-y>" : "\<CR>"
-endfunction
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<C-x>\<C-n>"
-inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
 " }}}
 
 " Disable useless {{{
