@@ -5,6 +5,7 @@ source $HOME/.vim/minimal.vim
 
 filetype off
 let g:ruby_path = system('rvm current')
+let g:ale_emit_conflict_warnings = 0
 
 " ******* Bundle ******* {{{
 "------ START PLUGINS -------
@@ -32,12 +33,17 @@ Plug 'itchyny/lightline.vim'
 " On-demand loading
 Plug 'scrooloose/nerdtree'
 
+
 " Initialize plugin system
 "File Mgt
 Plug 'mhinz/vim-grepper'
-Plug 'Shougo/neocomplete.vim'
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/neocomplete.vim'
+end
 
-Plug 'scrooloose/nerdcommenter' "essential
+Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-abolish'
@@ -77,6 +83,7 @@ Plug 'chrishunt/xterm-color-table.vim'
 
 Plug 'marijnh/tern_for_vim'
 Plug 'w0rp/ale'
+Plug 'neomake/neomake'
 
 Plug 'rizzatti/dash.vim'
 set rtp+=/usr/local/opt/fzf
@@ -87,7 +94,6 @@ Plug 'honza/vim-snippets'
 Plug 'chrisgillis/vim-bootstrap3-snippets'
 Plug 'vimwiki/vimwiki'
 "Plug 'tpope/vim-dispatch'
-Plug 'skywind3000/asyncrun.vim'
 Plug 'junegunn/gv.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
@@ -321,8 +327,8 @@ if has("gui_running")
 else
   set background=dark
   set guifont=Menlo:h12
-  let g:solarized_termtrans=1
-  let g:solarized_termcolors=16
+  " let g:solarized_termtrans=1
+  " let g:solarized_termcolors=16
   let g:solarized_contrast="high"
   let g:solarized_visibility="high"
 endif
@@ -465,9 +471,6 @@ nmap ,wc :call CtrlPWithSearchText(expand('<cword>'), 'CmdPalette')<CR>
 let g:ctrlp_by_filename = 1
 " *** NERDTree ***
 nnoremap <leader>n :NERDTree<CR>
-" *** TAGLIST/TAGBAR ***
-noremap <leader>l :TagbarToggle<CR>
-let g:tagbar_autofocus = 1
 "}}}"
 
 " ******* Git / Fugitive ******* {{{
@@ -864,11 +867,10 @@ inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
 " Recommended key-mappings.
 " <CR>: close popup and save indent.
+
 inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
 function! s:my_cr_function()
   return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-  " For no inserting <CR> key.
-  "return pumvisible() ? "\<C-y>" : "\<CR>"
 endfunction
 "" <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
@@ -895,19 +897,13 @@ let g:jedi#show_call_signatures = 2
 let g:jedi#documentation_command = "DO"
 "}}}
 
-function! s:ExecuteInShell(command)
-  let command = join(map(split(a:command), 'expand(v:val)'))
-  let winnr = bufwinnr('^' . command . '$')
-silent! execute  winnr < 0 ? 'vnew ' . fnameescape(command) : winnr . 'wincmd w'
-  setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
-  echo 'Execute ' . command . '...'
-  silent! execute 'silent %!'. command
-  "silent! execute 'resize ' . line('$')
-  silent! redraw
-  silent! execute 'au BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
-  echo 'Shell command ' . command . ' executed.'
-endfunction
-command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
+" TAGS {{{
+command! TagsRegenerate :NeomakeSh ctags -R --exclude=.git --exclude=log
+" *** TAGLIST/TAGBAR ***
+noremap <leader>l :TagbarToggle<CR>
+let g:tagbar_autofocus = 1
+" }}}
+
 let g:syntastic_ruby_exec = '~/.rvm/rubies/ruby-2.1.0/bin/ruby'
 let g:loaded_rrhelper = 1
 let g:loaded_vimballPlugin = 1
@@ -975,16 +971,6 @@ command! SetTmuxWindowToBufferName :call SetTmuxWindowToBufferName()
 "nnoremap <up> :call FoldingEnter()<CR>
 " }}}
 
-" {{{ Snippets
-
-" Snippets are separated from the engine. Add this if you want them:
-
-let g:UltiSnipsExpandTrigger="<c-j>"
-let g:UltiSnipsJumpForwardTrigger="<c-n>"
-let g:UltiSnipsJumpBackwardTrigger="<c-p>"
-
-" }}}
-
 " {{{ Mappings
 noremap Y y$
 " Leader
@@ -1015,6 +1001,9 @@ let g:vimwiki_table_mappings = 0
 "}}}
 
 " Snippets {{{
+let g:UltiSnipsExpandTrigger="<c-j>"
+let g:UltiSnipsJumpForwardTrigger="<c-n>"
+let g:UltiSnipsJumpBackwardTrigger="<c-p>"
 let g:UltiSnipsExpandTrigger="<C-j>"
 let g:UltiSnipsJumpForwardTrigger="<c-o>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
@@ -1036,6 +1025,10 @@ imap <C-k>     <Plug>(neosnippet_expand_or_jump)
 " \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+let g:neosnippet#snippets_directory = "~/.vim/customsnippets"
+let g:neosnippet#scope_aliases = {}
+let g:neosnippet#scope_aliases['ruby'] = 'ruby,ruby-rails, rails'
+
 "}}}
 
 " For conceal markers.
@@ -1046,14 +1039,7 @@ endif
 let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 
-let g:neosnippet#snippets_directory = "~/.vim/customsnippets"
-let g:neosnippet#scope_aliases = {}
-let g:neosnippet#scope_aliases['ruby'] = 'ruby,ruby-rails, rails'
 
-
-" ******* Experimental *******  {{{
-source $HOME/.vim/experimental.vim
-"}}}
 
 nmap <C-@> gt
 vmap <C-@> cw
@@ -1097,3 +1083,36 @@ if !empty(glob("~/.vim/bundle/vim-colors-solarized/autoload/togglebg.vim"))
   " Change the color scheme here.
   "colorscheme gruvbox
 endif
+
+" ******* Experimental *******  {{{
+source $HOME/.vim/experimental.vim
+"}}}
+" imap <S-Tab> <Plug>delimitMateS-Tab
+cnoremap Qa qa
+
+function! TagOrGrep()
+  try
+    execute(":normal! \<C-]>")
+  catch
+    execute(":Grepper -cword -noprompt -noswitch\<cr>")
+  endtry
+endfunction
+command! TagOrGrep :call TagOrGrep()
+autocmd FileType ruby,eruby,python,javascript,php nnoremap <buffer> <cr> :TagOrGrep<cr>
+" -----------------------------------------------------
+" Deoplete autocomplete settings {{{
+" -----------------------------------------------------
+" let g:deoplete#enable_at_startup=1
+" let g:deoplete#enable_refresh_always=0
+" let g:deoplete#file#enable_buffer_path=1
+
+" let g:deoplete#sources={}
+" let g:deoplete#sources._    = ['buffer', 'file', 'neosnippet']
+" let g:deoplete#sources.ruby = ['buffer', 'member', 'file', 'neosnippet']
+" let g:deoplete#sources.vim  = ['buffer', 'member', 'file', 'neosnippet']
+" let g:deoplete#sources['javascript.jsx'] = ['buffer', 'file', 'neosnippet', 'ternjs']
+" let g:deoplete#sources.css  = ['buffer', 'member', 'file', 'omni', 'neosnippet']
+" let g:deoplete#sources.scss = ['buffer', 'member', 'file', 'omni', 'neosnippet']
+" let g:deoplete#sources.html = ['buffer', 'member', 'file', 'omni', 'neosnippet']
+" inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
+"}}}
