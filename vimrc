@@ -18,19 +18,13 @@ endif
 call plug#begin('~/.vim/bundle')
 
 "Colorscheme
-Plug 'jnurmine/Zenburn'
-Plug 'sonph/onehalf', {'rtp': 'vim/'}
-Plug 'jdkanani/vim-material-theme'
 Plug 'trevordmiller/nova-vim'
-Plug 'NLKNguyen/papercolor-theme'
-Plug 'altercation/vim-colors-solarized'
-Plug 'tpope/vim-vividchalk'
-Plug 'morhetz/gruvbox'
+Plug 'alnjxn/estilo-nova'
 
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
 
-" On-demand loading
+" " On-demand loading
 Plug 'scrooloose/nerdtree'
 
 
@@ -93,12 +87,13 @@ Plug 'tpope/vim-repeat'
 Plug 'honza/vim-snippets'
 Plug 'chrisgillis/vim-bootstrap3-snippets'
 Plug 'vimwiki/vimwiki'
-"Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-dispatch'
 Plug 'junegunn/gv.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
-"Plug 'tpope/vim-eunuch'
-Plug 'takac/vim-hardtime'
+Plug 'tpope/vim-eunuch'
+Plug 'edkolev/tmuxline.vim'
+"Plug 'takac/vim-hardtime'
 call plug#end()
 " }}}"
 
@@ -337,7 +332,7 @@ endif
 " ******* Status Line ******* "{{{
 
 let g:lightline = {
-            \ 'colorscheme': 'solarized',
+            \ 'colorscheme': 'nova',
             \ 'active': {
             \   'left': [ [ 'mode', 'paste' ], [ 'filename' ], ['ctrlpmark'] ],
             \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
@@ -948,16 +943,15 @@ let g:fzf_buffers_jump = 1
 " }}}
 
 " {{{ TMUX
-"Plugin 'edkolev/tmuxline.vim'
-"let g:tmuxline_powerline_separators = 0
-"let g:tmuxline_preset = {
-"      \'a'    : '#S',
-"      \'win'  : '#I #W',
-"      \'cwin' : '#I #W',
-"      \'z'    : '#H',
-"      \'options' : {
-"      \ 'status-justify': 'left'}
-"      \ }
+let g:tmuxline_powerline_separators = 0
+let g:tmuxline_preset = {
+     \'a'    : '#S',
+     \'win'  : '#I #W',
+     \'cwin' : '#I #W',
+     \'z'    : '#H',
+     \'options' : {
+     \ 'status-justify': 'left'}
+     \ }
 "" Automatic rename of tmux window
   "if exists('$TMUX') && !exists('$NORENAME')
     "au BufEnter * if empty(&buftype) | call system('tmux rename-window '.expand('%:t:S')) | endif
@@ -1079,10 +1073,10 @@ set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
 
 "
 if !empty(glob("~/.vim/bundle/vim-colors-solarized/autoload/togglebg.vim"))
-  colorscheme solarized
   " Change the color scheme here.
   "colorscheme gruvbox
 endif
+colorscheme nova
 
 " ******* Experimental *******  {{{
 source $HOME/.vim/experimental.vim
