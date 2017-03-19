@@ -61,12 +61,11 @@ Plug 'pangloss/vim-javascript'
 Plug 'mozilla/doctorjs'
 Plug 'leshill/vim-json'
 Plug 'groenewege/vim-less'
-Plug 'plasticboy/vim-markdown'
 Plug 'lukaszb/vim-web-indent'
 
 "Utils
-Plug 'tomtom/tlib_vim'
-Plug 'MarcWeber/vim-addon-mw-utils'
+" Plug 'tomtom/tlib_vim'
+" Plug 'MarcWeber/vim-addon-mw-utils'
 
 " Easily use quickfix to search and replace bulk files
 Plug 'terryma/vim-expand-region'
@@ -75,7 +74,10 @@ Plug 'tpope/vim-rails'
 Plug 'vim-ruby/vim-ruby'
 Plug 'chrishunt/xterm-color-table.vim'
 
-Plug 'marijnh/tern_for_vim'
+if executable('npm')
+	" Configured in plugins/completion.vim
+	Plug 'ternjs/tern_for_vim', { 'do': 'npm install --global tern', 'for': ['javascript', 'javascript.jsx']  }
+endif
 Plug 'w0rp/ale'
 Plug 'neomake/neomake'
 
@@ -92,7 +94,9 @@ Plug 'junegunn/gv.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
 Plug 'tpope/vim-eunuch'
-Plug 'edkolev/tmuxline.vim'
+Plug 'AndrewRadev/splitjoin.vim' " add gS to smart split lines like comma lists and html tags
+"heavenshell/vim-jsdoc
+"Plug 'edkolev/tmuxline.vim'
 "Plug 'takac/vim-hardtime'
 call plug#end()
 " }}}"
@@ -101,7 +105,7 @@ if has('autocmd')
   filetype plugin indent on
 endif
 
-
+" ******* Files Opener ******* {{{
 if isdirectory($HOME . "/.vim/bundle/nerdtree")
   " *** NERDTree ***
   nnoremap <leader>n :NERDTree<CR>
@@ -112,17 +116,6 @@ if isdirectory($HOME . "/.vim/bundle/fzf.vim")
   nnoremap <leader>p :FZF<CR>
   " quick edit file, useful in log files to quickly go to the file
   nnoremap <leader>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
-  "let g:fzf_colors =
-        "\ { 'fg':      ['fg', 'Normal'],
-        "\ 'bg':      ['bg', 'Normal'],
-        "\ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-        "\ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-        "\ 'info':    ['fg', 'PreProc'],
-        "\ 'prompt':  ['fg', 'Conditional'],
-        "\ 'pointer': ['fg', 'Exception'],
-        "\ 'marker':  ['fg', 'Keyword'],
-        "\ 'spinner': ['fg', 'Label'],
-        "\ 'header':  ['fg', 'Comment'] }
   let g:fzf_files_options =
         \ '--preview "(highlight -O ansi {} || cat {}) 2> /dev/null | head -'.&lines.'"'
 
@@ -158,13 +151,16 @@ elseif isdirectory($HOME . "/.vim/bundle/ctrlp")
   nnoremap <leader>m :CtrlPMRUFiles<CR>
 else
 endif
+"}}}
 
-" gui colors if running iTerm
-"if $TERM_PROGRAM =~ "iTerm"
-  "set termguicolors
-"endif
-"set t_8f=[38;2;%lu;%lu;%lum
-"set t_8b=[48;2;%lu;%lu;%lum
+" ******* TERMINAL SETTINGS ******* "{{{
+if $TERM_PROGRAM =~ "iTerm"
+  set termguicolors
+endif
+set t_8f=[38;2;%lu;%lu;%lum
+set t_8b=[48;2;%lu;%lu;%lum
+"}}}
+
 " ******* Search ******* "{{{
 " Autoscroll to middle of the screen when searching
 autocmd CmdwinEnter * :set scrolloff=9999
@@ -335,7 +331,7 @@ let g:lightline = {
             \ 'colorscheme': 'nova',
             \ 'active': {
             \   'left': [ [ 'mode', 'paste' ], [ 'filename' ], ['ctrlpmark'] ],
-            \   'right': [ [ 'syntastic', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+            \   'right': [ [ 'lint', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
             \ },
             \ 'component_function': {
             \   'fugitive': 'MyFugitive',
@@ -344,6 +340,7 @@ let g:lightline = {
             \   'filetype': 'MyFiletype',
             \   'fileencoding': 'MyFileencoding',
             \   'mode': 'MyMode',
+            \   'lint': 'ale#statusline#Status',
             \   'ctrlpmark': 'CtrlPMark',
             \ },
             \ 'component_expand': {
@@ -490,6 +487,7 @@ function! CD_Git_Root()
     let curdir = getcwd()
     echo 'CWD now set to: '.curdir
 endfunction
+command! GetGitRepo :call Git_Repo_Cdup()
  " change to the git project dir
 nnoremap <leader>gr :call CD_Git_Root()<cr>
 map <leader>gb :Gblame<CR>
@@ -569,7 +567,7 @@ if has("autocmd")
     autocmd FileType xml        set omnifunc=xmlcomplete#CompleteTags
     autocmd FileType python     set omnifunc=pythoncomplete#Complete
     "autocmd FileType php        set omnifunc=phpcomplete#CompletePHP
-    " autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
+    autocmd FileType javascript set omnifunc=javascriptcomplete#CompleteJS
     autocmd FileType sql        setlocal completefunc=sqlcomplete#Complete"
     autocmd FileType * if exists("+omnifunc") && &omnifunc == "" | setlocal omnifunc=syntaxcomplete#Complete | endif
     autocmd FileType * if exists("+completefunc") && &completefunc == "" | setlocal completefunc=syntaxcomplete#Complete | endif
@@ -807,10 +805,14 @@ let g:ackprg = 'ag --nogroup --nocolor --column'
 command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
 nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
 nnoremap <leader>f :Grepper -noswitch<cr>
-"nmap gs  <plug>(GrepperOperator)
-"xmap gs  <plug>(GrepperOperator)
-nnoremap <leader>a :Ag <C-r>=expand("<cword>")<CR><CR>
+nmap gs  <plug>(GrepperOperator)
+xmap gs  <plug>(GrepperOperator)
+nnoremap <leader>a :Ag <C-r>=expand( "<cword>")<CR><CR>
 nnoremap <leader>A :Ag 
+command! Todo :Grepper -noprompt -tool git -grepprg git grep -nIi '\(TODO\|FIXME\)'
+let g:grepper = {}
+" let g:grepper.prompt = 0
+let g:grepper.tools =  ['rg', 'ag', 'ack', 'grep', 'findstr', 'pt', 'sift', 'git']
 
 "}}}
 
@@ -842,8 +844,6 @@ nnoremap <silent> <leader>DC :exe ":profile continue"<cr>
 nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 "}}}
 
-let g:syntastic_javascript_jshint_args = '--config ~/.jshintrc'
-
 " Complete {{{
 
 " Disable AutoComplPop.
@@ -857,6 +857,12 @@ if !exists('g:neocomplete#keyword_patterns')
     let g:neocomplete#keyword_patterns = {}
 endif
 let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+if !exists('g:neocomplete#force_omni_input_patterns')
+  let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.ruby =
+      \ '[^. *\t]\.\w*\|\h\w*::'
+let g:neocomplete#force_omni_input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
@@ -874,7 +880,8 @@ inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 let g:neocomplete#enable_ignore_case = 0
-" AutoComplPop like behavior.
+let tern_show_signature_in_pum = 1
+autocmd CompleteDone * pclose
 
 " Enable omni completion.
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -893,37 +900,27 @@ let g:jedi#documentation_command = "DO"
 "}}}
 
 " TAGS {{{
-command! TagsRegenerate :NeomakeSh ctags -R --exclude=.git --exclude=log
+"command! TagsRegenerate :NeomakeSh ctags -R --exclude=.git --exclude=log
 " *** TAGLIST/TAGBAR ***
 noremap <leader>l :TagbarToggle<CR>
 let g:tagbar_autofocus = 1
 " }}}
 
+" ******* Linter ******* "{{{
 let g:syntastic_ruby_exec = '~/.rvm/rubies/ruby-2.1.0/bin/ruby'
 let g:loaded_rrhelper = 1
 let g:loaded_vimballPlugin = 1
 let g:ale_lint_on_save = 1
 let g:ale_lint_on_text_changed = 0
+"}}}
 
 nnoremap <leader>d :Dash <C-r>=expand("<cword>")<CR><CR>
 
 " FZF {{{ 
 nnoremap <leader>p :FZF<CR>
-nnoremap <space>p :FZF<CR>
 
 " quick edit file, useful in log files to quickly go to the file
 nnoremap <leader>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
 " Replace the default dictionary completion with fzf-based fuzzy completion
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
 if executable('rg')
@@ -943,15 +940,15 @@ let g:fzf_buffers_jump = 1
 " }}}
 
 " {{{ TMUX
-let g:tmuxline_powerline_separators = 0
-let g:tmuxline_preset = {
-     \'a'    : '#S',
-     \'win'  : '#I #W',
-     \'cwin' : '#I #W',
-     \'z'    : '#H',
-     \'options' : {
-     \ 'status-justify': 'left'}
-     \ }
+" let g:tmuxline_powerline_separators = 0
+" let g:tmuxline_preset = {
+"      \'a'    : '#S',
+"      \'win'  : '#I #W',
+"      \'cwin' : '#I #W',
+"      \'z'    : '#H',
+"      \'options' : {
+"      \ 'status-justify': 'left'}
+"      \ }
 "" Automatic rename of tmux window
   "if exists('$TMUX') && !exists('$NORENAME')
     "au BufEnter * if empty(&buftype) | call system('tmux rename-window '.expand('%:t:S')) | endif
@@ -966,7 +963,6 @@ command! SetTmuxWindowToBufferName :call SetTmuxWindowToBufferName()
 " }}}
 
 " {{{ Mappings
-noremap Y y$
 " Leader
 " <leader> e = edit
 " <leader> ev = edit vim
@@ -1003,7 +999,8 @@ let g:UltiSnipsJumpForwardTrigger="<c-o>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
 " Enable snipMate compatibility feature.
- let g:neosnippet#enable_snipmate_compatibility = 1
+let g:neosnippet#enable_snipmate_compatibility = 1
+" let g:neosnippet#disable_runtime_snippets = { '-' : 1, }
  " Plugin key-mappings.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)
@@ -1013,16 +1010,18 @@ xmap <C-k>     <Plug>(neosnippet_expand_target)
 " SuperTab like snippets behavior.
 " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-"imap <expr><TAB>
-" \ pumvisible() ? "\<C-n>" :
-" \ neosnippet#expandable_or_jumpable() ?
-" \    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
 \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-let g:neosnippet#snippets_directory = "~/.vim/customsnippets"
+let g:neosnippet#snippets_directory = "~/.vim/bundle/vim-snippets/snippets,~/.vim/bundle/vim-snippets/snippets, ~/.vim/customsnippets"
 let g:neosnippet#scope_aliases = {}
 let g:neosnippet#scope_aliases['ruby'] = 'ruby,ruby-rails, rails'
+"}}}
 
+" Command Line {{{
+" %% to insert the fodler of  
+cnoremap %% <C-R>=expand('%:h').'/'<CR>
+cnoremap %p <C-R>=expand('%')<CR>
+cnoremap Qa qa
 "}}}
 
 " For conceal markers.
@@ -1033,23 +1032,11 @@ endif
 let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 
-
-
-nmap <C-@> gt
-vmap <C-@> cw
-
-nnoremap gO O<Esc>j
-nnoremap go o<Esc>k
-"imap <D-v> ^O:set paste<Enter>^R+^O:set nopaste<Enter>
-
-nnoremap <space>a gT
 nnoremap <space>t :tabnew<cr>
 " Color name (:help cterm-colors) or ANSI code
  let g:limelight_conceal_ctermfg = 'gray'
  let g:limelight_conceal_ctermfg = 240
 let g:hardtime_default_on = 1
-" %% to insert the fodler of  
-cnoremap %% <C-R>=expand('%:h').'/'<CR>
 command! Rm :call delete(@%) | bdelete!
 " select last paste in visual mode
 nnoremap <expr> gb '`[' . strpart(getregtype(), 0, 1) . '`]'
@@ -1061,39 +1048,31 @@ command! CmdHist call fzf#vim#command_history({'down': '40'})
 " Better search history
 command! QHist call fzf#vim#search_history({'down': '40'})
 
-
-" Makes the background transparent. Leave these out if you're not using a transparent
-" terminal.
-"highlight Normal ctermbg=NONE guibg=NONE
-"highlight NonText ctermbg=NONE guibg=NONE
 command! BBLines call fzf#vim#buffer_lines({'down': '~6'})
 nnoremap \ :BBLines<cr>
 set isfname-==    " remove '=' from filename characters; for completion of FOO=/path/to/file"
 set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
 
-"
-if !empty(glob("~/.vim/bundle/vim-colors-solarized/autoload/togglebg.vim"))
-  " Change the color scheme here.
-  "colorscheme gruvbox
+if !empty(glob("~/.vim/bundle/nova-vim/colors/nova.vim"))
+  colorscheme nova
 endif
-colorscheme nova
 
-" ******* Experimental *******  {{{
-source $HOME/.vim/experimental.vim
-"}}}
 " imap <S-Tab> <Plug>delimitMateS-Tab
-cnoremap Qa qa
 
 function! TagOrGrep()
   try
     execute(":normal! \<C-]>")
   catch
-    execute(":Grepper -cword -noprompt -noswitch\<cr>")
+    execute(":Grepper -cword -tool git -noopen -jump -noprompt -noswitch\<cr>")
   endtry
 endfunction
 command! TagOrGrep :call TagOrGrep()
 autocmd FileType ruby,eruby,python,javascript,php nnoremap <buffer> <cr> :TagOrGrep<cr>
-" -----------------------------------------------------
+
+" ******* Experimental *******  {{{
+source $HOME/.vim/experimental.vim
+"}}}
+
 " Deoplete autocomplete settings {{{
 " -----------------------------------------------------
 " let g:deoplete#enable_at_startup=1
@@ -1110,3 +1089,6 @@ autocmd FileType ruby,eruby,python,javascript,php nnoremap <buffer> <cr> :TagOrG
 " let g:deoplete#sources.html = ['buffer', 'member', 'file', 'omni', 'neosnippet']
 " inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
 "}}}
+let g:ale_sign_error = '!'
+let g:ale_lint_on_enter = 0
+
