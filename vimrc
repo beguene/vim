@@ -20,6 +20,7 @@ call plug#begin('~/.vim/bundle')
 "Colorscheme
 Plug 'trevordmiller/nova-vim'
 Plug 'alnjxn/estilo-nova'
+"https://github.com/Valloric/YouCompleteMe/issues/1751
 
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
@@ -49,8 +50,9 @@ Plug 'mattn/emmet-vim'
 
 Plug 'mileszs/ack.vim'
 
-Plug 'Shougo/neosnippet'
-Plug 'Shougo/neosnippet-snippets'
+" Plug 'Shougo/neosnippet'
+" Plug 'Shougo/neosnippet-snippets'
+Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 "UI
@@ -69,7 +71,6 @@ Plug 'lukaszb/vim-web-indent'
 
 " Easily use quickfix to search and replace bulk files
 Plug 'terryma/vim-expand-region'
-Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-rails'
 Plug 'vim-ruby/vim-ruby'
 Plug 'chrishunt/xterm-color-table.vim'
@@ -445,9 +446,6 @@ let g:ctrlp_buftag_types = {
       \ 'args': '-f -',
       \ }
     \ }
-func! MyCtrlPMappings()
-  nnoremap <buffer> <silent> <c-@> :call <sid>DeleteBuffer()<cr>
-endfunc
 
 " to be able to call CtrlP with default search text
 function! CtrlPWithSearchText(search_text, ctrlp_command_end)
@@ -991,30 +989,39 @@ let g:vimwiki_table_mappings = 0
 "}}}
 
 " Snippets {{{
-let g:UltiSnipsExpandTrigger="<c-j>"
-let g:UltiSnipsJumpForwardTrigger="<c-n>"
-let g:UltiSnipsJumpBackwardTrigger="<c-p>"
-let g:UltiSnipsExpandTrigger="<C-j>"
-let g:UltiSnipsJumpForwardTrigger="<c-o>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+set runtimepath+=~/.vim/customsnippets
+let g:UltiSnipsSnippetsDir='~/.vim/customsnippets'
+let g:UltiSnipsJumpForwardTrigger="<C-k>"
+let g:UltiSnipsJumpBackwardTrigger="<C-j>"
+let g:UltiSnipsExpandTrigger="<nop>"
+let g:ulti_expand_or_jump_res = 0
+function! <SID>ExpandSnippetOrReturn()
+  let snippet = UltiSnips#ExpandSnippetOrJump()
+  if g:ulti_expand_or_jump_res > 0
+    return snippet
+  else
+    return "\<C-Y>"
+  endif
+endfunction
+imap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "<Plug>delimitMateCR"
 
 " Enable snipMate compatibility feature.
-let g:neosnippet#enable_snipmate_compatibility = 1
-" let g:neosnippet#disable_runtime_snippets = { '-' : 1, }
- " Plugin key-mappings.
-" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
+" let g:neosnippet#enable_snipmate_compatibility = 1
+" " let g:neosnippet#disable_runtime_snippets = { '-' : 1, }
+"  " Plugin key-mappings.
+" " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+" imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+" smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+" xmap <C-k>     <Plug>(neosnippet_expand_target)
 
-" SuperTab like snippets behavior.
-" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-let g:neosnippet#snippets_directory = "~/.vim/bundle/vim-snippets/snippets,~/.vim/bundle/vim-snippets/snippets, ~/.vim/customsnippets"
-let g:neosnippet#scope_aliases = {}
-let g:neosnippet#scope_aliases['ruby'] = 'ruby,ruby-rails, rails'
+" " SuperTab like snippets behavior.
+" " Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+" imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+" smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+" \ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+" let g:neosnippet#snippets_directory = "~/.vim/bundle/vim-snippets/snippets,~/.vim/bundle/vim-snippets/snippets, ~/.vim/customsnippets"
+" let g:neosnippet#scope_aliases = {}
+" let g:neosnippet#scope_aliases['ruby'] = 'ruby,ruby-rails, rails'
 "}}}
 
 " Command Line {{{
