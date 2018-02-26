@@ -102,6 +102,7 @@ Plug 'AndrewRadev/splitjoin.vim' " add gS to smart split lines like comma lists 
 "Plug 'edkolev/tmuxline.vim'
 "Plug 'takac/vim-hardtime'
 Plug 'leafgarland/typescript-vim'
+Plug 'othree/html5.vim'
 call plug#end()
 " }}}"
 
@@ -126,6 +127,33 @@ if isdirectory($HOME . "/.vim/bundle/fzf.vim")
   let g:fzf_layout = { 'down': '~10%' }
   let g:fzf_buffers_jump = 1
   nnoremap <leader>m :History<CR>
+
+  function! s:build_quickfix_list(lines)
+    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+    copen
+    cc
+  endfunction
+  let g:fzf_action = {
+        \ 'ctrl-q': function('s:build_quickfix_list'),
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-x': 'split',
+        \ 'ctrl-v': 'vsplit' }
+
+  let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
+  let g:fzf_colors =
+        \ { "fg":      ["fg", "Normal"],
+        \ "bg":      ["bg", "Normal"],
+        \ "hl":      ["fg", "IncSearch"],
+        \ "fg+":     ["fg", "CursorLine", "CursorColumn", "Normal"],
+        \ "bg+":     ["bg", "CursorLine", "CursorColumn"],
+        \ "hl+":     ["fg", "IncSearch"],
+        \ "info":    ["fg", "IncSearch"],
+        \ "border":  ["fg", "Ignore"],
+        \ "prompt":  ["fg", "Comment"],
+        \ "pointer": ["fg", "IncSearch"],
+        \ "marker":  ["fg", "IncSearch"],
+        \ "spinner": ["fg", "IncSearch"],
+        \ "header":  ["fg", "WildMenu"] }
 elseif isdirectory($HOME . "/.vim/bundle/ctrlp")
   let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
   let g:ctrlp_working_path_mode = 2
@@ -153,6 +181,7 @@ elseif isdirectory($HOME . "/.vim/bundle/ctrlp")
   nnoremap <leader>p :CtrlP<CR>
   nnoremap <leader>k :CtrlPBuffer<CR>
   nnoremap <leader>m :CtrlPMRUFiles<CR>
+
 else
 endif
 "}}}
@@ -334,7 +363,7 @@ endif
 let g:lightline = {
             \ 'colorscheme': 'nova',
             \ 'active': {
-            \   'left': [ [ 'mode', 'paste' ], [ 'filename' ]],
+            \   'left': [ [ 'mode', 'paste' ], [ 'filename', 'modified' ]],
             \   'right': [ [ 'lint', 'lineinfo' ], ['percent'], [ 'filetype' ] ]
             \ },
             \ 'component_function': {
@@ -804,11 +833,13 @@ if executable('ack') || executable('ag')
 endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
 command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
-nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
+" nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
+" nnoremap <leader>f :Grepper -query ""<left>
+nnoremap <silent> <Leader>a :Ag <C-R><C-W><CR>
 nnoremap <leader>f :Grepper -query ""<left>
 nmap gs  <plug>(GrepperOperator)
 xmap gs  <plug>(GrepperOperator)
-nnoremap <leader>a :Ag <C-r>=expand( "<cword>")<CR><CR>
+" nnoremap <leader>a :Ag <C-r>=expand( "<cword>")<CR><CR>
 nnoremap <leader>A :Ag 
 command! Todo :Grepper -noprompt -tool git -grepprg git grep -nIi '\(TODO\|FIXME\)'
 let g:grepper = {}
@@ -852,15 +883,15 @@ let g:neocomplete#enable_at_startup = 1
 " Set minimum syntax keyword length.
 "let g:neocomplete#sources#syntax#min_keyword_length = 3
 " Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-if !exists('g:neocomplete#force_omni_input_patterns')
-  let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.ruby =
-      \ '[^. *\t]\.\w*\|\h\w*::'
+" if !exists('g:neocomplete#keyword_patterns')
+"     let g:neocomplete#keyword_patterns = {}
+" endif
+" let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+" if !exists('g:neocomplete#force_omni_input_patterns')
+"   let g:neocomplete#force_omni_input_patterns = {}
+" endif
+" let g:neocomplete#force_omni_input_patterns.ruby =
+"       \ '[^. *\t]\.\w*\|\h\w*::'
 "let g:neocomplete#force_omni_input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
@@ -1068,11 +1099,12 @@ endif
 " imap <S-Tab> <Plug>delimitMateS-Tab
 
 function! TagOrGrep()
-  try
-    execute(":normal! \<C-]>")
-  catch
-    execute(":Grepper -cword -tool git -noopen -jump -noprompt -noswitch\<cr>")
-  endtry
+  call fzf#vim#ag(expand('<cword>'))
+  " try
+  "   execute(":Ag \<C-R>\<C-W>\<CR>")
+  " catch
+  "   execute(":Ag \<C-R>\<C-W>\<CR>")
+  " endtry
 endfunction
 command! TagOrGrep :call TagOrGrep()
 autocmd FileType ruby,eruby,python,javascript,php nnoremap <buffer> <cr> :TagOrGrep<cr>
@@ -1083,6 +1115,7 @@ source $HOME/.vim/experimental.vim
 
 let g:ale_sign_error = '!'
 let g:ale_lint_on_enter = 0
+let g:ale_set_highlights = 0
 " go to previous buffer
 nnoremap <leader>v :b#<CR>
 
@@ -1097,3 +1130,36 @@ nmap ga <Plug>(EasyAlign)
 " Very long lines will cause performance problems with Vim. One of the main
 " culprits for this performance issue is the syntax highlighter
 set synmaxcol=200
+autocmd BufNewFile,BufRead *.vue set filetype=html.javascript.vue
+
+function! DeleteEmptyBuffers()
+    let [i, n; empty] = [1, bufnr('$')]
+    while i <= n
+        if bufexists(i) && bufname(i) == ''
+            call add(empty, i)
+        endif
+        let i += 1
+    endwhile
+    if len(empty) > 0
+        exe 'bdelete' join(empty)
+    endif
+endfunction
+command! DeleteEmptyBuffers :call DeleteEmptyBuffers()
+
+" TODO
+" Remove Grepper, use only Fzf
+nnoremap <leader>x :call fzf#vim#tags(expand('<cword>'), {'options': '--exact --select-1 --exit-0'})<CR>
+nnoremap <leader>o :BTags<CR>
+
+" function! SearchVisualSelectionWithAg() range
+"   let old_reg = getreg('"')
+"   let old_regtype = getregtype('"')
+"   let old_clipboard = &clipboard
+"   set clipboard&
+"   normal! ""gvy
+"   let selection = getreg('"')
+"   call setreg('"', old_reg, old_regtype)
+"   let &clipboard = old_clipboard
+"   execute 'Ag' selection
+" endfunction
+imap <C-x><C-l> <plug>(fzf-complete-line)

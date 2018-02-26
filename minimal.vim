@@ -102,6 +102,7 @@ set wildignore=.svn,CVS,.git,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.
 set wildignore+=tags
 set wildignore+=*/tmp/*
 set wildignore+=*/vendor/*
+set wildignore+=**/node_modules/**
 set confirm
 set ttyfast
 set showcmd
