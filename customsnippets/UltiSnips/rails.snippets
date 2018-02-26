@@ -1,0 +1,39 @@
+snippet claco "Create concern class"
+module ${1:Concern}
+  extend ActiveSupport::Concern
+
+  included do
+    # scope :disabled, -> { where(disabled: true) }
+  end
+
+  module ClassMethods
+		$2
+  end
+end
+endsnippet
+snippet scop "scope , ->"
+scope :${1:name}, -> (${2:param})  { ${3:where(${4::${5:field} => ${6:"${7:value}"}})} }
+endsnippet
+
+snippet rename_col "DB Rename Column" b
+rename_column :${1:table_name}, :${2:old_column}, :${3:new_column}
+endsnippet
+snippet change "DB Change Column" b
+change_column(:${1:table_name}, :${2:field}, :${3:string}, ${4: limit: 80})
+endsnippet
+snippet change_column_default "DB Change Column Default" b
+change_column_default(:${1:table_name}, :${2:field}, ${3:"default_value"})
+endsnippet
+
+snippet bk "Breakpoint pry" b
+binding.pry
+endsnippet
+
+snippet bkb "Breakpoint byebug" b
+byebug
+endsnippet
+
+snippet has_many "has_many dependent destroy" b
+has_many :${1:objects}, dependent: :destroy
+$0
+endsnippet

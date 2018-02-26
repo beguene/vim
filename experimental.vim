@@ -29,10 +29,10 @@ function! Async(command, opts)
     execute ':buffer '.buf_num
   endif
 
-  if get(opts, 'filetype', '') ==# ''
-  else
-    execute buf_num . ':bufdo set ft='.get(opts, 'filetype', '')
-  endif
+  " if get(opts, 'filetype', '') ==# ''
+  " else
+  "   execute buf_num . ':bufdo set ft='.get(opts, 'filetype', '')
+  " endif
 
 endfunction
 
@@ -64,3 +64,25 @@ command! RunCurrentSpecFile            call RunCurrentSpecFile()
 " nnoremap <leader>8         8gt
 " nnoremap <leader>9         9gt
 " nnoremap <leader>0         0gt
+"
+function! InsertTextBefore(name)
+  :normal! O
+  execute "normal! i" . a:name . "\<esc>"
+endfunction
+command! InsertBreakpoint call InsertTextBefore('binding.pry')
+
+nnoremap <leader>bk :InsertBreakpoint<cr>
+
+augroup VIMRC
+  autocmd!
+
+  autocmd BufLeave *.css  normal! mC
+  autocmd BufLeave *.scss  normal! mC
+  autocmd BufLeave *.html normal! mH
+  autocmd BufLeave *.erb normal! mH
+  autocmd BufLeave *.js   normal! mJ
+  autocmd BufLeave *.php  normal! mP
+  autocmd BufLeave *.log  normal! mL
+  autocmd BufLeave *.rb  normal! mR
+  autocmd BufLeave *_spec.rb  normal! mT
+augroup END

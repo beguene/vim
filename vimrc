@@ -38,12 +38,14 @@ else
   Plug 'Shougo/neocomplete.vim'
 end
 
+Plug 'posva/vim-vue'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-abolish'
 Plug 'milkypostman/vim-togglelist'
 Plug 'Raimondi/delimitMate'
+Plug 'junegunn/vim-easy-align'
 
 Plug 'majutsushi/tagbar'
 Plug 'mattn/emmet-vim'
@@ -75,10 +77,10 @@ Plug 'tpope/vim-rails'
 Plug 'vim-ruby/vim-ruby'
 Plug 'chrishunt/xterm-color-table.vim'
 
-if executable('npm')
-	" Configured in plugins/completion.vim
-	Plug 'ternjs/tern_for_vim', { 'do': 'npm install --global tern', 'for': ['javascript', 'javascript.jsx']  }
-endif
+" if executable('npm')
+" 	" Configured in plugins/completion.vim
+" 	Plug 'ternjs/tern_for_vim', { 'do': 'npm install --global tern', 'for': ['javascript', 'javascript.jsx']  }
+" endif
 Plug 'w0rp/ale'
 Plug 'neomake/neomake'
 
@@ -99,6 +101,7 @@ Plug 'AndrewRadev/splitjoin.vim' " add gS to smart split lines like comma lists 
 "heavenshell/vim-jsdoc
 "Plug 'edkolev/tmuxline.vim'
 "Plug 'takac/vim-hardtime'
+Plug 'leafgarland/typescript-vim'
 call plug#end()
 " }}}"
 
@@ -331,18 +334,14 @@ endif
 let g:lightline = {
             \ 'colorscheme': 'nova',
             \ 'active': {
-            \   'left': [ [ 'mode', 'paste' ], [ 'filename' ], ['ctrlpmark'] ],
-            \   'right': [ [ 'lint', 'lineinfo' ], ['percent'], [ 'fileformat', 'fileencoding', 'filetype' ] ]
+            \   'left': [ [ 'mode', 'paste' ], [ 'filename' ]],
+            \   'right': [ [ 'lint', 'lineinfo' ], ['percent'], [ 'filetype' ] ]
             \ },
             \ 'component_function': {
             \   'fugitive': 'MyFugitive',
-            \   'filename': 'MyFilename',
-            \   'fileformat': 'MyFileformat',
             \   'filetype': 'MyFiletype',
-            \   'fileencoding': 'MyFileencoding',
             \   'mode': 'MyMode',
             \   'lint': 'ale#statusline#Status',
-            \   'ctrlpmark': 'CtrlPMark',
             \ },
             \ 'component_expand': {
             \   'syntastic': 'SyntasticStatuslineFlag',
@@ -352,6 +351,10 @@ let g:lightline = {
             \ },
             \ 'subseparator': { 'left': '|', 'right': '|' }
             \ }
+
+function! MyModified()
+    return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
 
 function! MyModified()
     return &ft =~ 'help' ? '' : &modified ? '+' : &modifiable ? '' : '-'
@@ -802,7 +805,7 @@ endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
 command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
 nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
-nnoremap <leader>f :Grepper -noswitch<cr>
+nnoremap <leader>f :Grepper -query ""<left>
 nmap gs  <plug>(GrepperOperator)
 xmap gs  <plug>(GrepperOperator)
 nnoremap <leader>a :Ag <C-r>=expand( "<cword>")<CR><CR>
@@ -844,8 +847,6 @@ nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 
 " Complete {{{
 
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
 "" Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
 " Set minimum syntax keyword length.
@@ -860,17 +861,17 @@ if !exists('g:neocomplete#force_omni_input_patterns')
 endif
 let g:neocomplete#force_omni_input_patterns.ruby =
       \ '[^. *\t]\.\w*\|\h\w*::'
-let g:neocomplete#force_omni_input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
+"let g:neocomplete#force_omni_input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
 " Recommended key-mappings.
 " <CR>: close popup and save indent.
 
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function()
-  return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-endfunction
+" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+" function! s:my_cr_function()
+"   return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+" endfunction
 "" <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
@@ -878,14 +879,16 @@ inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 let g:neocomplete#enable_ignore_case = 0
+let g:neocomplete#fallback_mappings =
+      \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 let tern_show_signature_in_pum = 1
 autocmd CompleteDone * pclose
 
 " Enable omni completion.
 autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
 autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-"autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType javascript setlocal omnifunc=tern#Complete
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+" autocmd FileType javascript setlocal omnifunc=tern#Complete
 autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
@@ -990,12 +993,13 @@ let g:vimwiki_table_mappings = 0
 
 " Snippets {{{
 set runtimepath+=~/.vim/customsnippets
-let g:UltiSnipsSnippetsDir='~/.vim/customsnippets'
+let g:UltiSnipsSnippetsDir='~/.vim/customsnippets/UltiSnips'
 let g:UltiSnipsJumpForwardTrigger="<C-k>"
 let g:UltiSnipsJumpBackwardTrigger="<C-j>"
-let g:UltiSnipsExpandTrigger="<nop>"
+let g:UltiSnipsExpandTrigger="<c-h>"
 let g:ulti_expand_or_jump_res = 0
 function! <SID>ExpandSnippetOrReturn()
+  echomsg "HELLOWOW"
   let snippet = UltiSnips#ExpandSnippetOrJump()
   if g:ulti_expand_or_jump_res > 0
     return snippet
@@ -1035,9 +1039,6 @@ cnoremap Qa qa
 if has('conceal')
   set conceallevel=2 concealcursor=niv
 endif
-
-let g:neocomplete#fallback_mappings =
-      \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
 
 nnoremap <space>t :tabnew<cr>
 " Color name (:help cterm-colors) or ANSI code
@@ -1080,22 +1081,19 @@ autocmd FileType ruby,eruby,python,javascript,php nnoremap <buffer> <cr> :TagOrG
 source $HOME/.vim/experimental.vim
 "}}}
 
-" Deoplete autocomplete settings {{{
-" -----------------------------------------------------
-" let g:deoplete#enable_at_startup=1
-" let g:deoplete#enable_refresh_always=0
-" let g:deoplete#file#enable_buffer_path=1
-
-" let g:deoplete#sources={}
-" let g:deoplete#sources._    = ['buffer', 'file', 'neosnippet']
-" let g:deoplete#sources.ruby = ['buffer', 'member', 'file', 'neosnippet']
-" let g:deoplete#sources.vim  = ['buffer', 'member', 'file', 'neosnippet']
-" let g:deoplete#sources['javascript.jsx'] = ['buffer', 'file', 'neosnippet', 'ternjs']
-" let g:deoplete#sources.css  = ['buffer', 'member', 'file', 'omni', 'neosnippet']
-" let g:deoplete#sources.scss = ['buffer', 'member', 'file', 'omni', 'neosnippet']
-" let g:deoplete#sources.html = ['buffer', 'member', 'file', 'omni', 'neosnippet']
-" inoremap <expr><BS>  deoplete#smart_close_popup()."\<C-h>"
-"}}}
 let g:ale_sign_error = '!'
 let g:ale_lint_on_enter = 0
+" go to previous buffer
+nnoremap <leader>v :b#<CR>
 
+augroup filetypedetect
+  au! BufRead,BufNewFile *_spec.rb		set filetype=ruby.rspec
+augroup END
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+" Very long lines will cause performance problems with Vim. One of the main
+" culprits for this performance issue is the syntax highlighter
+set synmaxcol=200
