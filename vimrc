@@ -21,6 +21,9 @@ call plug#begin()
 "Colorscheme
 Plug 'trevordmiller/nova-vim'
 Plug 'alnjxn/estilo-nova'
+Plug 'sheerun/vim-polyglot'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
 
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
@@ -39,7 +42,7 @@ else
   Plug 'Shougo/neocomplete.vim'
 end
 
-Plug 'posva/vim-vue'
+" Plug 'posva/vim-vue'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
@@ -62,15 +65,15 @@ Plug 'honza/vim-snippets'
 Plug 'jszakmeister/vim-togglecursor'
 
 " Languages
-Plug 'pangloss/vim-javascript'
-Plug 'leshill/vim-json'
-Plug 'groenewege/vim-less'
-Plug 'lukaszb/vim-web-indent'
+" Plug 'pangloss/vim-javascript'
+" Plug 'leshill/vim-json'
+" Plug 'groenewege/vim-less'
+" Plug 'lukaszb/vim-web-indent'
 
 " Easily use quickfix to search and replace bulk files
 Plug 'terryma/vim-expand-region'
 Plug 'tpope/vim-rails'
-Plug 'vim-ruby/vim-ruby'
+" Plug 'vim-ruby/vim-ruby'
 Plug 'chrishunt/xterm-color-table.vim'
 
 " if executable('npm')
@@ -96,7 +99,7 @@ Plug 'AndrewRadev/splitjoin.vim' " add gS to smart split lines like comma lists 
 "Plug 'edkolev/tmuxline.vim'
 "Plug 'takac/vim-hardtime'
 " Plug 'leafgarland/typescript-vim'
-Plug 'othree/html5.vim'
+"Plug 'othree/html5.vim'
 call plug#end()
 " }}}"
 
@@ -877,7 +880,7 @@ nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 "" Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
 " Set minimum syntax keyword length.
-"let g:neocomplete#sources#syntax#min_keyword_length = 3
+let g:neocomplete#sources#syntax#min_keyword_length = 2
 " Define keyword.
 " if !exists('g:neocomplete#keyword_patterns')
 "     let g:neocomplete#keyword_patterns = {}
@@ -890,6 +893,8 @@ let g:neocomplete#enable_at_startup = 1
 "       \ '[^. *\t]\.\w*\|\h\w*::'
 "let g:neocomplete#force_omni_input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
 let g:neocomplete#auto_complete_delay = 300
+
+let g:neocomplete#auto_completion_start_length = 2
 
 "
 " Plugin key-mappings.
@@ -1156,3 +1161,4 @@ imap <C-x><C-l> <plug>(fzf-complete-line)
 if has("gui_running")
   cd ~/notes
 end
+set autowriteall
