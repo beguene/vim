@@ -15,18 +15,19 @@ if empty(glob("~/.vim/autoload/plug.vim"))
 	auto VimEnter * PlugInstall
 endif
 " Specify a directory for plugins (for Neovim: ~/.local/share/nvim/plugged)
-call plug#begin('~/.vim/bundle')
+" call plug#begin('~/.vim/bundle')
+call plug#begin()
 
 "Colorscheme
 Plug 'trevordmiller/nova-vim'
 Plug 'alnjxn/estilo-nova'
-"https://github.com/Valloric/YouCompleteMe/issues/1751
 
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
 
 " " On-demand loading
 Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-rhubarb'
 
 
 " Initialize plugin system
@@ -62,14 +63,9 @@ Plug 'jszakmeister/vim-togglecursor'
 
 " Languages
 Plug 'pangloss/vim-javascript'
-Plug 'mozilla/doctorjs'
 Plug 'leshill/vim-json'
 Plug 'groenewege/vim-less'
 Plug 'lukaszb/vim-web-indent'
-
-"Utils
-" Plug 'tomtom/tlib_vim'
-" Plug 'MarcWeber/vim-addon-mw-utils'
 
 " Easily use quickfix to search and replace bulk files
 Plug 'terryma/vim-expand-region'
@@ -89,19 +85,17 @@ set rtp+=/usr/local/opt/fzf
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-repeat'
-Plug 'honza/vim-snippets'
 Plug 'chrisgillis/vim-bootstrap3-snippets'
 Plug 'vimwiki/vimwiki'
 Plug 'tpope/vim-dispatch'
 Plug 'junegunn/gv.vim'
 Plug 'junegunn/goyo.vim'
-Plug 'junegunn/limelight.vim'
 Plug 'tpope/vim-eunuch'
 Plug 'AndrewRadev/splitjoin.vim' " add gS to smart split lines like comma lists and html tags
 "heavenshell/vim-jsdoc
 "Plug 'edkolev/tmuxline.vim'
 "Plug 'takac/vim-hardtime'
-Plug 'leafgarland/typescript-vim'
+" Plug 'leafgarland/typescript-vim'
 Plug 'othree/html5.vim'
 call plug#end()
 " }}}"
@@ -111,13 +105,13 @@ if has('autocmd')
 endif
 
 " ******* Files Opener ******* {{{
-if isdirectory($HOME . "/.vim/bundle/nerdtree")
+if isdirectory($HOME . "/.vim/plugged/nerdtree")
   " *** NERDTree ***
   nnoremap <leader>n :NERDTree<CR>
   let NERDTreeHijackNetrw=1
 endif
 
-if isdirectory($HOME . "/.vim/bundle/fzf.vim")
+if isdirectory($HOME . "/.vim/plugged/fzf.vim") && !has("gui_running")
   nnoremap <leader>p :FZF<CR>
   " quick edit file, useful in log files to quickly go to the file
   nnoremap <leader>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
@@ -154,7 +148,7 @@ if isdirectory($HOME . "/.vim/bundle/fzf.vim")
         \ "marker":  ["fg", "IncSearch"],
         \ "spinner": ["fg", "IncSearch"],
         \ "header":  ["fg", "WildMenu"] }
-elseif isdirectory($HOME . "/.vim/bundle/ctrlp")
+elseif isdirectory($HOME . "/.vim/plugged/ctrlp.vim")
   let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
   let g:ctrlp_working_path_mode = 2
   let g:ctrlp_custom_ignore = {
@@ -322,7 +316,7 @@ set scrolloff=6 " keep at least 6 lines above/below
 if &t_Co > 2 || has("gui_running")
   syntax on
   set hlsearch
-  au GUIEnter * set fullscreen
+  " au GUIEnter * set fullscreen
 endif
 if &diff
   syntax off
@@ -343,11 +337,12 @@ if has("gui_running")
       set guifont=Consolas:h11,Courier\ New:h10
     endif
   endif
-  set guioptions=abirLb
-  set guioptions-=T
+  set guioptions=
+  " set guioptions=abirLb
+  " set guioptions-=T
   set guifont=Menlo:h12
-  set guioptions-=r
-  set guioptions-=L
+  " set guioptions-=r
+  " set guioptions-=L
 else
   set background=dark
   set guifont=Menlo:h12
@@ -471,7 +466,6 @@ nnoremap <leader>k :Buffers<CR>
 hi CursorLine cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 hi PmenuSel cterm=NONE ctermbg=93 ctermfg=white guibg=darkred guifg=white
 " Delete buffer on CtrlPBuffer
-let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
 let g:ctrlp_buftag_types = {
     \ 'javascript' : {
       \ 'bin': 'jsctags',
@@ -833,14 +827,16 @@ if executable('ack') || executable('ag')
 endif
 let g:ackprg = 'ag --nogroup --nocolor --column'
 command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
-" nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
-" nnoremap <leader>f :Grepper -query ""<left>
-nnoremap <silent> <Leader>a :Ag <C-R><C-W><CR>
+if isdirectory($HOME . "/.vim/plugged/fzf.vim")
+  nnoremap <leader>a :Ag <C-R><C-W>
+  nnoremap <leader>A :Ag 
+end
+nnoremap <leader>a :Grepper -cword -noprompt -noswitch<cr>
 nnoremap <leader>f :Grepper -query ""<left>
+" nnoremap <leader>f :Grepper -query ""<left>
 nmap gs  <plug>(GrepperOperator)
 xmap gs  <plug>(GrepperOperator)
-" nnoremap <leader>a :Ag <C-r>=expand( "<cword>")<CR><CR>
-nnoremap <leader>A :Ag 
+" nnoremap <leader>a :Ag <C-r>=expand( "<cword>")<CR>
 command! Todo :Grepper -noprompt -tool git -grepprg git grep -nIi '\(TODO\|FIXME\)'
 let g:grepper = {}
 " let g:grepper.prompt = 0
@@ -893,26 +889,25 @@ let g:neocomplete#enable_at_startup = 1
 " let g:neocomplete#force_omni_input_patterns.ruby =
 "       \ '[^. *\t]\.\w*\|\h\w*::'
 "let g:neocomplete#force_omni_input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
+let g:neocomplete#auto_complete_delay = 300
+
+"
 " Plugin key-mappings.
 inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-
-" inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-" function! s:my_cr_function()
-"   return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-" endfunction
 "" <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr><C-@> neocomplete#start_manual_complete()
 " <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 let g:neocomplete#enable_ignore_case = 0
+let g:neocomplete#max_keyword_width = 150
+" let g:neocomplete#disable_auto_complete = 1
+
 let g:neocomplete#fallback_mappings =
       \ ["\<C-x>\<C-o>", "\<C-x>\<C-n>"]
-let tern_show_signature_in_pum = 1
 autocmd CompleteDone * pclose
 
 " Enable omni completion.
@@ -924,11 +919,6 @@ autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
 autocmd FileType python setlocal omnifunc=jedi#completions
-
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#show_call_signatures = 2
-let g:jedi#documentation_command = "DO"
 "}}}
 
 " TAGS {{{
@@ -939,7 +929,6 @@ let g:tagbar_autofocus = 1
 " }}}
 
 " ******* Linter ******* "{{{
-let g:syntastic_ruby_exec = '~/.rvm/rubies/ruby-2.1.0/bin/ruby'
 let g:loaded_rrhelper = 1
 let g:loaded_vimballPlugin = 1
 let g:ale_lint_on_save = 1
@@ -949,10 +938,7 @@ let g:ale_lint_on_text_changed = 0
 nnoremap <leader>d :Dash <C-r>=expand("<cword>")<CR><CR>
 
 " FZF {{{ 
-nnoremap <leader>p :FZF<CR>
 
-" quick edit file, useful in log files to quickly go to the file
-nnoremap <leader>e :FZF -1 -0 --query '<C-r>=expand("<cWORD>")<CR>'<CR>
 " Replace the default dictionary completion with fzf-based fuzzy completion
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
 if executable('rg')
@@ -1006,6 +992,7 @@ nnoremap <space><space> <c-w><c-w>
 nnoremap <space>m :History<CR>
 nnoremap <space>k :tabnext<cr>
 nnoremap <space>j :tabprevious<cr>
+nnoremap <space>a :b#
 nnoremap <leader>s ysiw
 nnoremap <Leader><Leader> :wa<cr>
 nnoremap <Leader>q :quit<CR>
@@ -1073,10 +1060,9 @@ endif
 
 nnoremap <space>t :tabnew<cr>
 " Color name (:help cterm-colors) or ANSI code
- let g:limelight_conceal_ctermfg = 'gray'
- let g:limelight_conceal_ctermfg = 240
+let g:limelight_conceal_ctermfg = 'gray'
+let g:limelight_conceal_ctermfg = 240
 let g:hardtime_default_on = 1
-command! Rm :call delete(@%) | bdelete!
 " select last paste in visual mode
 nnoremap <expr> gb '`[' . strpart(getregtype(), 0, 1) . '`]'
 autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1 
@@ -1092,19 +1078,16 @@ nnoremap \ :BBLines<cr>
 set isfname-==    " remove '=' from filename characters; for completion of FOO=/path/to/file"
 set synmaxcol=1000  " don't syntax-highlight long lines (default: 3000)
 
-if !empty(glob("~/.vim/bundle/nova-vim/colors/nova.vim"))
+if !empty(glob("~/.vim/plugged/nova-vim/colors/nova.vim"))
   colorscheme nova
 endif
 
-" imap <S-Tab> <Plug>delimitMateS-Tab
-
 function! TagOrGrep()
-  call fzf#vim#ag(expand('<cword>'))
-  " try
-  "   execute(":Ag \<C-R>\<C-W>\<CR>")
-  " catch
-  "   execute(":Ag \<C-R>\<C-W>\<CR>")
-  " endtry
+  try
+    execute(":normal! \<C-]>")
+  catch
+    call fzf#vim#ag(expand('<cword>'))
+  endtry
 endfunction
 command! TagOrGrep :call TagOrGrep()
 autocmd FileType ruby,eruby,python,javascript,php nnoremap <buffer> <cr> :TagOrGrep<cr>
@@ -1116,6 +1099,9 @@ source $HOME/.vim/experimental.vim
 let g:ale_sign_error = '!'
 let g:ale_lint_on_enter = 0
 let g:ale_set_highlights = 0
+let g:ale_fixers = {
+  \ 'javascript': ['eslint']
+  \ }
 " go to previous buffer
 nnoremap <leader>v :b#<CR>
 
@@ -1148,6 +1134,8 @@ command! DeleteEmptyBuffers :call DeleteEmptyBuffers()
 
 " TODO
 " Remove Grepper, use only Fzf
+" Make Ag from word from FzF a command line to save history
+" K should always have quickfix full width (:bot copen)
 nnoremap <leader>x :call fzf#vim#tags(expand('<cword>'), {'options': '--exact --select-1 --exit-0'})<CR>
 nnoremap <leader>o :BTags<CR>
 
@@ -1163,3 +1151,8 @@ nnoremap <leader>o :BTags<CR>
 "   execute 'Ag' selection
 " endfunction
 imap <C-x><C-l> <plug>(fzf-complete-line)
+
+
+if has("gui_running")
+  cd ~/notes
+end

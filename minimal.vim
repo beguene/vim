@@ -319,9 +319,6 @@ nnoremap <leader>p :Explore<CR>
 nnoremap <leader>n :Explore<CR>
 " }}}
 
-" ******* TAB ******* {{{
-" }}}
-
 " Disable useless {{{
 set mouse=
 set nomousef
