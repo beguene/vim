@@ -20,15 +20,14 @@ call plug#begin()
 
 "Colorscheme
 Plug 'trevordmiller/nova-vim'
+Plug 'lifepillar/vim-solarized8'
 Plug 'alnjxn/estilo-nova'
 Plug 'sheerun/vim-polyglot'
-Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
 
-" " On-demand loading
 Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-rhubarb'
 
@@ -56,19 +55,11 @@ Plug 'mattn/emmet-vim'
 
 Plug 'mileszs/ack.vim'
 
-" Plug 'Shougo/neosnippet'
-" Plug 'Shougo/neosnippet-snippets'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 "UI
 Plug 'jszakmeister/vim-togglecursor'
-
-" Languages
-" Plug 'pangloss/vim-javascript'
-" Plug 'leshill/vim-json'
-" Plug 'groenewege/vim-less'
-" Plug 'lukaszb/vim-web-indent'
 
 " Easily use quickfix to search and replace bulk files
 Plug 'terryma/vim-expand-region'
@@ -184,7 +175,7 @@ endif
 "}}}
 
 " ******* TERMINAL SETTINGS ******* "{{{
-if $TERM_PROGRAM =~ "iTerm"
+if $TERM_PROGRAM =~ "iTerm.app"
   set termguicolors
 endif
 set t_8f=[38;2;%lu;%lu;%lum
@@ -880,7 +871,7 @@ nnoremap <silent> <leader>DQ :exe ":profile pause"<cr>:noautocmd qall!<cr>
 "" Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
 " Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 2
+" let g:neocomplete#sources#syntax#min_keyword_length = 2
 " Define keyword.
 " if !exists('g:neocomplete#keyword_patterns')
 "     let g:neocomplete#keyword_patterns = {}
@@ -894,7 +885,7 @@ let g:neocomplete#sources#syntax#min_keyword_length = 2
 "let g:neocomplete#force_omni_input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
 let g:neocomplete#auto_complete_delay = 300
 
-let g:neocomplete#auto_completion_start_length = 2
+" let g:neocomplete#auto_completion_start_length = 2
 
 "
 " Plugin key-mappings.
@@ -1121,7 +1112,7 @@ nmap ga <Plug>(EasyAlign)
 " Very long lines will cause performance problems with Vim. One of the main
 " culprits for this performance issue is the syntax highlighter
 set synmaxcol=200
-autocmd BufNewFile,BufRead *.vue set filetype=html.javascript.vue
+autocmd BufNewFile,BufRead *.vue set filetype=html
 
 function! DeleteEmptyBuffers()
     let [i, n; empty] = [1, bufnr('$')]
@@ -1162,3 +1153,8 @@ if has("gui_running")
   cd ~/notes
 end
 set autowriteall
+" nnoremap p ]p
+" Remove split bar separator
+set fillchars+=vert:\ 
+" Select last pasted
+nnoremap gp `[v`]

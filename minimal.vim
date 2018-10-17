@@ -11,8 +11,6 @@ else
   let g:loaded_mininal = 1
 endif
 
-set nocompatible
-
 if has('autocmd')
   filetype plugin indent on
 endif
