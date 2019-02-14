@@ -19,8 +19,9 @@ endif
 call plug#begin()
 
 "Colorscheme
+Plug 'dikiaap/minimalist'
+Plug 'kristijanhusak/vim-hybrid-material'
 Plug 'trevordmiller/nova-vim'
-Plug 'lifepillar/vim-solarized8'
 Plug 'alnjxn/estilo-nova'
 Plug 'sheerun/vim-polyglot'
 Plug 'plasticboy/vim-markdown'
@@ -1135,20 +1136,6 @@ command! DeleteEmptyBuffers :call DeleteEmptyBuffers()
 nnoremap <leader>x :call fzf#vim#tags(expand('<cword>'), {'options': '--exact --select-1 --exit-0'})<CR>
 nnoremap <leader>o :BTags<CR>
 
-" function! SearchVisualSelectionWithAg() range
-"   let old_reg = getreg('"')
-"   let old_regtype = getregtype('"')
-"   let old_clipboard = &clipboard
-"   set clipboard&
-"   normal! ""gvy
-"   let selection = getreg('"')
-"   call setreg('"', old_reg, old_regtype)
-"   let &clipboard = old_clipboard
-"   execute 'Ag' selection
-" endfunction
-imap <C-x><C-l> <plug>(fzf-complete-line)
-
-
 if has("gui_running")
   cd ~/notes
 end
@@ -1158,3 +1145,6 @@ set autowriteall
 set fillchars+=vert:\ 
 " Select last pasted
 nnoremap gp `[v`]
+
+set background=dark
+colorscheme nova
