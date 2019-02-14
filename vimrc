@@ -711,6 +711,12 @@ function! XDeleteHiddenBuffers()
 endfunction
 command! XDeleteHiddenBuffers :call XDeleteHiddenBuffers()
 
+" JSON beautifier
+function! XJSONBeautifyer()
+  silent execute '%!python -m json.tool'
+endfunction
+command! XJSONBeautifyer :call XJSONBeautifyer()
+
 " Don't close window, when deleting a buffer
 command! Bclose call <SID>BufcloseCloseIt()
 function! <SID>BufcloseCloseIt() "{{{"
@@ -1148,3 +1154,4 @@ nnoremap gp `[v`]
 
 set background=dark
 colorscheme nova
+nmap <Leader>C :Commands<CR>
